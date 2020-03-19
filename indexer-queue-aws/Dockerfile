@@ -1,6 +1,9 @@
 FROM amazoncorretto:8
 
-WORKDIR /
-COPY indexer-queue-aws/target/indexer-queue-aws-1.0-SNAPSHOT.jar indexer-queue-aws-1.0-SNAPSHOT.jar
+ARG JAR_VERSION
+ENV JAR_FILE=indexer-queue-aws-${JAR_VERSION}.jar
 
-CMD ["java","-jar", "indexer-queue-aws-1.0-SNAPSHOT.jar"]
+WORKDIR /
+COPY indexer-queue-aws/target/$JAR_FILE $JAR_FILE
+
+CMD java -jar $JAR_FILE
