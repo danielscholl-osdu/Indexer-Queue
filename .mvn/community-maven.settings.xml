@@ -1,0 +1,55 @@
+<settings>
+	<profiles>
+		<profile>
+			<!-- This profile uses the CI-Token to authenticate with the server, and is the default case -->
+			<id>GitLab-Authenticate-With-Job-Token</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<gitlab-server>community-maven-via-job-token</gitlab-server>
+			</properties>
+		</profile>
+
+		<profile>
+			<!-- This profile uses a personal token to authenticate, which is useful for local or manual runs. The
+			     presence of the COMMUNITY_MAVEN_TOKEN variable triggers this and overrides the CI Token
+			     based authentication -->
+			<id>GitLab-Authenticate-With-Private-Token</id>
+			<activation>
+			<property>
+				<name>env.COMMUNITY_MAVEN_TOKEN</name>
+			</property>
+			</activation>
+			<properties>
+				<gitlab-server>community-maven-via-private-token</gitlab-server>
+			</properties>
+		</profile>
+	</profiles>
+
+	<servers>
+		<server>
+			<id>community-maven-via-job-token</id>
+			<configuration>
+				<httpHeaders>
+					<property>
+						<name>Job-Token</name>
+						<value>${env.CI_JOB_TOKEN}</value>
+					</property>
+				</httpHeaders>
+			</configuration>
+		</server>
+
+		<server>
+			<id>community-maven-via-private-token</id>
+			<configuration>
+				<httpHeaders>
+					<property>
+						<name>Private-Token</name>
+						<value>${env.COMMUNITY_MAVEN_TOKEN}</value>
+					</property>
+				</httpHeaders>
+			</configuration>
+		</server>
+	</servers>
+</settings>

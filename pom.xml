@@ -41,26 +41,21 @@
 
     <repositories>
         <repository>
-            <id>elastic</id>
-            <url>https://artifacts.elastic.co/maven</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>os-core</id>
-            <url>https://pkgs.dev.azure.com/slb-des-ext-collaboration/_packaging/os-core/maven/v1</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <id>${gitlab-server}</id>
+            <url>https://community.opengroup.org/api/v4/groups/17/-/packages/maven</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>${gitlab-server}</id>
+            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+        </repository>
+        <snapshotRepository>
+            <id>${gitlab-server}</id>
+            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 
     <dependencies>
