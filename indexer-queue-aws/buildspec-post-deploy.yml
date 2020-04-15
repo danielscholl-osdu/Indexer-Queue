@@ -1,0 +1,75 @@
+# Copyright © Amazon Web Services
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      - echo Entered the install phase...
+      - apt-get update -y
+      - apt-get install -y maven
+      - java -version
+      - mvn clean # .m2 is not created until the first Maven command
+      - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
+      - cat /root/.m2/settings.xml
+      - java -version
+      - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      - echo $JAVA_HOME
+      - mvn -version
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2& # start the Docker Daemon
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done" # wait for Docker to be ready before proceeding to the build steps
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME # build and store the ECR repo URI
+      - echo Repository URI - $REPOSITORY_URI
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}') # generate a version tag from the commit hash for the Docker image
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7) # get the commit hash
+  build:
+    commands:
+      - echo os-indexer-queue Java build started on `date`...
+      - java -version
+      - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      - mvn -version
+      - echo Look below for repository bucket
+      - echo $S3_MAVEN_REPOSITORY
+      - echo All environment variables
+      - printenv
+      - mvn clean test -pl indexer-queue-aws -Ddeployment.environment=$ENVIRONMENT -Ddeployment.repositorybucket=$S3_MAVEN_REPOSITORY -Daws.accessKeyId=$AWS_ACCESS_KEY_ID_MAVEN -Daws.secretKey=$AWS_SECRET_ACCESS_KEY_MAVEN -Dazure.devops.token=$VSTS_FEED_TOKEN -DAWS_ACCOUNT_ID=$AWS_ACCOUNT_ID -DAWS_REGION=$AWS_REGION
+      - echo ...os-indexer-queue Java build completed on `date`.
+      - echo os-indexer-queue beginning packaging to jar...
+      - mvn clean deploy -pl indexer-queue-aws -Ddeployment.environment=$ENVIRONMENT -Ddeployment.repositorybucket=$S3_MAVEN_REPOSITORY -Daws.accessKeyId=$AWS_ACCESS_KEY_ID_MAVEN -Daws.secretKey=$AWS_SECRET_ACCESS_KEY_MAVEN -Dazure.devops.token=$VSTS_FEED_TOKEN -DAWS_ACCOUNT_ID=$AWS_ACCOUNT_ID -DAWS_REGION=$AWS_REGION
+      - echo os-indexer-queue Docker image build started on `date`...
+      - docker build -f indexer-queue-aws/Dockerfile -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo ...os-indexer-queue Docker image build completed on `date`.
+      - echo Pushing the Docker image to ECR...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Docker image pushed to ECR successfully!
+      - ECS_CLUSTER_NAME=$(aws cloudformation list-exports --query "Exports[?Name=='$ENVIRONMENT-os-indexer-EcsClusterName'].[Value]" --output text --region $AWS_REGION)
+      - ECS_SERVICE_NAME=$(aws cloudformation list-exports --query "Exports[?Name=='$ENVIRONMENT-$APPLICATION_NAME-EcsServiceName'].[Value]" --output text --region $AWS_REGION)
+      - aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment # force a new deployment with the updated image
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
+
+artifacts:
+  files:
+    - '**/*'

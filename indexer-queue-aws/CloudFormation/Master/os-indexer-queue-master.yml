@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  CloudFormation template for creating the resources used for the ECS cluster the application will
+  be deployed into. Will create the CodeDeploy application, the ECR repository, and the ECS cluster.
+
+Parameters:
+
+  Environment:
+    Description: An environment name that will be prefixed to resource names.
+    Type: String
+    AllowedValues:
+      - dev
+      - uat
+      - prod
+    ConstraintDescription: Can only be "dev/uat/prod"
+    Default: dev
+
+  DeploymentRegion:
+    Description: The AWS region to deploy the resources to.
+    Type: String
+    Default: us-east-1
+
+  ApplicationName:
+    Description: >
+      The name of the application, which will be used to generate the ECS cluster name.
+      It will be prefixed with the environment name.
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_-]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
+    Default: os-indexer
+
+  QueueApplicationName:
+    Description: >
+      The name of the application, which will be used to generate the ECS cluster name.
+      It will be prefixed with the environment name.
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_-]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
+    Default: os-indexer-queue
+
+  StorageApplicationName:
+    Description: >
+      The name of the storage application
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_-]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
+    Default: osdu-storage
+
+  IndexerEndpoint:
+    Description: Endpoint to index records.
+    Type: String
+    Default: api/indexer/v2/_dps/task-handlers/index-worker
+
+  MaxThreads:
+    Description: Maximum number of parallel threads.
+    Type: Number
+    Default: '50'
+
+  MaxMessages:
+    Description: Maximum number of messages that can in flight from SQS.
+    Type: Number
+    Default: '100000'
+
+  ChildTemplateBasePath:
+    Description: >-
+      The base path for where child CloudFormation templates are located – can be relative or absolute, e.g.
+      https://s3.amazonaws.com/dev-osdu-cloudformation-scripts/Automated/
+    Type: String
+    AllowedPattern: '^https:\/\/s3.amazonaws.com\/.*\/$'
+    Default: https://s3.amazonaws.com/dev-osdu-cloudformation-scripts/Automated/
+
+Resources:
+
+  #### ECS Resources ###################################################################
+
+  ECSStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Join [ '', [ !Ref ChildTemplateBasePath, ecs.yml ] ]
+      Parameters:
+        Environment: !Ref Environment
+        Region: !Ref DeploymentRegion
+        ApplicationName: !Ref ApplicationName
+        StorageApplicationName: !Ref StorageApplicationName
+        QueueApplicationName: !Ref QueueApplicationName
+        IndexerEndpoint: !Ref IndexerEndpoint
+        MaxThreads: !Ref MaxThreads
+        MaxMessages: !Ref MaxMessages

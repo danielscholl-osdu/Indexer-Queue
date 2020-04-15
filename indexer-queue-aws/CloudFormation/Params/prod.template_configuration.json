@@ -1,0 +1,16 @@
+{
+  "Parameters" : {
+    "Environment" : "prod",
+    "DeploymentRegion" : "us-east-1",
+    "ApplicationName" : "os-indexer",
+    "QueueApplicationName" : "os-indexer-queue",
+    "StorageApplicationName": "osdu-storage",
+    "IndexerEndpoint": "api/indexer/v2/_dps/task-handlers/index-worker",
+    "MaxThreads": "50",
+    "MaxMessages": "100000",
+    "ChildTemplateBasePath" : "https://s3.amazonaws.com/prod-os-indexer-queue-cloudformation-scripts/Automated/"
+  },
+  "Tags" : {
+    "Environment" : "prod"
+  }
+}

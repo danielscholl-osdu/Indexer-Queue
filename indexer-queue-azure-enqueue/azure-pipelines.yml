@@ -1,0 +1,77 @@
+#  Copyright © Microsoft Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+# Required Group Variables
+  # VSTS_FEED_TOKEN
+  # CONTAINER_REGISTRY_NAME
+  # SERVICE_CONNECTION_NAME
+  # RESOURCE_GROUP_NAME
+  # FUNCTION_APP_NAME
+  # AGENT_POOL
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - /indexer-queue-azure-enqueue/*
+    - /pom.xml
+    - /maven/settings.xml
+    exclude:
+    - /**/*.md
+    - .gitignore
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - '*'
+    exclude:
+    - master
+  paths:
+    include:
+    - /indexer-queue-azure-enqueue/*
+    - /pom.xml
+    - /maven/settings.xml
+    exclude:
+    - /**/*.md
+    - .gitignore
+
+variables:
+- group: 'Azure Common Secrets'
+- group: 'Azure - Common'
+
+- name: MAVEN_SETTINGS      # Relative path to the settings.xml file.
+  value: './indexer-queue-azure-enqueue/maven/settings.xml'
+
+- name: DOCKERFILE          # Relative path to the Docker File.
+  value: './indexer-queue-azure-enqueue/Dockerfile'
+
+- name: POM_FILE            # Relative path to the POM File.
+  value: './indexer-queue-azure-enqueue/pom.xml'
+
+- name: IMAGE_NAME         # Determines name of the Docker Image
+  value: 'indexer-enqueue'
+
+stages:
+- template: pipelines/stages.yml
+  parameters:
+    environments:
+    - name: 'devint'
+
+    - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      - name: 'qa'
+      - name: 'prod'

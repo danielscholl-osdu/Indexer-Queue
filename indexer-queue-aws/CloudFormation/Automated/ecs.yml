@@ -1,0 +1,219 @@
+# Copyright © Amazon Web Services
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates all AWS resources used by OSDU's Indexer Queue Service. Requires having previously setup the CodeCommit repository, as well as the CodePipeline (manual template).
+
+Parameters:
+  Environment:
+    Description: An environment name that will be prefixed to resource names.
+    Type: String
+    AllowedValues:
+      - dev
+      - uat
+      - prod
+    ConstraintDescription: Can only be "dev/uat/prod"
+    Default: dev
+
+  Region:
+    Description: The AWS region to deploy the resources to.
+    Type: String
+    Default: us-east-1
+
+  ApplicationName:
+    Description: >
+      The name of the indexer service application, which will be used to generate the ECS cluster name.
+      It will be prefixed with the environment name.
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_-]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
+    Default: os-indexer
+
+  QueueApplicationName:
+    Description: >
+      The name of the indexer queue application, which will be used to generate the ECS cluster name.
+      It will be prefixed with the environment name.
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_-]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
+    Default: os-indexer-queue
+
+  StorageApplicationName:
+    Description: >
+      The name of the storage application
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: "^[a-zA-Z]+[0-9a-zA-Z_-]*$"
+    ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
+    Default: osdu-storage
+
+  IndexerEndpoint:
+    Description: Endpoint to index records.
+    Type: String
+    Default: api/indexer/v2/_dps/task-handlers/index-worker
+
+  MaxThreads:
+    Description: Maximum number of parallel threads.
+    Type: Number
+    Default: '50'
+
+  MaxMessages:
+    Description: Maximum number of messages that can in flight from SQS.
+    Type: Number
+    Default: '100000'
+
+Resources:
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['-', [ECSLogGroup, !Ref 'QueueApplicationName']]
+      RetentionInDays: 365
+
+  ECRQueueRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${Environment}-${QueueApplicationName}-repository
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowPushPull
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+                - Fn::ImportValue:
+                    !Sub "${Environment}-${QueueApplicationName}-CodeBuildRoleArn"
+                - Fn::ImportValue:
+                    !Sub "${Environment}-${QueueApplicationName}-CFNRoleArn"
+                - Fn::ImportValue:
+                    !Sub "${Environment}-${QueueApplicationName}-PipelineRoleArn"
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
+
+  QueueTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Join ['', [!Ref 'AWS::StackName', -, !Ref 'QueueApplicationName']]
+      ContainerDefinitions:
+        - Name: !Ref 'QueueApplicationName'
+          Cpu: '10'
+          Essential: 'true'
+          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Environment}-${QueueApplicationName}-repository:latest
+          Memory: '300'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref 'CloudWatchLogsGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: !Ref 'QueueApplicationName'
+          MountPoints:
+            - ContainerPath: /root/.m2
+              SourceVolume: docker-volume
+          PortMappings:
+            - ContainerPort: 80
+          Environment:
+            - Name: AWS_ACCESS_KEY_ID
+              Value: '{{resolve:secretsmanager:dev-IndexerServiceIamCredentials:SecretString:access_key}}'
+            - Name: AWS_SECRET_KEY
+              Value: '{{resolve:secretsmanager:dev-IndexerServiceIamCredentials:SecretString:secret_key}}'
+            - Name: ENVIRONMENT
+              Value: !Ref Environment
+            - Name: VSTS_FEED_TOKEN
+              Value: '{{resolve:secretsmanager:dev-VSTSFeedToken:SecretString:vsts_feed_token}}'
+            - Name: AWS_REGION
+              Value: !Ref Region
+            - Name: AWS_QUEUE_INDEXER_NAME
+              Value: !Sub ${Environment}-${StorageApplicationName}-queue
+            - Name: AWS_INDEXER_INDEX_API
+              Value:
+                Fn::ImportValue:
+                  !Sub "${Environment}-${ApplicationName}-EcsAlbUrl"
+            - Name: AWS_DEADLETTER_QUEUE_NAME
+              Value: !Sub ${Environment}-${StorageApplicationName}-dead-letter-queue
+            - Name: MAX_INDEX_THREADS
+              Value: !Ref MaxThreads
+            - Name: MAX_REQUEST_COUNT
+              Value: 10
+            - Name: MAX_MESSAGE_COUNT
+              Value: !Ref MaxMessages
+            - Name: KEEP_ALIVE_IN_MINUTES
+              Value: 9999
+            - Name: AWS_COGNITO_CLIENT_ID
+              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:CognitoClientId}}'
+            - Name: AWS_COGNITO_AUTH_FLOW
+              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:CognitoAuthFlow}}'
+            - Name: AWS_COGNITO_AUTH_PARAMS_USER
+              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:AWS_COGNITO_AUTH_PARAMS_USER}}'
+            - Name: AWS_COGNITO_AUTH_PARAMS_PASSWORD
+              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:AWS_COGNITO_AUTH_PARAMS_PASSWORD}}'
+      Volumes:
+        - Name: docker-volume
+
+  SchedulingRule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(5 minutes)
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::ImportValue:
+              !Sub "${Environment}-${ApplicationName}-EcsClusterArn"
+          Id: !Sub ${Environment}-${QueueApplicationName}-target
+          EcsParameters:
+            TaskCount: 1
+            TaskDefinitionArn: !Ref 'QueueTaskDefinition'
+          RoleArn:
+            Fn::ImportValue:
+              !Sub "${Environment}-${ApplicationName}-EC2RoleArn"
+
+  QueueService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Fn::ImportValue:
+          !Sub "${Environment}-${ApplicationName}-EcsClusterArn"
+      DesiredCount: 1
+      TaskDefinition: !Ref 'QueueTaskDefinition'
+
+Outputs:
+  ECSQueueServiceArn:
+    Description: The ARN of the Indexer Queue Service service in the ECS cluster.
+    Value: !Ref 'QueueService'
+    Export:
+      Name: !Sub ${Environment}-${QueueApplicationName}-EcsServiceArn
+
+  ECSServiceName:
+    Description: The name of the Legal Service service in the ECS cluster.
+    Value: !GetAtt QueueService.Name
+    Export:
+      Name: !Sub ${Environment}-${QueueApplicationName}-EcsServiceName
+
+  TaskDefinitionArn:
+    Description: The ARN of the Storage Service ECS task definition.
+    Value: !Ref 'QueueTaskDefinition'
+    Export:
+      Name: !Sub ${Environment}-${QueueApplicationName}-EcsTaskDefinitionArn
