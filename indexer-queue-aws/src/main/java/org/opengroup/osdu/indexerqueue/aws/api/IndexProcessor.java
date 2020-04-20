@@ -17,9 +17,6 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 
 
 import com.amazonaws.services.sqs.model.MessageAttributeValue;
-import com.amazonaws.services.xray.model.Http;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
@@ -30,6 +27,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+
 import com.amazonaws.services.sqs.model.Message;
 
 
@@ -51,6 +50,14 @@ public class IndexProcessor implements Callable<IndexProcessor> {
         this.indexerServiceAccountJWT = indexServiceAccountJWT;
     }
 
+    public IndexProcessor(Message message, String targetUrl, String indexServiceAccountJWT, CallableResult result){
+        this.message = message;
+        this.targetURL = targetUrl;
+        this.receiptHandle = message.getReceiptHandle();
+        this.result = result;
+        this.indexerServiceAccountJWT = indexServiceAccountJWT;
+    }
+
     @Override
     public IndexProcessor call() {
         ObjectMapper mapper = new ObjectMapper();
@@ -62,7 +69,7 @@ public class IndexProcessor implements Callable<IndexProcessor> {
             RecordChangedMessages convertedMessage = getConvertedMessage(message);
             String body = mapper.writeValueAsString(convertedMessage);
 
-            HttpURLConnection connection = getConnection(body, convertedMessage.attributes.get("data-partition-id"));
+            HttpURLConnection connection = getConnection(body, convertedMessage.attributes);
 
             sendRequest(connection, body);
 
@@ -96,19 +103,20 @@ public class IndexProcessor implements Callable<IndexProcessor> {
         convertedMessage.data = message.getBody();
         convertedMessage.messageId = message.getMessageId();
 
-        Map<String, MessageAttributeValue> messageAttributes = message.getMessageAttributes();
-        MessageAttributeValue dataPartitionIdValue = messageAttributes.get("data-partition-id");
-        MessageAttributeValue accountIdValue = messageAttributes.get("account-id");
+        Map<String, String> messageAttributes = message
+                .getMessageAttributes()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        attribute -> attribute
+                                .getValue()
+                                .getStringValue()));
+        convertedMessage.attributes = messageAttributes;
 
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put("data-partition-id", dataPartitionIdValue.getStringValue());
-        attributes.put("account-id", accountIdValue.getStringValue());
-
-        convertedMessage.attributes = attributes;
         return convertedMessage;
     }
 
-    private HttpURLConnection getConnection(String body, String dataPartitionId) throws IOException {
+    private HttpURLConnection getConnection(String body, Map<String, String> attributes) throws IOException {
         URL url = new URL(this.targetURL);
         System.out.println(String.format("The url is: %s", url));
         HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
@@ -117,9 +125,9 @@ public class IndexProcessor implements Callable<IndexProcessor> {
                 Integer.toString(body.getBytes().length));;
         connection.setRequestProperty("Content-Type",
                 "application/json");
-        connection.setRequestProperty("data-partition-id", dataPartitionId);
-        connection.setRequestProperty("Authorization", "Bearer " + this.indexerServiceAccountJWT);
-
+        connection.setRequestProperty("data-partition-id", attributes.get("data-partition-id"));
+        connection.setRequestProperty("Authorization", this.indexerServiceAccountJWT);
+        connection.setRequestProperty("user", attributes.get("user"));
         connection.setUseCaches(false);
         connection.setDoOutput(true);
         return connection;
@@ -141,5 +149,9 @@ public class IndexProcessor implements Callable<IndexProcessor> {
             this.response.append('\r');
         }
         rd.close();
+    }
+
+    public boolean expectionExists(){
+        return exception != null;
     }
 }

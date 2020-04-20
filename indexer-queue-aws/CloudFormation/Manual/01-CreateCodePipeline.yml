@@ -42,6 +42,11 @@ Parameters:
       connected to.
     Type: String
     Default: os-indexer-queue
+  IndexerApplicationName:
+    Description: >-
+      The name of the Indexer Service application (since Indexer Queue shared certain resources.
+    Type: String
+    Default: os-indexer
   CodeCommitBranchName:
     Description: >-
       The name of the Code Commit branch that the CodePipeline source is
@@ -59,35 +64,6 @@ Parameters:
     Type: String
     Default: indexer-queue-aws/CloudFormation/Master/os-indexer-queue-master.yml
 Resources:
-  S3BucketCloudFormation:
-    Type: 'AWS::S3::Bucket'
-    DeletionPolicy: Delete
-    Properties:
-      BucketName: !Sub '${Environment}-os-indexer-queue-cloudformation-scripts'
-  CloudFormationS3BucketPolicy:
-    Type: 'AWS::S3::BucketPolicy'
-    Properties:
-      Bucket: !Ref S3BucketCloudFormation
-      PolicyDocument:
-        Statement:
-          - Action:
-              - 's3:*'
-            Effect: Allow
-            Resource:
-              - !Sub 'arn:aws:s3:::${S3BucketCloudFormation}'
-              - !Sub 'arn:aws:s3:::${S3BucketCloudFormation}/*'
-            Principal:
-              AWS:
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-                - !GetAtt
-                  - CodeBuildRole
-                  - Arn
-                - !GetAtt
-                  - PipelineRole
-                  - Arn
-                - !GetAtt
-                  - CFNRole
-                  - Arn
   ArtifactStoreBucket:
     Type: 'AWS::S3::Bucket'
     DeletionPolicy: Delete
@@ -109,15 +85,12 @@ Resources:
             Principal:
               AWS:
                 - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-                - !GetAtt
-                  - CodeBuildRole
-                  - Arn
-                - !GetAtt
-                  - PipelineRole
-                  - Arn
-                - !GetAtt
-                  - CFNRole
-                  - Arn
+                - !ImportValue
+                  'Fn::Sub': '${Environment}-CodeBuildRoleArn'
+                - !ImportValue
+                  'Fn::Sub': '${Environment}-PipelineRoleArn'
+                - !ImportValue
+                  'Fn::Sub': '${Environment}-CFNRoleArn'
   CachingBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
@@ -140,9 +113,12 @@ Resources:
             Principal:
               AWS:
                 - !Sub arn:aws:iam::${AWS::AccountId}:root
-                - !GetAtt [CodeBuildRole,Arn]
-                - !GetAtt [PipelineRole,Arn]
-                - !GetAtt [CFNRole,Arn]
+                - !ImportValue
+                  'Fn::Sub': '${Environment}-CodeBuildRoleArn'
+                - !ImportValue
+                  'Fn::Sub': '${Environment}-PipelineRoleArn'
+                - !ImportValue
+                  'Fn::Sub': '${Environment}-CFNRoleArn'
 
   SNSCodePipelineDeploymentFailed:
     Type: 'AWS::SNS::Topic'
@@ -150,7 +126,7 @@ Resources:
       Subscription:
         - Endpoint: !Ref SNSNotificationEmail
           Protocol: email
-      TopicName: !Sub '${Environment}-Os-Indexer-queue-Deployment-CodePipeline-Failed'
+      TopicName: !Sub '${Environment}-os-Indexer-queue-Deployment-CodePipeline-Failed'
 
   EventRuleCodePipelineFailed:
     Type: 'AWS::Events::Rule'
@@ -165,7 +141,7 @@ Resources:
           state:
             - FAILED
           pipeline:
-            - !Sub '${Environment}-OSDU-Os-Indexer-queue-CodePipeline'
+            - !Sub '${Environment}-OSDU-os-Indexer-queue-CodePipeline'
       Name: !Sub '${Environment}-CodePipelineEventRule-${CodeCommitRepositoryName}'
       Targets:
         - Arn: !Ref SNSCodePipelineDeploymentFailed
@@ -181,10 +157,9 @@ Resources:
       ArtifactStore:
         Location: !Ref ArtifactStoreBucket
         Type: S3
-      Name: !Sub '${Environment}-OSDU-Os-indexer-queue-CodePipeline'
-      RoleArn: !GetAtt
-        - PipelineRole
-        - Arn
+      Name: !Sub '${Environment}-OSDU-os-indexer-queue-CodePipeline'
+      RoleArn: !ImportValue
+        'Fn::Sub': '${Environment}-PipelineRoleArn'
       Stages:
         - Name: Source
           Actions:
@@ -228,9 +203,8 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_NAMED_IAM
-                RoleArn: !GetAtt
-                  - CFNRole
-                  - Arn
+                RoleArn: !ImportValue
+                  'Fn::Sub': '${Environment}-CFNRoleArn'
                 StackName: !Sub '${Environment}-${MasterStackName}'
                 TemplatePath: !Sub 'Source::${MasterTemplateName}'
                 TemplateConfiguration: !Sub >-
@@ -258,10 +232,8 @@ Resources:
     Properties:
       Name: !Sub '${Environment}-pre-deployment-codebuild-${CodeCommitRepositoryName}'
       Description: CodeBuild commands which run prior to the CloudFormation deployment.
-      ServiceRole:
-        'Fn::GetAtt':
-          - CodeBuildRole
-          - Arn
+      ServiceRole: !ImportValue
+        'Fn::Sub': '${Environment}-CodeBuildRoleArn'
       Artifacts:
         Type: S3
         Location: !Ref ArtifactStoreBucket
@@ -282,7 +254,10 @@ Resources:
             Value: !Ref DeploymentRegion
           - Name: CFN_S3_BUCKET
             Type: PLAINTEXT
-            Value: !Sub '${Environment}-os-indexer-queue-cloudformation-scripts'
+            Value: !ImportValue
+              'Fn::Sub': '${Environment}-S3BucketCloudFormation'
+          - Name: APPLICATION_NAME
+            Value: !Ref CodeCommitRepositoryName
         PrivilegedMode: false
       Source:
         BuildSpec: ./indexer-queue-aws/buildspec-pre-deploy.yml
@@ -296,8 +271,8 @@ Resources:
     Properties:
       Name: !Sub ${Environment}-post-deployment-codebuild-${CodeCommitRepositoryName}
       Description: CodeBuild commands which run after the CloudFormation deployment.
-      ServiceRole:
-        Fn::GetAtt: [ CodeBuildRole, Arn ]
+      ServiceRole: !ImportValue
+        'Fn::Sub': '${Environment}-CodeBuildRoleArn'
       Artifacts:
         Type: S3
         Location: !Ref ArtifactStoreBucket
@@ -319,12 +294,9 @@ Resources:
           - Name: S3_MAVEN_REPOSITORY
             Type: PLAINTEXT
             Value: !Sub ${Environment}-osdu-local-maven-repository
-          - Name: AWS_SECRET_ACCESS_KEY_MAVEN
+          - Name: VSTS_FEED_USER
             Type: PLAINTEXT
-            Value: '{{resolve:secretsmanager:dev-MavenS3RepositoryIamCredentials:SecretString:secret_key}}'
-          - Name: AWS_ACCESS_KEY_ID_MAVEN
-            Type: PLAINTEXT
-            Value: '{{resolve:secretsmanager:dev-MavenS3RepositoryIamCredentials:SecretString:access_key}}'
+            Value: '{{resolve:secretsmanager:dev-VSTSFeedToken:SecretString:vsts_feed_user}}'
           - Name: VSTS_FEED_TOKEN
             Type: PLAINTEXT
             Value: '{{resolve:secretsmanager:dev-VSTSFeedToken:SecretString:vsts_feed_token}}'
@@ -337,6 +309,12 @@ Resources:
           - Name: APPLICATION_NAME
             Type: PLAINTEXT
             Value: !Ref CodeCommitRepositoryName
+          - Name: INDEXER_APPLICATION_NAME
+            Type: PLAINTEXT
+            Value: !Ref IndexerApplicationName
+          - Name: M2_REPO_S3_BUCKET
+            Type: PLAINTEXT
+            Value: !Sub "${Environment}-${AWS::AccountId}-persistent-maven-m2-bucket"
         PrivilegedMode: true
       Source:
         BuildSpec: ./indexer-queue-aws/buildspec-post-deploy.yml
@@ -358,294 +336,3 @@ Resources:
         VpcId:
           Fn::ImportValue:
             !Sub "${Environment}-OSDU-VPC"
-
-  CFNRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action:
-              - 'sts:AssumeRole'
-            Effect: Allow
-            Principal:
-              Service:
-                - cloudformation.amazonaws.com
-        Version: 2012-10-17
-      Path: /
-      Policies:
-        - PolicyName: !Sub 'CloudFormationRole-${CodeCommitRepositoryName}'
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Action:
-                  - 's3:*'
-                  - 'ec2:*'
-                  - 'apigateway:*'
-                  - 'cloudwatch:*'
-                  - 'events:*'
-                  - 'logs:*'
-                  - 'xray:*'
-                  - 'lambda:*'
-                  - 'rds:*'
-                  - 'codepipeline:*'
-                  - 'codecommit:*'
-                  - 'cloudformation:*'
-                  - 'ecr:*'
-                  - 'dynamodb:*'
-                  - 'application-autoscaling:*'
-                  - 'autoscaling:*'
-                  - 'states:*'
-                  - 'iam:CreateUser'
-                  - 'iam:UpdateUser'
-                  - 'iam:DeleteUser'
-                  - 'iam:CreateAccessKey'
-                  - 'iam:UpdateAccessKey'
-                  - 'iam:DeleteAccessKey'
-                  - 'iam:Delete*'
-                  - 'iam:List*'
-                  - 'iam:Get*'
-                  - 'iam:Put*'
-                  - 'iam:CreateServiceSpecificCredential'
-                  - 'iam:DeactivateMFADevice'
-                  - 'iam:GenerateServiceLastAccessedDetails'
-                  - 'iam:UpdateOpenIDConnectProviderThumbprint'
-                  - 'iam:PutRolePolicy'
-                  - 'iam:AddRoleToInstanceProfile'
-                  - 'iam:SimulateCustomPolicy'
-                  - 'iam:UploadSSHPublicKey'
-                  - 'iam:UpdateServiceSpecificCredential'
-                  - 'iam:RemoveClientIDFromOpenIDConnectProvider'
-                  - 'iam:UpdateRoleDescription'
-                  - 'iam:UpdateServerCertificate'
-                  - 'iam:CreateInstanceProfile'
-                  - 'iam:GenerateCredentialReport'
-                  - 'iam:UntagRole'
-                  - 'iam:PutRolePermissionsBoundary'
-                  - 'iam:TagRole'
-                  - 'iam:ResetServiceSpecificCredential'
-                  - 'iam:PassRole'
-                  - 'iam:EnableMFADevice'
-                  - 'iam:ResyncMFADevice'
-                  - 'iam:UpdateSAMLProvider'
-                  - 'iam:CreatePolicy'
-                  - 'iam:CreateServiceLinkedRole'
-                  - 'iam:UpdateRole'
-                  - 'iam:AddClientIDToOpenIDConnectProvider'
-                  - 'iam:SetDefaultPolicyVersion'
-                  - 'iam:UpdateAssumeRolePolicy'
-                  - 'iam:RemoveRoleFromInstanceProfile'
-                  - 'iam:CreateRole'
-                  - 'iam:AttachRolePolicy'
-                  - 'iam:CreateLoginProfile'
-                  - 'iam:DetachRolePolicy'
-                  - 'iam:AttachUserPolicy'
-                  - 'iam:DetachUserPolicy'
-                  - 'iam:SimulatePrincipalPolicy'
-                  - 'iam:CreateAccountAlias'
-                  - 'iam:ChangePassword'
-                  - 'iam:UpdateLoginProfile'
-                  - 'iam:UpdateAccessKey'
-                  - 'iam:UpdateSSHPublicKey'
-                  - 'iam:UpdateAccountPasswordPolicy'
-                  - 'iam:CreateSAMLProvider'
-                  - 'iam:CreateVirtualMFADevice'
-                  - 'iam:CreateAccessKey'
-                  - 'iam:AddUserToGroup'
-                  - 'iam:RemoveUserFromGroup'
-                  - 'iam:CreatePolicyVersion'
-                  - 'iam:UploadSigningCertificate'
-                  - 'iam:TagUser'
-                  - 'iam:CreateOpenIDConnectProvider'
-                  - 'iam:UploadServerCertificate'
-                  - 'iam:UntagUser'
-                  - 'iam:UpdateSigningCertificate'
-                  - 'sns:*'
-                  - 'sqs:*'
-                  - 'secretsmanager:*'
-                  - 'acm:*'
-                  - 'kms:*'
-                  - 'cloudfront:*'
-                  - 'route53:*'
-                  - 'route53domains:*'
-                  - 'elasticache:*'
-                  - 'es:*'
-                  - 'ecr:*'
-                  - 'codedeploy:*'
-                  - 'elasticloadbalancing:*'
-                  - 'ecs:*'
-                  - 'servicediscovery:CreatePrivateDnsNamespace'
-                  - 'servicediscovery:CreateService'
-                  - 'servicediscovery:GetNamespace'
-                  - 'servicediscovery:GetOperation'
-                  - 'servicediscovery:GetService'
-                  - 'servicediscovery:ListNamespaces'
-                  - 'servicediscovery:ListServices'
-                  - 'servicediscovery:UpdateService'
-                  - 'servicediscovery:DeleteService'
-                Effect: Allow
-                Resource: '*'
-
-  CodeBuildRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      RoleName: !Sub 'CodeBuildRole-${CodeCommitRepositoryName}'
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - codebuild.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-      Path: /service-role/
-      Policies:
-        - PolicyName: !Sub 'CodeBuildNestedCFNAccessPolicy-${CodeCommitRepositoryName}'
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'cloudformation:Get*'
-                  - 'cloudformation:Describe*'
-                  - 'cloudformation:List*'
-                Resource:
-                  - '*'
-              - Effect: Allow
-                Action:
-                  - 'codebuild:StartBuild'
-                Resource:
-                  - 'Fn::Sub': >-
-                      arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/*
-              - Effect: Allow
-                Action:
-                  - 'codecommit:ListBranches'
-                  - 'codecommit:ListRepositories'
-                  - 'codecommit:BatchGetRepositories'
-                  - 'codecommit:Get*'
-                  - 'codecommit:GitPull'
-                Resource:
-                  - !Sub >-
-                    arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:${CodeCommitRepositoryName}
-              - Effect: Allow
-                Action:
-                  - 'ec2:*'
-                  - 'cloudformation:ValidateTemplate'
-                  - 'elasticloadbalancing:Describe*'
-                  - 'autoscaling:Describe*'
-                  - 'iam:Get*'
-                  - 'iam:List*'
-                  - 'logs:Describe*'
-                  - 'logs:Get*'
-                  - 'tag:Get*'
-                  - "ecr:*"
-                  - "codedeploy:*"
-                  - "ecs:*"
-                Resource:
-                  - '*'
-              - Effect: Allow
-                Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource:
-                  - 'Fn::Sub': >-
-                      arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
-              - Effect: Allow
-                Action:
-                  - 's3:*'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'lambda:UpdateFunctionCode'
-                  - 'lambda:UpdateFunctionConfiguration'
-                  - 'lambda:PublishLayerVersion'
-                  - 'lambda:GetLayerVersion'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'apigateway:GET'
-                  - 'apigateway:POST'
-                Resource: '*'
-
-  PipelineRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action:
-              - 'sts:AssumeRole'
-            Effect: Allow
-            Principal:
-              Service:
-                - codepipeline.amazonaws.com
-        Version: 2012-10-17
-      Path: /
-      Policies:
-        - PolicyName: !Sub 'CodePipelineAccess-${CodeCommitRepositoryName}'
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Action:
-                  - 's3:*'
-                  - 'cloudformation:CreateStack'
-                  - 'cloudformation:DescribeStacks'
-                  - 'cloudformation:DeleteStack'
-                  - 'cloudformation:UpdateStack'
-                  - 'cloudformation:CreateChangeSet'
-                  - 'cloudformation:ExecuteChangeSet'
-                  - 'cloudformation:DeleteChangeSet'
-                  - 'cloudformation:DescribeChangeSet'
-                  - 'cloudformation:SetStackPolicy'
-                  - 'cloudformation:ValidateTemplate'
-                  - 'iam:PassRole'
-                  - 'sns:Publish'
-                  - 'lambda:ListFunctions'
-                  - 'lambda:InvokeFunction'
-                  - 'ec2:Describe*'
-                  - 'ec2:Get*'
-                  - 'ec2:Search*'
-                  - 'ec2:*Vpc*'
-                  - 'ec2:*Gateway'
-                  - 'ec2:*Tags'
-                  - 'ec2:*Subnet*'
-                  - 'ec2:*Route*'
-                  - 'ec2:*SecurityGroup'
-                  - 'ec2:allocate*'
-                  - 'ec2:release*'
-                Effect: Allow
-                Resource: '*'
-              - Action:
-                  - 'codecommit:GetUploadArchiveStatus'
-                  - 'codecommit:CancelUploadArchive'
-                  - 'codecommit:GetBranch'
-                  - 'codecommit:GetCommit'
-                  - 'codecommit:GetUploadStatus'
-                  - 'codecommit:UploadArchive'
-                Effect: Allow
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'codebuild:*'
-                Resource:
-                  - 'Fn::Sub': >-
-                      arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/*
-
-Outputs:
-  CodeBuildRoleArn:
-    Description: The ARN of the role used by the CodeBuild projects.
-    Value: !GetAtt CodeBuildRole.Arn
-    Export:
-      Name: !Sub ${Environment}-${CodeCommitRepositoryName}-CodeBuildRoleArn
-
-  CFNRoleArn:
-    Description: The ARN of the role used by CloudFormation templates run from the automated pipeline.
-    Value: !GetAtt CFNRole.Arn
-    Export:
-      Name: !Sub ${Environment}-${CodeCommitRepositoryName}-CFNRoleArn
-
-  PipelineRoleArn:
-    Description: The ARN of the role used by the application's CodePipeline.
-    Value: !GetAtt PipelineRole.Arn
-    Export:
-      Name: !Sub ${Environment}-${CodeCommitRepositoryName}-PipelineRoleArn

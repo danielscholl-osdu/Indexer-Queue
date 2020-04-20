@@ -12,6 +12,7 @@
     <modules>
         <module>indexer-queue-gcp</module>
         <module>indexer-queue-aws</module>
+        <module>indexer-queue-ibm</module>
         <module>indexer-queue-azure-enqueue</module>
         <module>indexer-queue-azure-requeue</module>
     </modules>
@@ -41,8 +42,14 @@
 
     <repositories>
         <repository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/groups/17/-/packages/maven</url>
+            <id>elastic</id>
+            <url>https://artifacts.elastic.co/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 

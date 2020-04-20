@@ -41,3 +41,9 @@ indexer-queue-azure-requeue/.classpath
 indexer-queue-azure-requeue/.factorypath
 indexer-queue-azure-enqueue/extensions.csproj
 indexer-queue-aws/dependency-reduced-pom.xml
+
+# Environment configuration
+*.env
+.classpath
+.factorypath
+.sts4*

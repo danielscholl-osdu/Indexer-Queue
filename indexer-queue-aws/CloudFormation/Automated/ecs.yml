@@ -31,9 +31,9 @@ Parameters:
     Type: String
     Default: us-east-1
 
-  ApplicationName:
+  IndexerApplicationName:
     Description: >
-      The name of the indexer service application, which will be used to generate the ECS cluster name.
+      The name of the Indexer Service application, which will be used to generate the ECS cluster name.
       It will be prefixed with the environment name.
     Type: String
     MinLength: '1'
@@ -42,9 +42,9 @@ Parameters:
     ConstraintDescription: Must start with a letter. Only numbers, letters, -, and _ accepted. Max. length 64 characters.
     Default: os-indexer
 
-  QueueApplicationName:
+  ApplicationName:
     Description: >
-      The name of the indexer queue application, which will be used to generate the ECS cluster name.
+      The name of the Indexer Queue application, which will be used to generate the ECS cluster name.
       It will be prefixed with the environment name.
     Type: String
     MinLength: '1'
@@ -55,7 +55,7 @@ Parameters:
 
   StorageApplicationName:
     Description: >
-      The name of the storage application
+      The name of the Storage Service application
     Type: String
     MinLength: '1'
     MaxLength: '64'
@@ -78,17 +78,28 @@ Parameters:
     Type: Number
     Default: '100000'
 
+  JarVersionNumber:
+    Description: The version number for the service jar being produced
+    Type: String
+    Default: '0.0.1'
+
+  JarServiceName:
+    Description: >-
+      The service name associated with the jar package for the Dockerfile.
+    Type: String
+    Default: 'indexer-queue'
+
 Resources:
   CloudWatchLogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Join ['-', [ECSLogGroup, !Ref 'QueueApplicationName']]
+      LogGroupName: !Join ['-', [ECSLogGroup, !Ref 'ApplicationName']]
       RetentionInDays: 365
 
   ECRQueueRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub ${Environment}-${QueueApplicationName}-repository
+      RepositoryName: !Sub ${Environment}-${ApplicationName}-repository
       RepositoryPolicyText:
         Version: "2012-10-17"
         Statement:
@@ -98,11 +109,11 @@ Resources:
               AWS:
                 - !Sub arn:aws:iam::${AWS::AccountId}:root
                 - Fn::ImportValue:
-                    !Sub "${Environment}-${QueueApplicationName}-CodeBuildRoleArn"
+                    !Sub "${Environment}-CodeBuildRoleArn"
                 - Fn::ImportValue:
-                    !Sub "${Environment}-${QueueApplicationName}-CFNRoleArn"
+                    !Sub "${Environment}-CFNRoleArn"
                 - Fn::ImportValue:
-                    !Sub "${Environment}-${QueueApplicationName}-PipelineRoleArn"
+                    !Sub "${Environment}-PipelineRoleArn"
               Service:
                 - codebuild.amazonaws.com
             Action:
@@ -117,19 +128,19 @@ Resources:
   QueueTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Join ['', [!Ref 'AWS::StackName', -, !Ref 'QueueApplicationName']]
+      Family: !Join ['', [!Ref 'AWS::StackName', -, !Ref 'ApplicationName']]
       ContainerDefinitions:
-        - Name: !Ref 'QueueApplicationName'
+        - Name: !Ref 'ApplicationName'
           Cpu: '10'
           Essential: 'true'
-          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Environment}-${QueueApplicationName}-repository:latest
+          Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Environment}-${ApplicationName}-repository:latest
           Memory: '300'
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: !Ref 'CloudWatchLogsGroup'
               awslogs-region: !Ref 'AWS::Region'
-              awslogs-stream-prefix: !Ref 'QueueApplicationName'
+              awslogs-stream-prefix: !Ref 'ApplicationName'
           MountPoints:
             - ContainerPath: /root/.m2
               SourceVolume: docker-volume
@@ -151,7 +162,7 @@ Resources:
             - Name: AWS_INDEXER_INDEX_API
               Value:
                 Fn::ImportValue:
-                  !Sub "${Environment}-${ApplicationName}-EcsAlbUrl"
+                  !Sub "${Environment}-${IndexerApplicationName}-EcsCloudFrontDomainName"
             - Name: AWS_DEADLETTER_QUEUE_NAME
               Value: !Sub ${Environment}-${StorageApplicationName}-dead-letter-queue
             - Name: MAX_INDEX_THREADS
@@ -162,14 +173,6 @@ Resources:
               Value: !Ref MaxMessages
             - Name: KEEP_ALIVE_IN_MINUTES
               Value: 9999
-            - Name: AWS_COGNITO_CLIENT_ID
-              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:CognitoClientId}}'
-            - Name: AWS_COGNITO_AUTH_FLOW
-              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:CognitoAuthFlow}}'
-            - Name: AWS_COGNITO_AUTH_PARAMS_USER
-              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:AWS_COGNITO_AUTH_PARAMS_USER}}'
-            - Name: AWS_COGNITO_AUTH_PARAMS_PASSWORD
-              Value: '{{resolve:secretsmanager:CognitoAccess:SecretString:AWS_COGNITO_AUTH_PARAMS_PASSWORD}}'
       Volumes:
         - Name: docker-volume
 
@@ -181,21 +184,21 @@ Resources:
       Targets:
         - Arn:
             Fn::ImportValue:
-              !Sub "${Environment}-${ApplicationName}-EcsClusterArn"
-          Id: !Sub ${Environment}-${QueueApplicationName}-target
+              !Sub "${Environment}-${IndexerApplicationName}-EcsClusterArn"
+          Id: !Sub ${Environment}-${ApplicationName}-target
           EcsParameters:
             TaskCount: 1
             TaskDefinitionArn: !Ref 'QueueTaskDefinition'
           RoleArn:
             Fn::ImportValue:
-              !Sub "${Environment}-${ApplicationName}-EC2RoleArn"
+              !Sub "${Environment}-${IndexerApplicationName}-EC2RoleArn"
 
   QueueService:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
         Fn::ImportValue:
-          !Sub "${Environment}-${ApplicationName}-EcsClusterArn"
+          !Sub "${Environment}-${IndexerApplicationName}-EcsClusterArn"
       DesiredCount: 1
       TaskDefinition: !Ref 'QueueTaskDefinition'
 
@@ -204,16 +207,28 @@ Outputs:
     Description: The ARN of the Indexer Queue Service service in the ECS cluster.
     Value: !Ref 'QueueService'
     Export:
-      Name: !Sub ${Environment}-${QueueApplicationName}-EcsServiceArn
+      Name: !Sub ${Environment}-${ApplicationName}-EcsServiceArn
 
   ECSServiceName:
     Description: The name of the Legal Service service in the ECS cluster.
     Value: !GetAtt QueueService.Name
     Export:
-      Name: !Sub ${Environment}-${QueueApplicationName}-EcsServiceName
+      Name: !Sub ${Environment}-${ApplicationName}-EcsServiceName
 
   TaskDefinitionArn:
     Description: The ARN of the Storage Service ECS task definition.
     Value: !Ref 'QueueTaskDefinition'
     Export:
-      Name: !Sub ${Environment}-${QueueApplicationName}-EcsTaskDefinitionArn
+      Name: !Sub ${Environment}-${ApplicationName}-EcsTaskDefinitionArn
+
+  JarVersionNumber:
+    Description: The service name associated with the JAR package for the Dockerfile.
+    Value: !Ref 'JarVersionNumber'
+    Export:
+      Name: !Sub ${Environment}-${ApplicationName}-JarVersionNumber
+
+  JarServiceName:
+    Description: The service name associated with the JAR package for the Dockerfile.
+    Value: !Ref 'JarServiceName'
+    Export:
+      Name: !Sub ${Environment}-${ApplicationName}-JarServiceName
