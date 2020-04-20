@@ -6,4 +6,4 @@ variables:
 include:
   - project: 'osdu/platform/ci-cd-pipelines'
     ref: 'master'
-    file: 'service.gitlab-ci.yml'
+    file: 'temp-service.gitlab-ci.yml'

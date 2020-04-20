@@ -14,13 +14,9 @@
 
 package org.opengroup.osdu.indexerqueue.aws.api;
 
-import com.amazonaws.services.logs.AWSLogs;
-import com.amazonaws.services.logs.model.InputLogEvent;
-import com.amazonaws.services.logs.model.PutLogEventsRequest;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
-import org.opengroup.osdu.core.aws.cognito.AWSCognitoClient;
-import org.opengroup.osdu.core.aws.logging.AmazonLogConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.opengroup.osdu.core.aws.sqs.AmazonSQSConfig;
 
 import java.util.ArrayList;
@@ -43,6 +39,8 @@ public class IndexerQueue {
 
     public static void main(String[] args) {
         EnvironmentVariables environmentVariables = new EnvironmentVariables();
+        List<Message> messages;
+        String indexerUrl = String.format("%s://%s/%s", setProtocol(environmentVariables.targetURL) ,environmentVariables.targetURL, "api/indexer/v2/_dps/task-handlers/index-worker" );
 
         // System print lines go to cloudwatch automatically within ECS
         System.out.println("Running Queue processor with the following environment variables:");
@@ -58,14 +56,6 @@ public class IndexerQueue {
         try {
             System.out.println("Starting Indexer Queue and obtaining Arguments");
 
-            System.out.println("Retrieving indexer service account JWT");
-            AWSCognitoClient cognitoClient = new AWSCognitoClient(environmentVariables.cognitoClientId, environmentVariables.cognitoAuthFlow,
-                    environmentVariables.cognitoUser, environmentVariables.cognitoPassword);
-            String indexerServiceAccountJWT = cognitoClient.getToken();
-            if(indexerServiceAccountJWT == null){
-                System.out.println("Indexer service account not set up correctly");
-            }
-
             System.out.println(String.format("Connecting to the SQS Queue: %s", environmentVariables.queueName));
             AmazonSQSConfig sqsConfig = new AmazonSQSConfig(environmentVariables.region);
             AmazonSQS sqsClient = sqsConfig.AmazonSQS();
@@ -75,17 +65,59 @@ public class IndexerQueue {
 
             final String deadLetterQueueUrl = sqsClient.getQueueUrl(environmentVariables.deadLetterQueueName).getQueueUrl();
             System.out.println(String.format("Dead letter queue url: %s", deadLetterQueueUrl));
-            List<Message> messages = IndexerQueueService.getMessages(sqsClient, environmentVariables.queueName, environmentVariables.maxBatchRequestCount, environmentVariables.maxMessagesAllowed);
+            messages = IndexerQueueService.getMessages(sqsClient, environmentVariables.queueName, environmentVariables.maxBatchRequestCount, environmentVariables.maxMessagesAllowed);
             System.out.println(String.format("Processing %s messages from storage queue", messages.size()));
 
-            String indexerUrl = String.format("http://%s/%s",environmentVariables.targetURL, "api/indexer/v2/_dps/task-handlers/index-worker" );
 
             if (!messages.isEmpty()) {
 
-                List<IndexProcessor> indexProcessors = IndexerQueueService.processQueue(messages,  indexerUrl, executorPool, indexerServiceAccountJWT);
+                List<IndexProcessor> nonAuthorizedProcessors = messages
+                        .stream()
+                        .filter(msg -> !msg.getMessageAttributes().containsKey("authorization"))
+                        .map(msg -> new IndexProcessor(msg, indexerUrl, "", CallableResult.Fail))
+                        .collect(Collectors.toList());
+
+                List<Message> authorizedMessages = messages
+                        .stream()
+                        .filter(msg -> msg.getMessageAttributes().containsKey("authorization"))
+                        .collect(Collectors.toList());
+
+                List<Message> freshMessages = authorizedMessages
+                        .stream()
+                        .filter(msg -> {
+                            if(msg.getMessageAttributes().containsKey("retry")) {
+                                int retryCount = Integer.parseInt(msg.getMessageAttributes().get("retry").getStringValue());
+                                if (retryCount < 10)
+                                {
+                                    return true;
+                                }
+                            } else {
+                                return true;
+                            }
+                            return false;
+                        }).collect(Collectors.toList());
+
+                List<IndexProcessor> maxedRetryFailedProcessors= authorizedMessages
+                        .stream()
+                        .filter(msg -> {
+                            if(msg.getMessageAttributes().containsKey("retry")) {
+                                int retryCount = Integer.parseInt(msg.getMessageAttributes().get("retry").getStringValue());
+                                if (retryCount > 9)
+                                {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        })
+                        .map(msg -> new IndexProcessor(msg, indexerUrl, "", CallableResult.Fail))
+                        .collect(Collectors.toList());
+
+                List<IndexProcessor> indexProcessors = IndexerQueueService.processQueue(freshMessages,  indexerUrl, executorPool);
                 System.out.println(String.format("%s Messages Processed", indexProcessors.size()));
 
                 List<IndexProcessor> failedProcessors =  indexProcessors.stream().filter(indexProcessor -> indexProcessor.result == CallableResult.Fail || indexProcessor.exception != null).collect(Collectors.toList());
+                failedProcessors.addAll(nonAuthorizedProcessors);
+                failedProcessors.addAll(maxedRetryFailedProcessors);
                 System.out.println(String.format("%s Messages Failed", failedProcessors.size()));
 
                 List<SendMessageResult> deadLetterResults = IndexerQueueService.sendMsgsToDeadLetterQueue(deadLetterQueueUrl, failedProcessors, sqsClient);
@@ -114,4 +146,9 @@ public class IndexerQueue {
             System.out.println("Finished.");
         }
     }
+
+    private static String setProtocol(String targetUrl) {
+        return (StringUtils.containsIgnoreCase(targetUrl, "localhost") || targetUrl.contains("127.0.0.1")) ? "http" : "https";
+    }
+
 }

@@ -66,7 +66,7 @@ public class IndexerQueueServiceTest {
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
         receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
-        receiveMessageRequest.withMessageAttributeNames("data-partition-id", "account-id");
+        receiveMessageRequest.withMessageAttributeNames("All");
 
         List<Message> messages = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -95,7 +95,7 @@ public class IndexerQueueServiceTest {
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
         receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
-        receiveMessageRequest.withMessageAttributeNames("data-partition-id", "account-id");
+        receiveMessageRequest.withMessageAttributeNames("All");
 
         List<Message> messages = new ArrayList<>();
 

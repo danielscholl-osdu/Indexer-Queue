@@ -17,10 +17,7 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.logging.log4j.Logger;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +28,10 @@ import java.util.stream.Collectors;
 
 public class IndexerQueueService {
 
-    public static List<IndexProcessor> processQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool, String indexerServiceAccountJWT)
+    public static List<IndexProcessor> processQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
             throws ExecutionException, InterruptedException {
 
-        List<CompletableFuture<IndexProcessor>> futures = createCompletableFutures(messages, executorPool, url, indexerServiceAccountJWT);
+        List<CompletableFuture<IndexProcessor>> futures = createCompletableFutures(messages, executorPool, url);
 
         CompletableFuture[] cfs = futures.toArray(new CompletableFuture[0]);
         CompletableFuture<List<IndexProcessor>> results = CompletableFuture
@@ -60,10 +57,11 @@ public class IndexerQueueService {
         return batchedEntries.stream().map(entries -> new DeleteMessageBatchRequest(queueUrl, entries)).collect(Collectors.toList());
     }
 
-    public static List<CompletableFuture<IndexProcessor>> createCompletableFutures(List<Message> messages, ThreadPoolExecutor executorPool, String url, String indexerServiceAccountJWT){
+    public static List<CompletableFuture<IndexProcessor>> createCompletableFutures(List<Message> messages, ThreadPoolExecutor executorPool, String url){
         List<CompletableFuture<IndexProcessor>> futures = new ArrayList<>();
 
         for (final Message message : messages) {
+            String indexerServiceAccountJWT = message.getMessageAttributes().get("authorization").getStringValue();
             System.out.println(message);
             System.out.println(url);
             System.out.println(indexerServiceAccountJWT);
@@ -83,7 +81,7 @@ public class IndexerQueueService {
         do {
             ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsQueueUrl);
             receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
-            receiveMessageRequest.withMessageAttributeNames("data-partition-id", "account-id");
+            receiveMessageRequest.withMessageAttributeNames("All");
             List<Message> retrievedMessages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
             messages.addAll(retrievedMessages);
             numOfMessages = retrievedMessages.size();
@@ -98,17 +96,18 @@ public class IndexerQueueService {
     }
 
     private static SendMessageResult sendMsgToDeadLetterQueue(String deadLetterQueueUrl, IndexProcessor indexProcessor, AmazonSQS sqsClient){
+        String exceptionMessage;
         Map<String, MessageAttributeValue> messageAttributes = indexProcessor.message.getMessageAttributes();
         MessageAttributeValue exceptionAttribute = new MessageAttributeValue()
                 .withDataType("String");
-        String exceptionMessage = indexProcessor.exception.getMessage();
-        if(exceptionMessage == null){
+
+        if(indexProcessor.expectionExists()){
+            exceptionMessage = indexProcessor.exception.getMessage();
+        } else {
             exceptionMessage = "Empty";
         }
 
-        StringWriter sw = new StringWriter();
-        indexProcessor.exception.printStackTrace(new PrintWriter(sw));
-        String exceptionAsString = String.format("Exception message: %s. Exception stacktrace: %s", exceptionMessage, sw.toString());
+        String exceptionAsString = String.format("Exception message: %s", exceptionMessage);
         exceptionAttribute.setStringValue(exceptionAsString);
         messageAttributes.put("Exception", exceptionAttribute);
         SendMessageRequest send_msg_request = new SendMessageRequest()

@@ -30,6 +30,9 @@ phases:
       - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
       - echo $JAVA_HOME
       - mvn -version
+      - echo "Look below for M2 bucket name:"
+      - echo $M2_REPO_S3_BUCKET
+      - aws s3 sync s3://$M2_REPO_S3_BUCKET /root/.m2 # copy previous state of the shared libraries' .m2 folder from S3 to local
       - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2& # start the Docker Daemon
       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done" # wait for Docker to be ready before proceeding to the build steps
   pre_build:
@@ -46,16 +49,20 @@ phases:
       - java -version
       - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
       - mvn -version
-      - echo Look below for repository bucket
-      - echo $S3_MAVEN_REPOSITORY
+      - echo Setting environment variables from CloudFormation Exports... # use the AWS CLI commands to query for the CloudFormation export values created in the previous step and set the required environment variables
+      - echo Environment - $ENVIRONMENT
+      - echo AWSRegion - $AWS_REGION
+      - export VERSIONNUMBER=$(aws cloudformation list-exports --query "Exports[?Name=='$ENVIRONMENT-$APPLICATION_NAME-JarVersionNumber'].[Value]" --output text --region $AWS_REGION)
+      - export SERVICE=$(aws cloudformation list-exports --query "Exports[?Name=='$ENVIRONMENT-$APPLICATION_NAME-JarServiceName'].[Value]" --output text --region $AWS_REGION)
+      - echo ...finished setting environment variables!
       - echo All environment variables
       - printenv
-      - mvn clean test -pl indexer-queue-aws -Ddeployment.environment=$ENVIRONMENT -Ddeployment.repositorybucket=$S3_MAVEN_REPOSITORY -Daws.accessKeyId=$AWS_ACCESS_KEY_ID_MAVEN -Daws.secretKey=$AWS_SECRET_ACCESS_KEY_MAVEN -Dazure.devops.token=$VSTS_FEED_TOKEN -DAWS_ACCOUNT_ID=$AWS_ACCOUNT_ID -DAWS_REGION=$AWS_REGION
+      - mvn clean test -pl indexer-queue-aws
       - echo ...os-indexer-queue Java build completed on `date`.
       - echo os-indexer-queue beginning packaging to jar...
-      - mvn clean deploy -pl indexer-queue-aws -Ddeployment.environment=$ENVIRONMENT -Ddeployment.repositorybucket=$S3_MAVEN_REPOSITORY -Daws.accessKeyId=$AWS_ACCESS_KEY_ID_MAVEN -Daws.secretKey=$AWS_SECRET_ACCESS_KEY_MAVEN -Dazure.devops.token=$VSTS_FEED_TOKEN -DAWS_ACCOUNT_ID=$AWS_ACCOUNT_ID -DAWS_REGION=$AWS_REGION
+      - mvn clean install -pl indexer-queue-aws -Ddeployment.environment=$ENVIRONMENT -Dversion.number=$VERSIONNUMBER
       - echo os-indexer-queue Docker image build started on `date`...
-      - docker build -f indexer-queue-aws/Dockerfile -t $REPOSITORY_URI:latest .
+      - docker build -f indexer-queue-aws/Dockerfile -t $REPOSITORY_URI:latest --build-arg versionNumber=$VERSIONNUMBER --build-arg service=$SERVICE .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
       - echo ...os-indexer-queue Docker image build completed on `date`.
       - echo Pushing the Docker image to ECR...
