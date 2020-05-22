@@ -18,17 +18,15 @@ services:
   indexer-enqueue:
     env_file:
       - .env
-    image: ${REGISTRY}/indexer-enqueue
+    image: indexer-enqueue
     build:
       context: ../
       dockerfile: indexer-queue-azure-enqueue/Dockerfile
-      args:
-        VSTS_FEED_TOKEN: ${VSTS_FEED_TOKEN}
     ports:
       - "9000:80"
     restart: always
     environment:
-      AzureWebJobsStorage: ${STORAGE_CONNECTION_STRING}
-      SERVICE_BUS: ${SERVICE_BUS_ENDPOINT}
-      TOPIC_NAME: ${TOPIC_NAME}
-      SUBSCRIPTION_NAME: ${SUBSCRIPTION_NAME}
+      AzureWebJobsStorage: ${AZURE_STORAGE_CONNECTION}
+      SERVICE_BUS: ${AZURE_SERVICEBUS_ENDPOINT}
+      TOPIC_NAME: recordstopic
+      SUBSCRIPTION_NAME: ${AZURE_SUBSCRIPTION_NAME}

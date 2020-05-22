@@ -13,13 +13,11 @@
 #  limitations under the License.
 
 FROM maven:3-jdk-8 AS installer-env
-ARG VSTS_FEED_TOKEN
 
 RUN mkdir -p /build/azure
 
 # Copy the parent pom and settings file
 COPY ./pom.xml /build
-COPY ./indexer-queue-azure-enqueue/maven/docker_settings.xml /root/.m2/settings.xml
 COPY ./indexer-queue-azure-enqueue/pom.xml /build/azure
 
 # # Copy the azure provider pom and pull artifacts
