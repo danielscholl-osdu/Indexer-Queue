@@ -111,18 +111,73 @@ Jet Brains - the authors of Intellij IDEA, have written an [excellent guide](htt
 
 ## Deploying service to Azure
 
-Service deployments into Azure are standardized to make the process the same for all services. The steps to deploy into
-Azure can be [found here](https://dev.azure.com/slb-des-ext-collaboration/open-data-ecosystem/_git/infrastructure-templates?path=%2Fdocs%2Fosdu%2FSERVICE_DEPLOYMENTS.md&_a=preview)
+Service deployments into Azure are standardized to make the process the same for all services if using ADO and are closely related to the infrastructure deployed. The steps to deploy into Azure can be [found here](https://github.com/azure/osdu-infrastructure)
 
 Note: The pipeline for `os-indexer-queue-azure` is slightly different than noted above because it is an Azure Function.
-The correct pipeline for Azure is [azure-pipelines.yml](./azure-pipelines.yml).
+The correct pipeline for Azure is [azure-pipeline.yml](./azure-pipeline.yml).
+
+### Manual Deployment Steps
+
+__Environment Settings__
+
+The following environment variables are necessary to properly deploy a service to an Azure OSDU Environment.
+
+```bash
+# Group Level Variables
+export AZURE_TENANT_ID=""
+export AZURE_SUBSCRIPTION_ID=""
+export AZURE_SUBSCRIPTION_NAME=""
+export AZURE_PRINCIPAL_ID=""
+export AZURE_PRINCIPAL_SECRET=""
+export AZURE_APP_ID=""
+export AZURE_BASENAME_21=""
+export AZURE_BASENAME=""
+export AZURE_BASE=""
+export AZURE_STORAGE_ACCOUNT=""
+export AZURE_NO_ACCESS_ID=""
+
+# Required for Azure Deployment
+export AZURE_CLIENT_ID="${AZURE_PRINCIPAL_ID}"
+export AZURE_CLIENT_SECRET="${AZURE_PRINCIPAL_SECRET}"
+export AZURE_RESOURCE_GROUP="${AZURE_BASENAME}-osdu-r2-app-rg"
+export AZURE_FUNCTIONAPP_NAME="${AZURE_BASENAME}-enque"
+export AZURE_CONTAINER_REGISTRY="${AZURE_BASE}cr"
+
+```
+
+__Azure Service Deployment__
+
+1. Log in to the Azure CLI
+  `az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID`
+
+2. Log in to the ACR Registry
+  `az acr login -n $AZURE_CONTAINER_REGISTRY`
+
+3. Build the Docker Image
+  `docker-compose build`
+
+4. Tag the Image to the Container Registry
+  `docker tag indexer-enqueue:latest ${AZURE_CONTAINER_REGISTRY}.azurecr.io/indexer-enqueue:latest`
+
+5. Push the Image to the Container Registry
+  `docker push ${AZURE_CONTAINER_REGISTRY}.azurecr.io/indexer-enqueue:latest`
+
+6. Deploy the Function App
+
+```bash
+az functionapp config container set \
+        --docker-custom-image-name ${AZURE_CONTAINER_REGISTRY}.azurecr.io/indexer-enqueue:latest \
+        --name $AZURE_FUNCTIONAPP_NAME \
+        --resource-group $AZURE_RESOURCE_GROUP \
+        -ojsonc
+```
 
 ## License
 Copyright © Microsoft Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at 
+You may obtain a copy of the License at
 
 [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
