@@ -4,6 +4,14 @@ variables:
   AWS_ENVIRONMENT: dev
 
 include:
-  - project: 'osdu/platform/ci-cd-pipelines'
-    ref: 'master'
-    file: 'temp-service.gitlab-ci.yml'
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "standard-setup.yml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "build/maven.yml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "scanners/fossa.yml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "scanners/gitlab-ultimate.yml"
