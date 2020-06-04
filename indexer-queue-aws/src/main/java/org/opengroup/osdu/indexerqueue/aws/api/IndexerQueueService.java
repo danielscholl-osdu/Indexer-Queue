@@ -72,8 +72,7 @@ public class IndexerQueueService {
         return futures;
     }
 
-    public static List<Message> getMessages(AmazonSQS sqsClient, String queueName, int numOfmessages, int maxMessageCount){
-        final String sqsQueueUrl = sqsClient.getQueueUrl(queueName).getQueueUrl();
+    public static List<Message> getMessages(AmazonSQS sqsClient, String sqsQueueUrl, int numOfmessages, int maxMessageCount){
         System.out.println("inside get messages");
         System.out.println(sqsQueueUrl);
         int numOfMessages = numOfmessages;
