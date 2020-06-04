@@ -1,7 +1,9 @@
 variables:
-  AWS_BUILD_SUBDIR: indexer-queue-aws
-  AWS_APPLICATION_NAME: os-indexer-queue
+  AWS_BUILD_SUBDIR: indexer-queue-aws/build-aws
+  AWS_TEST_SUBDIR: indexer-queue-aws
+  AWS_SERVICE: indexer-queue
   AWS_ENVIRONMENT: dev
+
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
@@ -15,3 +17,6 @@ include:
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "scanners/gitlab-ultimate.yml"
+
+  - project: 'osdu/platform/ci-cd-pipelines'
+    file: 'cloud-providers/aws.yml'  
