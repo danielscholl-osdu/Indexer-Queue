@@ -12,15 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html
 FROM amazoncorretto:8
 
-ARG versionNumber
-ARG service
-ENV serviceName=${service}-aws
-ENV awsJar=${serviceName}-${versionNumber}.jar
-
+ARG JAR_FILE=indexer-queue-aws/target/indexer-queue*.jar
 WORKDIR /
-COPY ${serviceName}/target/${awsJar} ${awsJar}
+COPY ${JAR_FILE} app.jar
 EXPOSE 8080
-
-CMD ["sh","-c", " java -jar ${awsJar}"]
+ENTRYPOINT java $JAVA_OPTS -jar /app.jar

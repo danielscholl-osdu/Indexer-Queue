@@ -41,19 +41,12 @@ public class IndexerQueueServiceTest {
     @Mock
     private AmazonSQS sqsClient = mock(AmazonSQS.class);
 
-    private GetQueueUrlResult queueUrlResult;
-
     private ReceiveMessageResult receiveResult;
 
-    private String queueName = "testQueue";
     private String queueUrl ="localhost";
 
     @Before
     public void setUp() {
-
-        queueUrlResult = new GetQueueUrlResult();
-        queueUrlResult.setQueueUrl(queueUrl);
-        Mockito.when(sqsClient.getQueueUrl(queueName)).thenReturn(queueUrlResult);
         receiveResult = new ReceiveMessageResult();
     }
 
@@ -79,7 +72,7 @@ public class IndexerQueueServiceTest {
         Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
 
         // Act
-         List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueName, numOfmessages, maxMessageCount);
+         List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfmessages, maxMessageCount);
 
         // Assert
         assertEquals(messages.get(1), actualMessages.get(1));
@@ -104,7 +97,7 @@ public class IndexerQueueServiceTest {
         Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
 
         // Act
-        List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueName, numOfmessages, maxMessageCount);
+        List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfmessages, maxMessageCount);
 
         // Assert
         assertEquals(messages.size(), actualMessages.size());

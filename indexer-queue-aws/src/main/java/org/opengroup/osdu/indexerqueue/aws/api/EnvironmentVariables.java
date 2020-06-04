@@ -14,25 +14,28 @@
 
 package org.opengroup.osdu.indexerqueue.aws.api;
 
+import org.opengroup.osdu.core.aws.ssm.ParameterStorePropertySource;
+import org.opengroup.osdu.core.aws.ssm.SSMConfig;
+
 public class EnvironmentVariables {
     public String region;
-    public String queueName;
+    public String queueUrl;
     public String targetURL;
-    public String deadLetterQueueName;
-    public int maxBatchRequestCount;
-    public int maxMessagesAllowed;
-    public int maxIndexThreads;
-    public long keepAliveTimeInMin;
+    public String deadLetterQueueUrl;
+    private String prefix = "osdu";
+
+    private ParameterStorePropertySource ssm;
 
     public EnvironmentVariables() {
 
+        Boolean ssmEnabled = System.getenv("SSM_ENABLED") != null ? Boolean.parseBoolean(System.getenv("SSM_ENABLED")) : false;
         this.region = System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "us-east-1";
-        this.queueName = System.getenv("AWS_QUEUE_INDEXER_NAME")  != null ? System.getenv("AWS_QUEUE_INDEXER_NAME") : "dev-osdu-storage-queue";
-        this.targetURL = System.getenv("AWS_INDEXER_INDEX_API") != null ? System.getenv("AWS_INDEXER_INDEX_API"): "ECSALB-os-indexer-355262993.us-east-1.elb.amazonaws.com/api/indexer/v2/_dps/task-handlers/index-worker";
-        this.deadLetterQueueName = System.getenv("AWS_DEADLETTER_QUEUE_NAME") != null ? System.getenv("AWS_DEADLETTER_QUEUE_NAME") : "dev-osdu-storage-dead-letter-queue";
-        this.maxIndexThreads = System.getenv("MAX_INDEX_THREADS") != null ? Integer.parseInt(System.getenv("MAX_INDEX_THREADS")) : 50;
-        this.maxBatchRequestCount = System.getenv("MAX_REQUEST_COUNT") != null ? Integer.parseInt(System.getenv("MAX_REQUEST_COUNT")) : 10;
-        this.maxMessagesAllowed = System.getenv("MAX_MESSAGE_COUNT") != null ? Integer.parseInt(System.getenv("MAX_MESSAGE_COUNT")) : 100000;
-        this.keepAliveTimeInMin = System.getenv("KEEP_ALIVE_IN_MINUTES") != null ? Long.parseLong(System.getenv("KEEP_ALIVE_IN_MINUTES")) : 9999;
-    };
+            String environment =  ssmEnabled ? System.getenv("ENVIRONMENT") : "";
+            String parameterPrefix = String.format("/%s/%s", prefix, environment);
+            SSMConfig ssmConfig = new SSMConfig();
+            ssm = ssmConfig.amazonSSM();
+            this.queueUrl = ssmEnabled ? ssm.getProperty(String.format("%s/%s", parameterPrefix, "storage/storage-sqs-url")).toString() : System.getenv("AWS_STORAGE_QUEUE_URL")  != null ? System.getenv("AWS_STORAGE_QUEUE_URL") : "dev-osdu-storage-queue";
+            this.targetURL = System.getenv("AWS_INDEXER_INDEX_API") != null ? System.getenv("AWS_INDEXER_INDEX_API"): "ECSALB-os-indexer-355262993.us-east-1.elb.amazonaws.com/api/indexer/v2/_dps/task-handlers/index-worker";
+        this.deadLetterQueueUrl = ssmEnabled ? ssm.getProperty(String.format("%s/%s", parameterPrefix, "indexer-queue/indexer-deadletter-queue-sqs-url")).toString() :System.getenv("AWS_DEADLETTER_QUEUE_URL") != null ? System.getenv("AWS_DEADLETTER_QUEUE_URL") : "https://sqs.us-east-1.amazonaws.com/888733619319/dev-osdu-storage-dead-letter-queue";
+    }
 }
