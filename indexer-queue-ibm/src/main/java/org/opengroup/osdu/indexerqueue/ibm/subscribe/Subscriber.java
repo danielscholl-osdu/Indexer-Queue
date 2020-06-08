@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.opengroup.osdu.indexerqueue.ibm;
+package org.opengroup.osdu.indexerqueue.ibm.subscribe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +29,8 @@ import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.ibm.messagebus.IMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -42,21 +41,20 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 @Component
-public class Subcriber {
+public class Subscriber {
 
 	private final Gson gson = new Gson();
 	
-	private static final Logger logger = LoggerFactory.getLogger(Subcriber.class);
+	private static final Logger logger = LoggerFactory.getLogger(Subscriber.class);
 	
 	private final DpsHeaders dpsHeaders = new DpsHeaders();
 
 	@Value("${INDEXER_URL}")
 	private String INDEXER_URL;
 
-	@RabbitListener(queues="${ibm.env.prefix}"+"-"+IMessageFactory.DEFAULT_QUEUE_NAME)
-    public void recievedMessage(Message message) {
-		byte[] body = message.getBody();
-		String msg = new String(body);
+	@JmsListener(destination="${ibm.env.prefix}"+"-"+IMessageFactory.DEFAULT_QUEUE_NAME)	
+    public void recievedMessage(String msg) {
+
         logger.info("Recieved Message: " + msg);
 
         RecordChangedMessages recordMessage = this.getTaskQueueMessage(msg);

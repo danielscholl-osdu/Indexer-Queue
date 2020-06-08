@@ -28,3 +28,7 @@ analyze:
     type: mvn
     target: indexer-queue-azure-requeue/pom.xml
     path: .
+  - name: indexer-queue-ibm
+    type: mvn
+    target: indexer-queue-ibm/pom.xml
+    path: .
