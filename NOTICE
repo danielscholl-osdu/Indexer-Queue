@@ -16,12 +16,15 @@ The following software have components provided under the terms of this license:
 
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils)
 - Plexus Interpolation API (from )
+- StAX (from http://stax.codehaus.org/)
 
 ========================================================================
 Apache-2.0
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- AMQP 1.0 JMS Spring Boot AutoConfiguration (from https://repo1.maven.org/maven2/org/amqphub/spring/amqp-10-jms-spring-boot-autoconfigure)
+- AMQP 1.0 JMS Spring Boot Starter (from https://repo1.maven.org/maven2/org/amqphub/spring/amqp-10-jms-spring-boot-starter)
 - ASM Core (from )
 - ASM Core (from )
 - ASM based accessors helper used by json-smart (from )
@@ -168,6 +171,7 @@ The following software have components provided under the terms of this license:
 - Apache Commons Lang (from http://commons.apache.org/proper/commons-lang/)
 - Apache Commons Lang (from http://commons.apache.org/proper/commons-lang/)
 - Apache Commons Logging (from http://commons.apache.org/proper/commons-logging/)
+- Apache Geronimo JMS Spec 2.0 (from http://geronimo.apache.org/maven/${siteId}/${version})
 - Apache HTTP transport for the Google HTTP Client Library for Java. (from )
 - Apache HttpAsyncClient (from http://hc.apache.org/httpcomponents-asyncclient)
 - Apache HttpAsyncClient (from http://hc.apache.org/httpcomponents-asyncclient)
@@ -197,6 +201,7 @@ The following software have components provided under the terms of this license:
 - Cloud Storage JSON API v1-rev58-1.21.0 (from )
 - Cloud Storage JSON API v1-rev58-1.21.0 (from )
 - CloudWatch Metrics for AWS Java SDK (from https://aws.amazon.com/sdkforjava)
+- Commons IO (from http://commons.apache.org/io/)
 - Commons IO (from http://commons.apache.org/io/)
 - Elastic JNA Distribution (from https://github.com/java-native-access/jna)
 - Elasticsearch: 5.0.0-alpha5 (from https://github.com/elastic/elasticsearch)
@@ -273,6 +278,8 @@ The following software have components provided under the terms of this license:
 - Jackson-module-parameter-names (from )
 - Java Libraries for Amazon Simple WorkFlow (from https://aws.amazon.com/sdkforjava)
 - Java Servlet API (from http://servlet-spec.java.net)
+- Java Servlet API (from http://servlet-spec.java.net)
+- Javassist (from http://www.javassist.org/)
 - Javassist (from http://www.javassist.org/)
 - Joda-Time (from http://www.joda.org/joda-time/)
 - Joda-Time (from http://www.joda.org/joda-time/)
@@ -319,16 +326,17 @@ The following software have components provided under the terms of this license:
 - Maven Settings (from )
 - Maven Settings Builder (from )
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java)
-- Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
 - Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
+- Mockito (from http://mockito.org)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Codec (from )
 - Netty/Codec (from )
 - Netty/Codec (from )
+- Netty/Codec/HTTP (from )
 - Netty/Codec/HTTP (from )
 - Netty/Common (from )
 - Netty/Common (from )
@@ -339,11 +347,16 @@ The following software have components provided under the terms of this license:
 - Netty/Resolver (from )
 - Netty/Transport (from http://netty.io/)
 - Netty/Transport (from http://netty.io/)
+- Netty/Transport/Native/Unix/Common (from )
+- Nimbus JOSE+JWT (from https://bitbucket.org/connect2id/nimbus-jose-jwt)
 - Nimbus JOSE+JWT (from https://bitbucket.org/connect2id/nimbus-jose-jwt)
 - Nimbus LangTag (from https://bitbucket.org/connect2id/nimbus-language-tags)
 - OAuth 2.0 SDK with OpenID Connect extensions (from https://bitbucket.org/connect2id/oauth-2.0-sdk-with-openid-connect-extensions)
 - Objenesis (from http://objenesis.org)
 - Objenesis (from http://objenesis.org)
+- OkHttp (from )
+- OkHttp URLConnection (from )
+- Okio (from )
 - OpenCensus (from https://github.com/census-instrumentation/opencensus-java)
 - OpenCensus (from https://github.com/census-instrumentation/opencensus-java)
 - OpenCensus (from https://github.com/census-instrumentation/opencensus-java)
@@ -363,6 +376,7 @@ The following software have components provided under the terms of this license:
 - PowerMock (from http://www.powermock.org)
 - Protocol Buffer extensions to the Google HTTP Client Library for Java. (from )
 - QDox (from http://qdox.codehaus.org)
+- QpidJMS Client (from )
 - RESTEasy Guice (from https://repo1.maven.org/maven2/org/jboss/resteasy/resteasy-guice)
 - RESTEasy JAX-RS Client (from )
 - RESTEasy JAX-RS Implementation (from )
@@ -370,6 +384,7 @@ The following software have components provided under the terms of this license:
 - Resteasy Validator Provider BV 1.1 (from http://maven.apache.org)
 - Servlet and JDO extensions to the Google API Client Library for Java. (from )
 - Servlet and JDO extensions to the Google OAuth Client Library for Java. (from )
+- Simple XML (from http://simple.sourceforge.net)
 - Sisu-Inject-Bean : legacy wrapper (from )
 - Sisu-Inject-Plexus : legacy wrapper (from )
 - SnakeYAML (from http://www.snakeyaml.org)
@@ -387,6 +402,7 @@ The following software have components provided under the terms of this license:
 - Spring Boot Jersey Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Json Starter (from https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-json)
 - Spring Boot Logging Starter (from http://projects.spring.io/spring-boot/)
+- Spring Boot Security Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Test (from http://projects.spring.io/spring-boot/)
 - Spring Boot Test Auto-Configure (from http://projects.spring.io/spring-boot/)
@@ -400,9 +416,14 @@ The following software have components provided under the terms of this license:
 - Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Expression Language (SpEL) (from https://github.com/spring-projects/spring-framework)
+- Spring JMS (from https://github.com/spring-projects/spring-framework)
+- Spring Messaging (from https://github.com/spring-projects/spring-framework)
 - Spring TestContext Framework (from https://github.com/spring-projects/spring-framework)
+- Spring Transaction (from https://github.com/spring-projects/spring-framework)
 - Spring Web (from https://github.com/spring-projects/spring-framework)
 - Spring Web MVC (from https://github.com/spring-projects/spring-framework)
+- StAX (from http://stax.codehaus.org/)
+- StAX API (from http://stax.codehaus.org/)
 - T-Digest (from https://github.com/tdunning/t-digest)
 - aggs-matrix-stats (from https://github.com/elastic/elasticsearch)
 - aggs-matrix-stats (from https://github.com/elastic/elasticsearch)
@@ -444,6 +465,8 @@ The following software have components provided under the terms of this license:
 - ion-java (from https://github.com/amznlabs/ion-java/)
 - jackson-databind (from http://github.com/FasterXML/jackson)
 - jackson-databind (from http://github.com/FasterXML/jackson)
+- java-cloudant (from https://cloudant.com)
+- java-cloudant (from https://cloudant.com)
 - javax.inject (from http://code.google.com/p/atinject/)
 - javax.ws.rs-api (from http://jax-rs-spec.java.net)
 - jersey-container-servlet (from git://java.net/jersey~code/project/jersey-container-servlet)
@@ -465,6 +488,7 @@ The following software have components provided under the terms of this license:
 - lang-mustache (from https://github.com/elastic/elasticsearch)
 - lettuce (from http://github.com/mp911de/lettuce/wiki)
 - micrometer-core (from https://github.com/micrometer-metrics/micrometer)
+- minio (from https://github.com/minio/minio-java)
 - org.xmlunit:xmlunit-core (from http://www.xmlunit.org/)
 - parent-join (from https://github.com/elastic/elasticsearch)
 - parent-join (from https://github.com/elastic/elasticsearch)
@@ -483,6 +507,7 @@ The following software have components provided under the terms of this license:
 - proto-google-cloud-datastore-v1 (from https://github.com/googleapis/api-client-staging)
 - proto-google-cloud-datastore-v1 (from https://github.com/googleapis/api-client-staging)
 - proton-j (from )
+- proton-j (from )
 - rank-eval (from https://github.com/elastic/elasticsearch)
 - rank-eval (from https://github.com/elastic/elasticsearch)
 - rest (from https://github.com/elastic/elasticsearch)
@@ -492,6 +517,12 @@ The following software have components provided under the terms of this license:
 - rxjava (from https://github.com/ReactiveX/RxJava)
 - secure-sm (from https://github.com/elastic/elasticsearch)
 - secure-sm (from https://github.com/elastic/elasticsearch)
+- spring-security-config (from http://spring.io/spring-security)
+- spring-security-core (from http://spring.io/spring-security)
+- spring-security-oauth2-core (from http://spring.io/spring-security)
+- spring-security-oauth2-jose (from http://spring.io/spring-security)
+- spring-security-oauth2-resource-server (from http://spring.io/spring-security)
+- spring-security-web (from http://spring.io/spring-security)
 - swagger-annotations (from )
 - swagger-jaxrs (from )
 - tomcat-embed-core (from http://tomcat.apache.org/)
@@ -516,6 +547,7 @@ The following software have components provided under the terms of this license:
 - Lucene Common Analyzers (from )
 - Lucene Common Analyzers (from )
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils)
+- StAX (from http://stax.codehaus.org/)
 - jersey-ext-bean-validation (from )
 - jersey-spring4 (from )
 
@@ -548,9 +580,10 @@ The following software have components provided under the terms of this license:
 - Lucene Core (from )
 - Lucene Suggest (from )
 - Lucene Suggest (from )
-- Mockito (from http://www.mockito.org)
-- Mockito (from http://www.mockito.org)
 - Mockito (from http://mockito.org)
+- Mockito (from http://www.mockito.org)
+- Mockito (from http://www.mockito.org)
+- Netty/Codec/HTTP (from )
 - Netty/Codec/HTTP (from )
 - Plexus Classworlds (from )
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils)
@@ -610,6 +643,7 @@ The following software have components provided under the terms of this license:
 - HK2 module of HK2 itself (from )
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from )
 - Java EE Transaction API (from http://jcp.org/en/jsr/detail?id=907)
+- Java Servlet API (from http://servlet-spec.java.net)
 - JavaBeans Activation Framework API jar (from )
 - JavaMail API (compat) (from http://kenai.com/projects/javamail/mail)
 - Run Level Service (from )
@@ -691,6 +725,7 @@ The following software have components provided under the terms of this license:
 - Java Architecture For XML Binding (from )
 - Java Architecture for XML Binding 2.3 (from )
 - Java Servlet API (from http://servlet-spec.java.net)
+- Java Servlet API (from http://servlet-spec.java.net)
 - JavaBeans Activation Framework API jar (from )
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - JavaMail API (compat) (from http://kenai.com/projects/javamail/mail)
@@ -736,6 +771,7 @@ The following software have components provided under the terms of this license:
 - JSR 353 (JSON Processing) Default Provider (from http://jsonp.java.net)
 - Java Architecture For XML Binding (from )
 - Java Architecture for XML Binding 2.3 (from )
+- Java Servlet API (from http://servlet-spec.java.net)
 - Java Servlet API (from http://servlet-spec.java.net)
 - JavaBeans Activation Framework API jar (from )
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
@@ -790,16 +826,20 @@ The following software have components provided under the terms of this license:
 - Elastic JNA Distribution (from https://github.com/java-native-access/jna)
 - JTS Topology Suite (from http://sourceforge.net/projects/jts-topo-suite)
 - Javassist (from http://www.javassist.org/)
+- Javassist (from http://www.javassist.org/)
 - Logback Classic Module (from )
 - Logback Core Module (from )
 - SnakeYAML (from http://www.snakeyaml.org)
+- SpotBugs Annotations (from https://spotbugs.github.io/)
 
 ========================================================================
 LGPL-2.1-or-later
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- Javassist (from http://www.javassist.org/)
 - SnakeYAML (from http://www.snakeyaml.org)
+- SpotBugs Annotations (from https://spotbugs.github.io/)
 
 ========================================================================
 LGPL-3.0-only
@@ -843,6 +883,7 @@ The following software have components provided under the terms of this license:
 - Mockito (from http://www.mockito.org)
 - Mockito (from http://www.mockito.org)
 - Netty/Codec/HTTP (from )
+- Netty/Codec/HTTP (from )
 - Netty/Common (from )
 - Netty/Common (from )
 - Plexus Compiler Api (from )
@@ -858,6 +899,7 @@ The following software have components provided under the terms of this license:
 - Sisu-Inject-Plexus : legacy wrapper (from )
 - adal4j (from https://github.com/AzureAD/azure-activedirectory-library-for-java)
 - powermock-api-mockito (from )
+- spring-security-core (from http://spring.io/spring-security)
 
 ========================================================================
 MPL-1.1
@@ -865,12 +907,14 @@ MPL-1.1
 The following software have components provided under the terms of this license:
 
 - Javassist (from http://www.javassist.org/)
+- Javassist (from http://www.javassist.org/)
 
 ========================================================================
 MPL-2.0
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- Javassist (from http://www.javassist.org/)
 - Javassist (from http://www.javassist.org/)
 
 ========================================================================
