@@ -23,9 +23,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.AppException;
-import org.opengroup.osdu.core.common.http.HeadersUtil;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.opengroup.osdu.indexerqueue.gcp.util.AppEngineTaskBuilder;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -42,7 +41,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 
 @RunWith(SpringRunner.class)
-@PrepareForTest({HeadersUtil.class, DpsHeaders.class})
 public class EnqueueApiTest {
 
     private final String requestBodyEmpty = "{}";
@@ -54,6 +52,8 @@ public class EnqueueApiTest {
 
     @Mock
     private HttpServletRequest request;
+    @Mock
+    private HeadersInfo headersInfo;
     @Mock
     private DpsHeaders dpsHeaders;
     @Mock
@@ -72,15 +72,16 @@ public class EnqueueApiTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(DpsHeaders.ACCOUNT_ID, this.ACCOUNT_ID);
         when(this.dpsHeaders.getHeaders()).thenReturn(headers);
+        when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
     }
 
     @Test
-    public void should_return200_when_given_validRequest_enqueueTaskTest() {
+    public void should_return200_when_given_validRequest_enqueueTaskTest() throws IOException {
         should_return200_enqueueTaskTest(requestBodyValid);
     }
 
     @Test
-    public void should_return200AndSevereLog_when_missing_correlationId_enqueueTaskTest() {
+    public void should_return200AndSevereLog_when_missing_correlationId_enqueueTaskTest() throws IOException {
         should_return200_enqueueTaskTest(requestBodyMissingCorrelationId);
     }
 
@@ -94,7 +95,7 @@ public class EnqueueApiTest {
         should_return400_enqueueTaskTest(requestBodyEmpty, "message object not found");
     }
 
-    private void should_return200_enqueueTaskTest(String requestBody) {
+    private void should_return200_enqueueTaskTest(String requestBody) throws IOException {
         createRequestStream(requestBody);
         ResponseEntity response = this.sut.enqueueTask();
         Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode().value());

@@ -25,6 +25,7 @@ import org.apache.http.HttpStatus;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.http.ResponseHeaders;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ public class AuthorizationRequestFilter implements Filter {
     private FilterConfig filterConfig;
 
     @Autowired
-    private DpsHeaders dpsHeaders;
+    private HeadersInfo headersInfo;
 
     @Value("${GOOGLE_AUDIENCES}")
     private String GOOGLE_AUDIENCES;
@@ -72,7 +73,7 @@ public class AuthorizationRequestFilter implements Filter {
             httpResponse.addHeader(header.getKey(), header.getValue().toString());
         }
         if (httpResponse.getHeader(DpsHeaders.CORRELATION_ID) == null) {
-            httpResponse.addHeader(DpsHeaders.CORRELATION_ID, dpsHeaders.getCorrelationId());
+            httpResponse.addHeader(DpsHeaders.CORRELATION_ID, headersInfo.getHeaders().getCorrelationId());
         }
         httpResponse.setContentType("application/json");
     }

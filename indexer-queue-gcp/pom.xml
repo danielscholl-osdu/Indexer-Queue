@@ -41,12 +41,12 @@
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
             <artifactId>os-core-common</artifactId>
-            <version>0.0.13</version>
+            <version>0.0.18</version>
         </dependency>
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
             <artifactId>core-lib-gcp</artifactId>
-            <version>0.1.17</version>
+            <version>0.1.21</version>
         </dependency>
         <!-- spring boot dependencies -->
         <dependency>
@@ -92,20 +92,15 @@
 
         <!-- Google Dependencies -->
         <dependency>
-            <groupId>com.google.appengine.tools</groupId>
-            <artifactId>appengine-gcs-client</artifactId>
-            <version>0.8.1</version>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-tasks</artifactId>
+            <version>1.2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-1.0-sdk</artifactId>
-            <version>1.9.79</version>
         </dependency>
 
         <dependency>

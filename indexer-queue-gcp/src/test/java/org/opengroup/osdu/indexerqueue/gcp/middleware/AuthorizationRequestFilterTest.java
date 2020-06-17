@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.gcp.model.AppEngineHeaders;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -48,6 +49,8 @@ public class AuthorizationRequestFilterTest {
     private FilterChain filterChain;
     @Mock
     DpsHeaders dpsHeaders;
+    @Mock
+    private HeadersInfo headersInfo;
     @InjectMocks
     private AuthorizationRequestFilter filter;
 
@@ -59,6 +62,7 @@ public class AuthorizationRequestFilterTest {
     @Test
     public void shouldNot_addAnyHeaders_filterSwaggerPath() throws IOException, ServletException {
         when(this.httpServletRequest.getRequestURI()).thenReturn("push-handlers");
+        when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(dpsHeaders.getCorrelationId()).thenReturn("correlation-id");
         Map<String, String> headers = new HashMap<>();
 

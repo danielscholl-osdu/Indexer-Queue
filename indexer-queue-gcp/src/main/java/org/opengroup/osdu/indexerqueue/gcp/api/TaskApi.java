@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 @Log
 @RestController
@@ -41,7 +42,7 @@ public class TaskApi {
     // THAT MEANS WE DON'T DOCUMENT IT IN SWAGGER, ACCESS IS LIMITED TO INDEXER SERVICE
 //    @RolesAllowed({SearchServiceRole.ADMIN})
     @PostMapping("/enqueue")
-    public ResponseEntity enqueueTask(@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request) {
+    public ResponseEntity enqueueTask(@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request) throws IOException {
 
         this.appEngineTaskBuilder.createTask(request);
 
