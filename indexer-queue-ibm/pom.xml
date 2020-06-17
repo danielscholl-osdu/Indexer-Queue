@@ -53,6 +53,12 @@
 	</distributionManagement>
 	<dependencies>
 
+		<dependency>
+			<groupId>org.opengroup.osdu</groupId>
+			<artifactId>os-core-lib-ibm</artifactId>
+			<version>0.0.14-SNAPSHOT</version>
+		</dependency>
+
 		<!-- spring boot dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
