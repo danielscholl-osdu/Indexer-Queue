@@ -21,10 +21,11 @@ import com.google.gson.JsonParser;
 import lombok.extern.java.Log;
 import org.apache.http.HttpStatus;
 import org.opengroup.osdu.core.common.Constants;
-import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.AppException;
+import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.opengroup.osdu.indexerqueue.gcp.util.AppEngineTaskBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -50,21 +51,21 @@ public class EnqueueApi {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    private DpsHeaders dpsHeaders;
+    private HeadersInfo headersInfo;
     @Autowired
     private AppEngineTaskBuilder appEngineTaskBuilder;
 
     // THIS IS AN INTERNAL USE API ONLY
     // THAT MEANS WE DON'T DOCUMENT IT IN SWAGGER, ACCESS IS LIMITED TO ADMIN ROLE
     @PostMapping("/enqueue")
-    public ResponseEntity enqueueTask() {
+    public ResponseEntity enqueueTask() throws IOException {
         RecordChangedMessages message = this.getTaskQueueMessage();
-        this.dpsHeaders.getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
-        this.dpsHeaders.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
+        this.headersInfo.getHeaders().getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
+        this.headersInfo.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
         if (message.hasCorrelationId()) {
-            this.dpsHeaders.getHeaders().put(DpsHeaders.CORRELATION_ID, message.getCorrelationId());
+            this.headersInfo.getHeaders().put(DpsHeaders.CORRELATION_ID, message.getCorrelationId());
         }
-        log.info(String.format("message headers: %s", this.dpsHeaders.toString()));
+        log.info(String.format("message headers: %s", this.headersInfo.toString()));
 
         CloudTaskRequest request = CloudTaskRequest.builder().message(this.gson.toJson(message)).url(Constants.WORKER_RELATIVE_URL).build();
         this.appEngineTaskBuilder.createTask(request);

@@ -18,10 +18,10 @@ import lombok.extern.java.Log;
 
 import org.apache.http.HttpStatus;
 import org.opengroup.osdu.core.common.Constants;
-import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.model.http.AppException;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -38,14 +38,14 @@ public class IndexerQueueIdentifier {
     private TenantInfo tenant;
 
     @Autowired
-    private DpsHeaders dpsHeaders;
+    private HeadersInfo headersInfo;
 
     public String getQueueId() {
         if (this.tenantInfoServiceProvider == null) {
             log.info("ITENANT FACTORY OBJECT is NULL");
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "ITenant factory object is Null", "ITenant factory object is Null");
         }
-        tenant = this.tenantInfoServiceProvider.getTenantInfo(dpsHeaders.getPartitionId());
+        tenant = this.tenantInfoServiceProvider.getTenantInfo(headersInfo.getPartitionId());
         if (tenant == null) {
             return("common");
         }

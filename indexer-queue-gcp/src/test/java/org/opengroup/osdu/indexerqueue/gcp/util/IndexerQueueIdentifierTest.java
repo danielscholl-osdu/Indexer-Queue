@@ -24,6 +24,7 @@ import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.multitenancy.ITenantInfoService;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -38,6 +39,8 @@ public class IndexerQueueIdentifierTest {
     private ITenantFactory tenantInfoServiceProvider;
     @Mock
     private DpsHeaders dpsHeaders;
+    @Mock
+    private HeadersInfo headersInfo;
 
     @InjectMocks
     private TenantInfo tenantInfo;
@@ -50,6 +53,7 @@ public class IndexerQueueIdentifierTest {
         this.tenantInfo.setName("tenant1");
         when(this.tenantInfoService.getTenantInfo()).thenReturn(tenantInfo);
         when(tenantInfoServiceProvider.getTenantInfo(Mockito.any())).thenReturn(tenantInfo);
+        when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(dpsHeaders.getPartitionId()).thenReturn("dummy-partition-id");
     }
 

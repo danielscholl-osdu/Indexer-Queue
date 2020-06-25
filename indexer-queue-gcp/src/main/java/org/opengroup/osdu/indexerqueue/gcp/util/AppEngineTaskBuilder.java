@@ -14,37 +14,53 @@
 
 package org.opengroup.osdu.indexerqueue.gcp.util;
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.RetryOptions;
-import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.cloud.tasks.v2.*;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.Timestamp;
 import lombok.extern.java.Log;
-import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
+import org.opengroup.osdu.core.common.search.Config;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.google.appengine.api.taskqueue.RetryOptions.Builder.withTaskRetryLimit;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.time.Clock;
+import java.time.Instant;
 
 @Log
 @Component
 public class AppEngineTaskBuilder {
 
-    private static final RetryOptions RETRY_OPTIONS = withTaskRetryLimit(5).taskAgeLimitSeconds(86400).minBackoffSeconds(120).maxBackoffSeconds(3600).maxDoublings(5);
-
     @Autowired
     private IndexerQueueIdentifier indexerQueueProvider;
     @Autowired
-    private DpsHeaders dpsHeaders;
+    private HeadersInfo headersInfo;
 
-    public void createTask(CloudTaskRequest request) {
-//        log.info(String.format("message: %s", request.getMessage()));
-//        log.info("CREATE TASK Headers: " + headersInfo.toString());
-//        log.info("INDEXER QUEUE NAME: " + indexerQueueProvider.getQueueId());
+    public Task createTask(CloudTaskRequest request) throws IOException {
+        this.log.info(String.format("project-id: %s | location: %s | queue-id: %s | indexer-host: %s | message: %s",
+                Config.getGoogleCloudProjectId(), Config.getDeploymentLocation(), indexerQueueProvider.getQueueId(), Config.getIndexerHostUrl(), request.getMessage()));
+        String queuePath = QueueName.of(Config.getGoogleCloudProjectId(), Config.getDeploymentLocation(), indexerQueueProvider.getQueueId()).toString();
+        AppEngineRouting routing = AppEngineRouting.newBuilder().setHost(Config.getIndexerHostUrl()).build();
+        Task.Builder taskBuilder = Task
+                .newBuilder()
+                .setScheduleTime(Timestamp.newBuilder()
+                        .setSeconds(Instant.now(Clock.systemUTC()).plusMillis(request.getInitialDelayMillis()).getEpochSecond())
+                        .build())
+                .setAppEngineHttpRequest(AppEngineHttpRequest.newBuilder()
+                        .putAllHeaders(this.headersInfo.getHeaders().getHeaders())
+                        .setBody(ByteString.copyFrom(request.getMessage(), Charset.defaultCharset()))
+                        .setRelativeUri(request.getUrl())
+                        .setAppEngineRouting(routing)
+                        .setHttpMethod(HttpMethod.POST)
+                        .build());
 
-        Queue queue = QueueFactory.getQueue(indexerQueueProvider.getQueueId());
-        queue.add(TaskOptions.Builder.withUrl(request.getUrl()).payload(request.getMessage()).headers(this.dpsHeaders.getHeaders()).retryOptions(RETRY_OPTIONS));
-
-        log.info("queued task successfully");
+        // Execute the request and return the created Task
+        try (CloudTasksClient client = CloudTasksClient.create()) {
+            Task response = client.createTask(queuePath, taskBuilder.build());
+            this.log.info(String.format("task created: %s", response.getName()));
+            return response;
+        }
     }
 }

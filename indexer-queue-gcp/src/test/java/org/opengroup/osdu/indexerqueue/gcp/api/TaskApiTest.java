@@ -28,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 
@@ -40,7 +42,7 @@ public class TaskApiTest {
     private TaskApi sut;
 
     @Test
-    public void should_enqueueTask() {
+    public void should_enqueueTask() throws IOException {
         CloudTaskRequest request = CloudTaskRequest.builder().url("dummy").message("message").build();
 
         ResponseEntity response = this.sut.enqueueTask(request);

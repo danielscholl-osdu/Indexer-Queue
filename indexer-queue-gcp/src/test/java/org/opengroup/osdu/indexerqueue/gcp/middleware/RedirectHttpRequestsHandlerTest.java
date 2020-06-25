@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.gcp.model.AppEngineHeaders;
+import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.FilterChain;
@@ -40,6 +41,8 @@ import static org.mockito.Mockito.when;
 public class RedirectHttpRequestsHandlerTest {
     @Mock
     private DpsHeaders dpsHeaders;
+    @Mock
+    private HeadersInfo headersInfo;
     @Mock
     private HttpServletRequest httpServletRequest;
     @Mock
@@ -83,6 +86,7 @@ public class RedirectHttpRequestsHandlerTest {
     @Test
     public void should_notThrowAppException302WithHttpsLocation_when_isAHttpsRequest() throws IOException, ServletException {
         headers.put(AppEngineHeaders.TASK_QUEUE_NAME, "dummyTenant");
+        when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(dpsHeaders.getHeaders()).thenReturn(headers);
         when(httpServletRequest.isSecure()).thenReturn(true);
         sut.doFilter(httpServletRequest, httpServletResponse, filterChain);
@@ -91,6 +95,7 @@ public class RedirectHttpRequestsHandlerTest {
     @Test
     public void should_notThrowAppException302WithHttpsLocation_when_isATaskQueue() throws IOException, ServletException {
         headers.put(AppEngineHeaders.TASK_QUEUE_NAME, "dummyTenant-os-indexer-queue");
+        when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(httpServletRequest.isSecure()).thenReturn(true);
         sut.doFilter(httpServletRequest, httpServletResponse, filterChain);
     }
