@@ -344,6 +344,11 @@
                     <groupId>com.google.cloud.tools</groupId>
                     <artifactId>appengine-maven-plugin</artifactId>
                     <version>1.3.2</version>
+                    <configuration>
+                        <version>1</version>
+                        <serviceAccountKeyFile>${env.GCP_DEPLOY_FILE}</serviceAccountKeyFile>
+                        <projectId>${env.GCP_PROJECT}</projectId>
+                    </configuration>
                 </plugin>
 
         <plugin>

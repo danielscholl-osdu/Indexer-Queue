@@ -10,6 +10,15 @@ variables:
   AZURE_BUILD_SUBDIR: indexer-queue-azure-enqueue
   AZURE_TEST_SUBDIR: indexer-queue-azure-enqueue
 
+  GCP_BUILD_SUBDIR: indexer-queue-gcp
+  GCP_INT_TEST_SUBDIR: indexer-queue-gcp # Fix as soon as integration tests are added
+  GCP_APPLICATION_NAME: osdu-indexer-queue
+  GCP_ENVIRONMENT: testing
+  GCP_PROJECT: opendes-evt
+  GCP_TENANT_NAME: opendesevt
+  GCP_DEPLOY_ENV: p4d
+  GCP_DOMAIN: cloud.slb-ds.com
+
 include:
   - project: "osdu/platform/ci-cd-pipelines"
     file: "standard-setup.yml"
@@ -32,3 +41,30 @@ include:
   - project: 'osdu/platform/ci-cd-pipelines'
     file: 'cloud-providers/azure-function.yml'
 
+  - project: 'osdu/platform/ci-cd-pipelines'
+    file: 'cloud-providers/gcp.yml'
+
+
+gcp-deploy:
+  image: divido2/gcp-maven
+  stage: deploy
+  extends:
+    - .gcp
+    - .maven
+
+  script:
+    - mkdir -p gcp_deploy_dir
+    - gcloud auth activate-service-account --key-file="$GCP_DEPLOY_FILE"
+    - sed -e "s|ENVIRONMENT|$GCP_ENVIRONMENT|g" "$GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml"
+    - cat $GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml
+    - $MAVEN package appengine:deploy -pl org.opengroup.osdu.indexerqueue:indexer-queue-gcp -Dapp.deploy.project=$GCP_PROJECT -Dapp.deploy.version=$CI_COMMIT_SHORT_SHA -DskipTests=true
+
+gcp-test:
+  extends:
+    - .gcp
+    - .maven
+    - .gcp_variables
+  stage: integration
+  needs: ['gcp-deploy']
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
