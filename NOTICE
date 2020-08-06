@@ -322,9 +322,9 @@ The following software have components provided under the terms of this license:
 - Maven Settings Builder (from )
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java)
 - Mockito (from http://www.mockito.org)
+- Mockito (from http://mockito.org)
+- Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
-- Mockito (from http://mockito.org)
-- Mockito (from http://mockito.org)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
@@ -563,8 +563,8 @@ The following software have components provided under the terms of this license:
 - Lucene Suggest (from )
 - Lucene Suggest (from )
 - Mockito (from http://www.mockito.org)
-- Mockito (from http://www.mockito.org)
 - Mockito (from http://mockito.org)
+- Mockito (from http://www.mockito.org)
 - Netty/Codec/HTTP (from )
 - Netty/Codec/HTTP (from )
 - Plexus Classworlds (from )
@@ -848,6 +848,7 @@ MIT
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- AWS Java SDK for AWS Lambda (from https://aws.amazon.com/sdkforjava)
 - Animal Sniffer Annotations (from )
 - Checker Qual (from https://checkerframework.org)
 - Checker Qual (from https://checkerframework.org)
