@@ -1,4 +1,4 @@
-# Copyright © Amazon Web Services
+# Copyright © 2020 Amazon Web Services
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
 # https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
 
 # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html
+
 version: 0.2
 
 phases:
   install:
     runtime-versions:
-      java: openjdk8
+      java: corretto8
     commands:
       - if [ $(echo $CODEBUILD_SOURCE_VERSION | grep -c  ^refs/heads.*) -eq 1 ]; then echo "Branch name found"; else echo "This build only supports branch builds" && exit 1; fi
       - apt-get update -y
@@ -29,9 +30,8 @@ phases:
       - mvn -version
       - echo $JAVA_HOME #WHY
       - mkdir -p /root/.m2
-      - aws s3 sync s3://$M2_REPO_S3_BUCKET /root/.m2 # copy previous state of the shared libraries' .m2 folder from S3 to local
       - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
-      - cat /root/.m2/settings.xml
+      - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain osdu-dev --domain-owner 888733619319 --query authorizationToken --output text`
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
