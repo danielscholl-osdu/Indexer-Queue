@@ -55,8 +55,8 @@ include:
     file: 'cloud-providers/gcp.yml'
 
   - project: 'osdu/platform/ci-cd-pipelines'
-    ref: "epam-gcp"
-    file: 'cloud-providers/epam-gcp.yml'
+    ref: "osdu-gcp"
+    file: 'cloud-providers/osdu-gcp.yml'
 
 gcp-deploy:
   image: divido2/gcp-maven
