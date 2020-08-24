@@ -19,6 +19,16 @@ variables:
   GCP_DEPLOY_ENV: p4d
   GCP_DOMAIN: cloud.slb-ds.com
 
+  OSDU_GCP_BUILD_SUBDIR: indexer-queue-gcp
+  OSDU_GCP_DEPLOY_DIR: OSDU_GCP_deploy_dir
+  OSDU_GCP_INT_TEST_SUBDIR: indexer-queue-gcp # Fix as soon as integration tests are added
+  OSDU_GCP_APPLICATION_NAME: os-indexer-queue
+  OSDU_GCP_ENVIRONMENT: osdu-gcp
+  OSDU_GCP_PROJECT: nice-etching-277309
+  OSDU_GCP_TENANT_NAME: osdu
+  OSDU_GCP_DEPLOY_ENV: empty
+  OSDU_INDEXER_AUDIENCES: 689762842995-pv217jo3k8j803kk6gqf52qb5amos3a9.apps.googleusercontent.com
+
 include:
   - project: "osdu/platform/ci-cd-pipelines"
     file: "standard-setup.yml"
@@ -44,6 +54,9 @@ include:
   - project: 'osdu/platform/ci-cd-pipelines'
     file: 'cloud-providers/gcp.yml'
 
+  - project: 'osdu/platform/ci-cd-pipelines'
+    ref: "epam-gcp"
+    file: 'cloud-providers/epam-gcp.yml'
 
 gcp-deploy:
   image: divido2/gcp-maven
@@ -66,5 +79,31 @@ gcp-test:
     - .gcp_variables
   stage: integration
   needs: ['gcp-deploy']
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
+
+osdu-gcp-deploy:
+  image: divido2/gcp-maven
+  stage: deploy
+  needs: ['compile-and-unit-test']
+  extends:
+    - .osdu-gcp
+    - .maven
+
+  script:
+    - mkdir -p "$OSDU_GCP_DEPLOY_DIR"
+    - gcloud auth activate-service-account --key-file="$OSDU_GCP_DEPLOY_FILE"
+    - sed -i -e "s|ENVIRONMENT|$OSDU_GCP_ENVIRONMENT|g" "$OSDU_GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml"
+    - sed -i -e "s|INDEXER_AUDIENCES|$OSDU_INDEXER_AUDIENCES|g" "$OSDU_GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml"
+    - cat $OSDU_GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml
+    - $MAVEN package appengine:deploy -pl org.opengroup.osdu.indexerqueue:indexer-queue-gcp -Dapp.deploy.project=$OSDU_GCP_PROJECT -Dapp.deploy.version=$CI_COMMIT_SHORT_SHA -DskipTests=true
+
+osdu-gcp-test:
+  extends:
+    - .osdu-gcp
+    - .maven
+    - .OSDU_GCP_variables
+  stage: integration
+  needs: ['osdu-gcp-deploy']
   script:
     - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
