@@ -51,7 +51,7 @@ spec:
           - name: AzureWebJobsStorage
             value: DefaultEndpointsProtocol=https;AccountName=$(storage_account);AccountKey=$(storage_account_key);EndpointSuffix=core.windows.net
           - name: INDEXER_WORKER_URL
-            value: http://indexer/api/indexer/v2/_dps/task-handlers/index-worker
+            value: http://indexer-service/api/indexer/v2/_dps/task-handlers/index-worker
           - name: AzureFunctionsJobHost__functions__0
             value: enqueue
           - name: FUNCTIONS_WORKER_RUNTIME
