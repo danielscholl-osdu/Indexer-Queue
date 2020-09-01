@@ -31,7 +31,8 @@ phases:
       - echo $JAVA_HOME #WHY
       - mkdir -p /root/.m2
       - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
-      - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain osdu-dev --domain-owner 888733619319 --query authorizationToken --output text`
+      - export AWS_ACCOUNT_ID=`aws sts get-caller-identity | grep Account | cut -d':' -f 2 | cut -d'"' -f 2`
+      - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_OSDU_DEV_MAVEN_DOMAIN --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text`
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
