@@ -18,7 +18,6 @@ metadata:
   name: {{ .Release.Name }}
   namespace: osdu
 spec:
-  replicas: {{ .Values.global.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
