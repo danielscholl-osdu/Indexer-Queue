@@ -20,6 +20,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.AppException;
@@ -48,7 +49,10 @@ public class EnqueueApplicationTest {
   private ExecutionContext executionContext;
   private final String requestBodyEmpty = "{}";
   private final String requestBodyValid = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
+  private final String requestBodyMissingData = "{\"message\":{\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
   private final String requestBodyMissingCorrelationId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\"}}";
+  private final String requestBodyMissingTenantId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
+  private final String requestBodyMissingAccountId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
   private final String requestBodyMissingTenantIdAndAccountId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
 
   private final String ACCOUNT_ID = "any-account";
@@ -72,6 +76,9 @@ public class EnqueueApplicationTest {
   @Rule
   public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   @Before
   public void setup() throws Exception {
     initMocks(this);
@@ -83,7 +90,6 @@ public class EnqueueApplicationTest {
     when(request.getReader()).thenReturn(bufferReader);
     when(Config.getDeploymentEnvironment()).thenReturn(DeploymentEnvironment.LOCAL);
     when(executionContext.getLogger()).thenReturn(Logger.getGlobal());
-    when(httpClientBuilder.build()).thenReturn(httpClient);
     when(httpClient.execute(httpPost)).thenReturn(httpResponse);
   }
 
@@ -98,6 +104,16 @@ public class EnqueueApplicationTest {
   }
 
   @Test
+  public void should_return400_when_missing_tenantIdInRequestBody_enqueueTaskTest() {
+    should_return400_enqueueTaskTest(requestBodyMissingTenantId, "tenant-id missing");
+  }
+
+  @Test
+  public void should_return400_when_missing_AccountIdInRequestBody_enqueueTaskTest() {
+    should_return400_enqueueTaskTest(requestBodyMissingAccountId, "tenant-id missing");
+  }
+
+  @Test
   public void should_return400_when_missing_tenantIdAndAccountIdInRequestBody_enqueueTaskTest() {
     should_return400_enqueueTaskTest(requestBodyMissingTenantIdAndAccountId, "tenant-id missing");
   }
@@ -107,7 +123,22 @@ public class EnqueueApplicationTest {
     should_return400_enqueueTaskTest(requestBodyEmpty, "message object not found");
   }
 
+  @Test
+  public void should_return400_when_missing_dataInRequestBody_enqueueTaskTest() {
+    should_return400_enqueueTaskTest(requestBodyMissingData, "message data not found");
+  }
+
+  @Test
+  public void should_throw_exception_when_httpClientBuilder_build_fail() throws Exception {
+    when(httpClientBuilder.build()).thenThrow(new RuntimeException("httpClientBuilder build failed"));
+    createRequestStream(requestBodyValid);
+    thrown.expect(Exception.class);
+    thrown.expectMessage("httpClientBuilder build failed");
+    this.sut.run(requestBodyValid, "1234", new Date().toString(), "1", executionContext);
+  }
+
   private void should_return400_enqueueTaskTest(String requestBody, String errorMessage) {
+    when(httpClientBuilder.build()).thenReturn(httpClient);
     try {
       createRequestStream(requestBody);
       this.sut.run(requestBody, "1234", new Date().toString(), "1", executionContext);
@@ -121,6 +152,7 @@ public class EnqueueApplicationTest {
   }
 
   private void should_return200_enqueueTaskTest(String requestBody) {
+    when(httpClientBuilder.build()).thenReturn(httpClient);
     createRequestStream(requestBody);
     Response response = null;
     try {
