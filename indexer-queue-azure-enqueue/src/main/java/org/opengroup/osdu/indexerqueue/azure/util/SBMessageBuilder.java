@@ -40,11 +40,13 @@ public class SBMessageBuilder {
     }
 
     // Data in service bus comes in as array converting it to string
-    String dataValue = message.getAsJsonObject().get(Constants.DATA).toString();
-    if (Strings.isNullOrEmpty(dataValue)) {
-      throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message", "message data not found",
-          "'message.data' not found in ServiceBus message");
+
+    JsonElement data = message.getAsJsonObject().get(Constants.DATA);
+    if (data == null || Strings.isNullOrEmpty(data.toString())) {
+      throw new AppException(org.apache.http.HttpStatus.SC_BAD_REQUEST, "Invalid record change message",
+          "message data not found", "'message.data' not found in ServiceBus message");
     }
+    String dataValue = data.toString();
     message.getAsJsonObject().addProperty(Constants.DATA, dataValue);
 
     Map<String, String> attributesMap = new HashMap<>();
@@ -55,13 +57,9 @@ public class SBMessageBuilder {
           String.format("Service Bus message: %s", serviceBusRequest));
     }
 
-    if (message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID) != null) {
-      attributesMap.put(DpsHeaders.ACCOUNT_ID, message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID).getAsString());
-    }
-    if (message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID) != null) {
-      attributesMap.put(DpsHeaders.DATA_PARTITION_ID,
-          message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID).getAsString());
-    }
+    attributesMap.put(DpsHeaders.ACCOUNT_ID, message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID).getAsString());
+    attributesMap.put(DpsHeaders.DATA_PARTITION_ID,
+        message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID).getAsString());
     // TODO Create a correlation id if it is null
     if (message.getAsJsonObject().get(DpsHeaders.CORRELATION_ID) != null) {
       attributesMap.put(DpsHeaders.CORRELATION_ID,
