@@ -1,0 +1,83 @@
+# Copyright © 2020 Amazon Web Services
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
+
+# https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-env-vars.html
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+      - if [ $(echo $CODEBUILD_SOURCE_VERSION | grep -c  ^refs/heads.*) -eq 1 ]; then echo "Branch name found"; else echo "This build only supports branch builds" && exit 1; fi
+      - apt-get update -y
+      - apt-get install -y maven
+      - java -version
+      - mvn -version
+      - echo $JAVA_HOME #WHY
+      - mkdir -p /root/.m2
+      - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
+      - export AWS_ACCOUNT_ID=`aws sts get-caller-identity | grep Account | cut -d':' -f 2 | cut -d'"' -f 2`
+      - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_OSDU_DEV_MAVEN_DOMAIN --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text`
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - $(aws ecr get-login --no-include-email --region $AWS_REGION) # authenticate with ECR via the AWS CLI
+  build:
+    commands:
+      - export REPO_NAME=${PWD##*/}
+      - export OUTPUT_DIR="dist"
+      - export BRANCH_NAME=`echo ${CODEBUILD_SOURCE_VERSION} | awk '{gsub("refs/heads/","");gsub("\\.","-");gsub("[[:space:]]","-")}1' | sed 's/\//-/g' | awk '{print tolower($0)}'`
+      - export ECR_TAG=`echo build.${BRANCH_NAME}.${CODEBUILD_BUILD_NUMBER}.${CODEBUILD_RESOLVED_SOURCE_VERSION} | cut -c 1-120`
+      - export ECR_IMAGE=${ECR_REGISTRY}:${ECR_TAG}
+      - export ECR_IMAGE_BRANCH_LATEST=${ECR_REGISTRY}:${BRANCH_NAME}
+      - mkdir -p ${OUTPUT_DIR}/bin
+      # - mkdir -p ${OUTPUT_DIR}/testing && mkdir -p ${OUTPUT_DIR}/testing/bin
+      - echo "Placeholder" >> ${OUTPUT_DIR}/build-info.json # touched so that the output directory has some content incase the build fails so that testing reports are uploaded
+      - printenv
+
+      - echo "Building primary service assemblies..."
+      - mvn -B test install -pl indexer-queue-aws -Ddeployment.environment=prod
+
+#      - echo "Copying assemblies to dist..."
+#      - cp ./indexer-queue-aws/target/indexer-queue*.jar ${OUTPUT_DIR}/bin # copy aws jars
+
+      - echo "Building docker image..."
+      - docker build -f indexer-queue-aws/build-aws/Dockerfile -t ${ECR_IMAGE} .
+      - docker tag  ${ECR_IMAGE} ${ECR_IMAGE_BRANCH_LATEST}
+      - echo "Pushing docker image..."
+      - docker push ${ECR_IMAGE}
+      - docker push ${ECR_IMAGE_BRANCH_LATEST}
+
+      - echo "Generate build-info.json"
+      - |
+        python indexer-queue-aws/build-aws/build-info.py --branch ${CODEBUILD_SOURCE_VERSION} --commit ${CODEBUILD_RESOLVED_SOURCE_VERSION} \
+          --buildid ${CODEBUILD_BUILD_ID} --buildnumber ${CODEBUILD_BUILD_NUMBER} --reponame ${REPO_NAME} --outdir ${OUTPUT_DIR} \
+          --artifact ${ECR_IMAGE}
+reports:
+  SurefireReports: # CodeBuild will create a report group called "SurefireReports".
+    files: #Store all of the files
+      - "indexer-queue-aws/target/surefire-reports/**/*"
+    base-directory: "." # Location of the reports
+artifacts:
+  files:
+    - "**/*"
+  base-directory: "dist"
+  name: ${REPO_NAME}_${BRANCH_NAME}_$(date +%F)_${CODEBUILD_BUILD_NUMBER}.zip
+cache:
+  paths:
+    - "/root/.m2/**/*"
