@@ -47,6 +47,17 @@
     <azure.functions.indexerworkerurl></azure.functions.indexerworkerurl>
     <azure.functions.indexerqueuekey></azure.functions.indexerqueuekey>
 
+
+    <os-core-common.vesrion>0.3.8</os-core-common.vesrion>
+    <jackson.version>2.11.2</jackson.version>
+    <commons-beanutils.version>1.9.4</commons-beanutils.version>
+    <elasticsearch.version>6.8.1</elasticsearch.version>
+    <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
+    <common-codec.version>1.14</common-codec.version>
+    <resteasy.version>3.12.0.Final</resteasy.version>
+    <netty.version>4.1.51.Final</netty.version>
+    <snakeyaml.version>1.26</snakeyaml.version>
+    <resteasy-validator-provider-11.version>3.6.2.Final</resteasy-validator-provider-11.version>
   </properties>
 
   <repositories>
@@ -89,6 +100,122 @@
       <version>1.3.0 </version>
     </dependency>
 
+    <!-- TODO: remove all gcp dependencies when dependency management in parent pom will be introduced  -->
+    <dependency>
+      <groupId>com.google.api-client</groupId>
+      <artifactId>google-api-client</artifactId>
+      <version>1.28.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine.tools</groupId>
+      <artifactId>appengine-gcs-client</artifactId>
+      <version>0.8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-datastore</artifactId>
+      <version>1.72.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec</artifactId>
+      <version>${netty.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>${hibernate-validator.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>${commons-beanutils.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>${elasticsearch.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-client</artifactId>
+      <version>${elasticsearch.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-high-level-client</artifactId>
+      <version>${elasticsearch.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-validator-provider-11</artifactId>
+      <version>${resteasy-validator-provider-11.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-validator</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <version>${resteasy.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>${common-codec.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-servicebus</artifactId>
@@ -98,7 +225,7 @@
     <dependency>
       <groupId>org.opengroup.osdu</groupId>
       <artifactId>os-core-common</artifactId>
-      <version>0.0.13</version>
+      <version>${os-core-common.vesrion}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
