@@ -98,10 +98,6 @@ After configuring your environment as specified above, you can follow these step
 cd indexer-queue-gcp/ && mvn spring-boot:run
 ```
 
-## Testing
-
-Navigate to indexer-queue service's root folder and run all the tests.
-
 ## Deployment
 
 * Data-Lake Indexer-queue Google Cloud Endpoints on App Engine Flex environment
