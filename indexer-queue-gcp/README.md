@@ -77,10 +77,6 @@ gcloud config set project <YOUR-PROJECT-ID>
 gcloud auth application-default login
 ```
 
-* Navigate to search service's root folder and run:
-
-```bash
-mvn jetty:run
 ## Testing
 * Navigate to indexer-queue service's root folder and run:
  
@@ -99,7 +95,7 @@ mvn clean install -DskipTests
 After configuring your environment as specified above, you can follow these steps to build and run the application. These steps should be invoked from the *repository root.*
 
 ```bash
-cd provider/indexer-queue-gcp/ && mvn spring-boot:run
+cd indexer-queue-gcp/ && mvn spring-boot:run
 ```
 
 ## Testing
