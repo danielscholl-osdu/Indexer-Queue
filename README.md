@@ -69,8 +69,11 @@ If you want to learn more about creating good readme files then refer the follow
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
 
-###
-Sample Request for various projects:
+### GCP
+
+Instructions for running the Google Cloud Platform implementation locally can be found [here](./indexer-queue-gcp/README.md).
+
+### Sample Request for various projects:
 1. indexer-queue-boot-gcp project:
 
     curl -X POST \
@@ -111,4 +114,5 @@ curl -X POST \
     "message": "{\"data\":[{\"id\":\"common:welldb:asd21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}",
     "url": "foo"
 }'
+
 
