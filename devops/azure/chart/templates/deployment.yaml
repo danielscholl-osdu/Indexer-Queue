@@ -36,17 +36,17 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: servicebus
-                key: servicebus
+                key: servicebus-connection
           - name: storage_account
             valueFrom:
-              configMapKeyRef:
-                name: osdu-svc-properties
-                key: ENV_STORAGE_DIAGNOSTICS
+              secretKeyRef:
+                name: airflow
+                key: storage-account
           - name: storage_account_key
             valueFrom:
               secretKeyRef:
-                name: diagnostics
-                key: diagnostics
+                name: airflow
+                key: storage-key
           - name: AzureWebJobsStorage
             value: DefaultEndpointsProtocol=https;AccountName=$(storage_account);AccountKey=$(storage_account_key);EndpointSuffix=core.windows.net
           - name: INDEXER_WORKER_URL
