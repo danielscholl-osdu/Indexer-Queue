@@ -1,0 +1,18 @@
+# This file contains the essential configs for the osdu on azure helm chart
+global:
+
+  # Service(s) Replica Count
+  replicaCount: 2
+
+################################################################################
+# Specify the Gitlab branch being used for image creation
+# ie: community.opengroup.org:5555/osdu/platform/security-and-compliance/legal/{{ .Values.global.branch }}/legal:latest
+#
+image:
+  repository: #{container-registry}#.azurecr.io
+  branch: #{ENVIRONMENT_NAME}#
+  tag: #{Build.SourceVersion}#
+
+azure:
+  servicebusSubscription: recordstopicsubscription
+  servicebusTopic: recordstopic
