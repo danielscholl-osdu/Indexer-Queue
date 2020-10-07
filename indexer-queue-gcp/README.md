@@ -24,6 +24,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Run Locally
 
+In order to run the service locally or remotely, you will need to have the following environment variables defined.
+
+| name | value | description | sensitive? | source |
+| ---  | ---   | ---         | ---        | ---    |
+| `LOG_PREFIX` | `service` | Logging prefix | no | - |
+| `SERVER_SERVLET_CONTEXPATH` | `/api/indexer/v1/` | Servlet context path | no | - |
+| `AUTHORIZE_API` | ex `https://entitlements.com/entitlements/v1` | Entitlements API endpoint | no | output of infrastructure deployment |
+| `LEGALTAG_API` | ex `https://legal.com/api/legal/v1` | Legal API endpoint | no | output of infrastructure deployment |
+| `STORAGE_HOSTNAME` | ex `os-storage-service` | Storage hostname | no | output of infrastructure deployment |
+| `CRS_API` | ex `https://crs-converter-gae-dot-opendes.appspot.com/api/crs/v1` | Crs Converter API endpoint | no | output of infrastructure deployment |
+| `GOOGLE_CLOUD_PROJECT` | ex `opendes` | Google Cloud Project Id| no | output of infrastructure deployment |
+| `GOOGLE_AUDIENCES` | ex `*****.apps.googleusercontent.com` | Client ID for getting access to cloud resources | yes | https://console.cloud.google.com/apis/credentials |
+| `GOOGLE_APPLICATION_CREDENTIALS` | ex `/path/to/directory/service-key.json` | Service account credentials, you only need this if running locally | yes | https://console.cloud.google.com/iam-admin/serviceaccounts |
+
 Check that maven is installed:
 
 ```bash
@@ -78,7 +92,7 @@ gcloud auth application-default login
 ```
 
 ## Testing
-* Navigate to indexer-queue service's root folder and run:
+* Navigate to Indexer-queue service's root folder and run:
  
 ```bash
 mvn clean install   
