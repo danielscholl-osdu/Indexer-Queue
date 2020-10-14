@@ -64,7 +64,6 @@ public class IndexerQueueService {
             String indexerServiceAccountJWT = message.getMessageAttributes().get("authorization").getStringValue();
             System.out.println(message);
             System.out.println(url);
-            System.out.println(indexerServiceAccountJWT);
             IndexProcessor processor = new IndexProcessor(message, url, indexerServiceAccountJWT);
             CompletableFuture<IndexProcessor> future = CompletableFuture.supplyAsync(processor::call, executorPool);
             futures.add(future);
