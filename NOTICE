@@ -9,7 +9,6 @@ The following software have components provided under the terms of this license:
 
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils)
 - Plexus Interpolation API (from )
-- StAX (from http://stax.codehaus.org/)
 
 ========================================================================
 Apache-2.0
@@ -175,6 +174,7 @@ The following software have components provided under the terms of this license:
 - Apache HttpClient (from http://hc.apache.org/httpcomponents-client)
 - Apache HttpClient (from http://hc.apache.org/httpcomponents-client)
 - Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client)
+- Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client)
 - Apache HttpCore (from http://hc.apache.org/httpcomponents-core-ga)
 - Apache HttpCore (from http://hc.apache.org/httpcomponents-core-ga)
 - Apache HttpCore NIO (from http://hc.apache.org/httpcomponents-core-ga)
@@ -244,6 +244,10 @@ The following software have components provided under the terms of this license:
 - Hibernate Validator Engine (from )
 - Hibernate Validator Engine (from )
 - Hibernate Validator Engine (from )
+- IBM COS Java SDK for Amazon S3 (from https://github.com/ibm/ibm-cos-sdk-java)
+- IBM COS Java SDK for COS KMS (from https://github.com/ibm/ibm-cos-sdk-java)
+- IBM COS SDK For Java (from https://github.com/ibm/ibm-cos-sdk-java)
+- IBM COS SDK for Java - Core (from https://github.com/ibm/ibm-cos-sdk-java)
 - Identity and Access Management (IAM) API v1-rev247-1.23.0 (from )
 - J2ObjC Annotations (from https://github.com/google/j2objc/)
 - J2ObjC Annotations (from https://github.com/google/j2objc/)
@@ -353,10 +357,10 @@ The following software have components provided under the terms of this license:
 - Maven Settings (from )
 - Maven Settings Builder (from )
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java)
-- Mockito (from http://mockito.org)
-- Mockito (from http://www.mockito.org)
 - Mockito (from http://www.mockito.org)
 - Mockito (from http://mockito.org)
+- Mockito (from http://mockito.org)
+- Mockito (from http://www.mockito.org)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
@@ -416,7 +420,6 @@ The following software have components provided under the terms of this license:
 - Resteasy Validator Provider BV 1.1 (from http://maven.apache.org)
 - Servlet and JDO extensions to the Google API Client Library for Java. (from )
 - Servlet and JDO extensions to the Google OAuth Client Library for Java. (from )
-- Simple XML (from http://simple.sourceforge.net)
 - Sisu-Inject-Bean : legacy wrapper (from )
 - Sisu-Inject-Plexus : legacy wrapper (from )
 - SnakeYAML (from http://www.snakeyaml.org)
@@ -467,8 +470,6 @@ The following software have components provided under the terms of this license:
 - Spring Web (from https://github.com/spring-projects/spring-framework)
 - Spring Web MVC (from https://github.com/spring-projects/spring-framework)
 - Spring Web MVC (from https://github.com/spring-projects/spring-framework)
-- StAX (from http://stax.codehaus.org/)
-- StAX API (from http://stax.codehaus.org/)
 - T-Digest (from https://github.com/tdunning/t-digest)
 - aggs-matrix-stats (from https://github.com/elastic/elasticsearch)
 - aggs-matrix-stats (from https://github.com/elastic/elasticsearch)
@@ -501,6 +502,7 @@ The following software have components provided under the terms of this license:
 - io.grpc:grpc-protobuf-lite (from https://github.com/grpc/grpc-java)
 - io.grpc:grpc-stub (from https://github.com/grpc/grpc-java)
 - ion-java (from https://github.com/amznlabs/ion-java/)
+- ion-java (from https://github.com/amznlabs/ion-java/)
 - jackson-databind (from http://github.com/FasterXML/jackson)
 - jackson-databind (from http://github.com/FasterXML/jackson)
 - jackson-databind (from http://github.com/FasterXML/jackson)
@@ -528,7 +530,6 @@ The following software have components provided under the terms of this license:
 - lang-mustache (from https://github.com/elastic/elasticsearch)
 - lettuce (from http://github.com/mp911de/lettuce/wiki)
 - micrometer-core (from https://github.com/micrometer-metrics/micrometer)
-- minio (from https://github.com/minio/minio-java)
 - org.xmlunit:xmlunit-core (from http://www.xmlunit.org/)
 - parent-join (from https://github.com/elastic/elasticsearch)
 - parent-join (from https://github.com/elastic/elasticsearch)
@@ -598,7 +599,6 @@ The following software have components provided under the terms of this license:
 - Lucene Common Analyzers (from )
 - Lucene Common Analyzers (from )
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils)
-- StAX (from http://stax.codehaus.org/)
 - jersey-ext-bean-validation (from )
 - jersey-spring4 (from )
 
@@ -906,7 +906,6 @@ The following software have components provided under the terms of this license:
 - Logback Classic Module (from )
 - Logback Core Module (from )
 - SnakeYAML (from http://www.snakeyaml.org)
-- SpotBugs Annotations (from https://spotbugs.github.io/)
 
 ========================================================================
 LGPL-2.1-or-later
@@ -916,7 +915,6 @@ The following software have components provided under the terms of this license:
 - Javassist (from http://www.javassist.org/)
 - SnakeYAML (from http://www.snakeyaml.org)
 - SnakeYAML (from http://www.snakeyaml.org)
-- SpotBugs Annotations (from https://spotbugs.github.io/)
 
 ========================================================================
 LGPL-3.0-only
