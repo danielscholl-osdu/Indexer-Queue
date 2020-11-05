@@ -22,6 +22,7 @@
         <artifactId>indexer-queue</artifactId>
         <groupId>org.opengroup.osdu.indexerqueue</groupId>
         <version>1.0.2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -47,24 +48,6 @@
         <azure.functions.subscriptionname></azure.functions.subscriptionname>
         <azure.functions.indexerqueuekey></azure.functions.indexerqueuekey>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/groups/17/-/packages/maven</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
-        </repository>
-        <snapshotRepository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <pluginRepositories>
         <pluginRepository>
