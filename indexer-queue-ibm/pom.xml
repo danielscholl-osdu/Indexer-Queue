@@ -37,23 +37,33 @@
 
 	<repositories>
 		<repository>
-			<id>${gitlab-server}</id>
-			<url>https://community.opengroup.org/api/v4/groups/17/-/packages/maven</url>
+			<id>elastic</id>
+			<url>https://artifacts.elastic.co/maven</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>${repo.releases.id}</id>
+			<url>${repo.releases.url}</url>
 		</repository>
 	</repositories>
 
 	<distributionManagement>
 		<repository>
-			<id>${gitlab-server}</id>
-			<url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+			<id>${publish.releases.id}</id>
+			<url>${publish.releases.url}</url>
 		</repository>
 		<snapshotRepository>
-			<id>${gitlab-server}</id>
-			<url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+			<id>${publish.snapshots.id}</id>
+			<url>${publish.snapshots.url}</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<dependencies>
 
+	<dependencies>
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>os-core-lib-ibm</artifactId>
