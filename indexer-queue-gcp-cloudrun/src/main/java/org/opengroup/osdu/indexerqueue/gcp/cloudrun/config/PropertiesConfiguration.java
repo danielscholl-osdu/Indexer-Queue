@@ -30,4 +30,10 @@ public class PropertiesConfiguration {
 
 	private String serviceMail;
 
+	private String googleCloudProject;
+
+	private String googleCloudProjectRegion;
+
+	private String indexerHost;
+
 }

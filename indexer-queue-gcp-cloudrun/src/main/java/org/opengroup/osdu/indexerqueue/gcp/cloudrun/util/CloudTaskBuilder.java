@@ -32,7 +32,6 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
-import org.opengroup.osdu.core.common.search.Config;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.PropertiesConfiguration;
 import org.springframework.stereotype.Component;
@@ -42,26 +41,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class CloudTaskBuilder implements TaskBuilder {
 
+	private static final String WORKER_ENDPOINT = "/api/indexer/v2/_dps/task-handlers/index-worker";
+
 	final IndexerQueueIdentifier indexerQueueProvider;
 
 	final HeadersInfo headersInfo;
 
-	final PropertiesConfiguration configuration;
+	final PropertiesConfiguration config;
 
 	public Task createTask(CloudTaskRequest request) throws IOException {
 		log.info(String.format("project-id: %s | location: %s | queue-id: %s | indexer-host: %s | message: %s",
-			Config.getGoogleCloudProjectId(), Config.getDeploymentLocation(), indexerQueueProvider.getQueueId(),
-			Config.getIndexerHostUrl(), request.getMessage()));
+			config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId(),
+			config.getIndexerHost() + WORKER_ENDPOINT, request.getMessage()));
 
 		String queuePath = QueueName
-			.of(Config.getGoogleCloudProjectId(), Config.getDeploymentLocation(), indexerQueueProvider.getQueueId())
+			.of(config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId())
 			.toString();
 
 		OidcToken.Builder oidcTokenBuilder = OidcToken.newBuilder()
-			.setServiceAccountEmail(configuration.getServiceMail()).setAudience(configuration.getGoogleAudience());
+			.setServiceAccountEmail(config.getServiceMail()).setAudience(config.getGoogleAudience());
 
 		HttpRequest httpRequest = HttpRequest.newBuilder()
-			.setUrl(Config.getIndexerHostUrl())
+			.setUrl(config.getIndexerHost() + WORKER_ENDPOINT)
 			.setBody(ByteString.copyFrom(request.getMessage(), Charset.defaultCharset()))
 			.setOidcToken(oidcTokenBuilder)
 			.putAllHeaders(this.headersInfo.getHeaders().getHeaders())
