@@ -15,8 +15,9 @@
         <module>indexer-queue-ibm</module>
         <module>indexer-queue-azure-enqueue</module>
         <module>indexer-queue-azure-requeue</module>
+		<module>indexer-queue-gcp-cloudrun</module>
         <module>indexer-queue-reference</module>
-    </modules>
+	</modules>
     <packaging>pom</packaging>
 
 
@@ -52,24 +53,31 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>${repo.releases.id}</id>
+            <url>${repo.releases.url}</url>
+        </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+            <id>${publish.releases.id}</id>
+            <url>${publish.releases.url}</url>
         </repository>
         <snapshotRepository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+            <id>${publish.snapshots.id}</id>
+            <url>${publish.snapshots.url}</url>
         </snapshotRepository>
     </distributionManagement>
 
-
     <dependencies>
-
-
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>2.1.16.RELEASE</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
         <dependency>
         <groupId>io.swagger</groupId>
         <artifactId>swagger-jaxrs</artifactId>
@@ -85,23 +93,6 @@
             </exclusion>
         </exclusions>
     </dependency>
-
-
-<!--    <dependency>-->
-<!--        <groupId>com.slb</groupId>-->
-<!--        <artifactId>slb-dps-utils</artifactId>-->
-<!--        <version>0.17.4</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--        <groupId>com.slb</groupId>-->
-<!--        <artifactId>slb-dps-clientlib</artifactId>-->
-<!--        <version>0.6.2</version>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--        <groupId>com.slb</groupId>-->
-<!--        <artifactId>slb-dps-logging</artifactId>-->
-<!--        <version>1.0.6</version>-->
-<!--    </dependency>-->
 
     <!--explicitly load latest compatible version with security fix in it-->
     <dependency>
@@ -274,23 +265,6 @@
         <version>2.10.2</version>
     </dependency>
 
-    <!--Logging-->
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-to-slf4j</artifactId>
-        <version>2.11.2</version>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-jdk14</artifactId>
-        <version>1.8.0-beta4</version>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.8.0-beta4</version>
-    </dependency>
-
     <!--Test-->
     <dependency>
         <groupId>org.powermock</groupId>
@@ -335,7 +309,6 @@
         <artifactId>jersey-client</artifactId>
         <version>1.19.4</version>
     </dependency>
-
 </dependencies>
 
     <build>
@@ -352,86 +325,80 @@
                     </configuration>
                 </plugin>
 
-        <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <version>9.4.11.v20180605</version>
-        </plugin>
-        <plugin>
-            <groupId>org.whitesource</groupId>
-            <artifactId>whitesource-maven-plugin</artifactId>
-            <version>3.3.0</version>
-            <configuration>
-                <orgToken>${orgToken}</orgToken>
-                <wssUrl>https://app-eu.whitesourcesoftware.com/agent</wssUrl>
-                <aggregateModules>true</aggregateModules>
-                <product>DPS</product>
-                <aggregateProjectName>dps-indexer-mvn</aggregateProjectName>
-                <forceCheckAllDependencies>false</forceCheckAllDependencies>
-                <checkPolicies>false</checkPolicies>
-                <forceUpdate>true</forceUpdate>
-                <failOnError>true</failOnError>
-                <excludes>
-                    <exclude>integration-tests</exclude>
-                </excludes>
-            </configuration>
-        </plugin>
-    </plugins>
-            </pluginManagement>
-    <plugins>
+                <plugin>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-maven-plugin</artifactId>
+                    <version>9.4.11.v20180605</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.whitesource</groupId>
+                    <artifactId>whitesource-maven-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <configuration>
+                        <orgToken>${orgToken}</orgToken>
+                        <wssUrl>https://app-eu.whitesourcesoftware.com/agent</wssUrl>
+                        <aggregateModules>true</aggregateModules>
+                        <product>DPS</product>
+                        <aggregateProjectName>dps-indexer-mvn</aggregateProjectName>
+                        <forceCheckAllDependencies>false</forceCheckAllDependencies>
+                        <checkPolicies>false</checkPolicies>
+                        <forceUpdate>true</forceUpdate>
+                        <failOnError>true</failOnError>
+                        <excludes>
+                            <exclude>integration-tests</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
 
-    <!-- JACOCO - code coverage -->
-    <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.1</version>
-        <executions>
-            <execution>
-                <id>prepare-unit-tests</id>
-                <goals>
-                    <goal>prepare-agent</goal>
-                </goals>
-            </execution>
+            <!-- JACOCO - code coverage -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.1</version>
+                <executions>
+                    <execution>
+                        <id>prepare-unit-tests</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
 
-            <!-- prepare agent for measuring integration tests -->
-            <execution>
-                <id>prepare-agent</id>
-                <goals>
-                    <goal>prepare-agent</goal>
-                </goals>
-                <phase>pre-integration-test</phase>
-                <configuration>
-                    <propertyName>itCoverageAgent</propertyName>
-                </configuration>
-            </execution>
-        </executions>
-    </plugin>
-    </plugins>
-            </build>
-<!--    <profiles>-->
-<!--    &lt;!&ndash; Unit test only &ndash;&gt;-->
-<!--    <profile>-->
-<!--        <id>dev</id>-->
-<!--        <properties>-->
-<!--            <skip.unit.tests>false</skip.unit.tests>-->
-<!--            <skip.integration.tests>true</skip.integration.tests>-->
-<!--        </properties>-->
-<!--    </profile>-->
-<!--    &lt;!&ndash; Integration test only &ndash;&gt;-->
-<!--    <profile>-->
-<!--        <id>integration-test</id>-->
-<!--        <properties>-->
-<!--            <skip.integration.tests>false</skip.integration.tests>-->
-<!--            <skip.unit.tests>true</skip.unit.tests>-->
-<!--        </properties>-->
-<!--    </profile>-->
-<!--    &lt;!&ndash; Unit and Integration tests combined &ndash;&gt;-->
-<!--    <profile>-->
-<!--        <id>test-all</id>-->
-<!--        <properties>-->
-<!--            <skip.integration.tests>false</skip.integration.tests>-->
-<!--            <skip.unit.tests>false</skip.unit.tests>-->
-<!--        </properties>-->
-<!--    </profile>-->
-<!--    </profiles>-->
+                    <!-- prepare agent for measuring integration tests -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <propertyName>itCoverageAgent</propertyName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>Default</id>
+            <activation>
+                <property>
+                    <name>!repo.releases.id</name>
+                </property>
+            </activation>
+            <properties>
+                <repo.releases.id>community-maven-repo</repo.releases.id>
+                <publish.snapshots.id>community-maven-via-job-token</publish.snapshots.id>
+                <publish.releases.id>community-maven-via-job-token</publish.releases.id>
+                <repo.releases.url>https://community.opengroup.org/api/v4/groups/17/-/packages/maven</repo.releases.url>
+                <publish.snapshots.url>https://community.opengroup.org/api/v4/projects/73/packages/maven</publish.snapshots.url>
+                <publish.releases.url>https://community.opengroup.org/api/v4/projects/73/packages/maven</publish.releases.url>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
