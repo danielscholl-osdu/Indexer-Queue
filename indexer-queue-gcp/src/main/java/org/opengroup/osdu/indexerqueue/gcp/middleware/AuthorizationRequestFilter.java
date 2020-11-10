@@ -26,6 +26,7 @@ import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.http.ResponseHeaders;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
+import org.opengroup.osdu.indexerqueue.gcp.config.IndexerQueueConfigurationPropertiesGcp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -49,8 +50,8 @@ public class AuthorizationRequestFilter implements Filter {
     @Autowired
     private HeadersInfo headersInfo;
 
-    @Value("${GOOGLE_AUDIENCES}")
-    private String GOOGLE_AUDIENCES;
+    @Autowired
+    private IndexerQueueConfigurationPropertiesGcp configurationProperties;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -111,7 +112,7 @@ public class AuthorizationRequestFilter implements Filter {
             }
 
             HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            String[] targetAudience = {GOOGLE_AUDIENCES};
+            String[] targetAudience = {configurationProperties.getGoogleAudiences()};
 
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(httpTransport, JSON_FACTORY)
                     .setIssuer("https://accounts.google.com")
