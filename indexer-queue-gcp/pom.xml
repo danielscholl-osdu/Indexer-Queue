@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
             <artifactId>os-core-common</artifactId>
-            <version>0.0.18</version>
+            <version>0.3.19</version>
         </dependency>
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
