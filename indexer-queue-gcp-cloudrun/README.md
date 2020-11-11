@@ -129,6 +129,8 @@ Push endpoint must be service endpoint:
 Push endpoint
 https://indexer-queue-jvmvia5dea-uc.a.run.app/api/indexer/v1/_ah/push-handlers/enqueue
 
+* Google Documentation: https://cloud.google.com/pubsub/docs/push#authentication_and_authorization
+
 ## Licence
 Copyright © Google LLC
 Copyright © EPAM Systems
