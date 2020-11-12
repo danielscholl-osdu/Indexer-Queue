@@ -22,6 +22,10 @@ metadata:
 spec:
   scaleTargetRef:
     deploymentName: {{ .Chart.Name }}
+  pollingInterval: 30  # Optional. Default: 30 seconds
+  cooldownPeriod:  60  # Optional. Default: 300 seconds
+  minReplicaCount: 1   # Optional. Default: 0
+  maxReplicaCount: 10  # Optional. Default: 100
   triggers:
   - type: azure-servicebus
     metadata:
