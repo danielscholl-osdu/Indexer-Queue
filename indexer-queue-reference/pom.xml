@@ -20,29 +20,22 @@
 
     <repositories>
         <repository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/groups/17/-/packages/maven</url>
+            <id>${repo.releases.id}</id>
+            <url>${repo.releases.url}</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+            <id>${publish.releases.id}</id>
+            <url>${publish.releases.url}</url>
         </repository>
         <snapshotRepository>
-            <id>${gitlab-server}</id>
-            <url>https://community.opengroup.org/api/v4/projects/73/packages/maven</url>
+            <id>${publish.snapshots.id}</id>
+            <url>${publish.snapshots.url}</url>
         </snapshotRepository>
     </distributionManagement>
     <dependencies>
-
-        <dependency>
-            <groupId>org.opengroup.osdu</groupId>
-            <artifactId>os-core-lib-ibm</artifactId>
-            <version>0.0.13-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
@@ -103,6 +96,11 @@
             <version>2.0.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opengroup.osdu</groupId>
+            <artifactId>os-core-common</artifactId>
+            <version>0.0.18</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -118,7 +116,7 @@
                         <configuration>
                             <classifier>spring-boot</classifier>
                             <mainClass>
-                                org.opengroup.osdu.indexerqueue.ibm.IndexerQueueReferenceApplication
+                                org.opengroup.osdu.indexerqueue.reference.IndexerQueueReferenceApplication
                             </mainClass>
                         </configuration>
                     </execution>

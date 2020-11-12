@@ -1,17 +1,16 @@
 apiVersion: v1
 data:
-  AUTHORIZE_API: https://os-entitlements-gcp-jvmvia5dea-uc.a.run.app/entitlements/v1
-  LEGALTAG_API: 35.193.27.80:80
-  STORAGE_HOSTNAME: 34.71.59.229:80
-  MONGO_DB_URL: 34.69.26.15:27017
-  MONGO_DB_USER: admin
-  MONGO_DB_NAME: main
-  reference.env.prefix: ic-r2-dev
-  INDEXER_URL: os-indexer-dot-osdu-cicd-epam.uc.r.appspot.com
-  #INDEXER_QUEUE_HOST: https://os-indexer-queue-dot-osdu-cicd-epam.uc.r.appspot.com/_dps/task-handlers/enqueue
-  GOOGLE_AUDIENCES: 56174004264-dodcad3iura0u27vggknioojp2cuvtat.apps.googleusercontent.com
-  CRS_API: https://crs-converter-jvmvia5dea-uc.a.run.app/api/crs/v1
-  GOOGLE_CLOUD_PROJECT: osdu-anthos-02
+  AUTHORIZE_API: ${AUTHORIZE_API}
+  LEGALTAG_API: ${LEGALTAG_API}
+  STORAGE_HOSTNAME: ${STORAGE_HOSTNAME}
+  MONGO_DB_URL: ${MONGO_DB_URL}
+  MONGO_DB_USER: ${MONGO_DB_USER}
+  MONGO_DB_NAME: ${MONGO_DB_NAME}
+  INDEXER_URL: ${INDEXER_URL}
+  GOOGLE_AUDIENCES: ${GOOGLE_AUDIENCES}
+  CRS_API: ${CRS_API}
+  GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
+  GOOGLE_CLOUD_PROJECT_REGION: ${GOOGLE_CLOUD_PROJECT_REGION}
 kind: ConfigMap
 metadata:
   labels:
@@ -48,6 +47,11 @@ spec:
                   valueFrom:
                     configMapKeyRef:
                       key: LEGALTAG_API
+                      name: indexer-queue-config
+              -   name: GOOGLE_CLOUD_PROJECT_REGION
+                  valueFrom:
+                    configMapKeyRef:
+                      key: GOOGLE_CLOUD_PROJECT_REGION
                       name: indexer-queue-config
               -   name: STORAGE_HOSTNAME
                   valueFrom:
@@ -99,7 +103,7 @@ spec:
                     configMapKeyRef:
                       key: GOOGLE_CLOUD_PROJECT
                       name: indexer-queue-config
-            image: us.gcr.io/osdu-anthos-02/os-indexer-queue/anthos-indexer-queue-reference:10b3d8b-dirty
+            image: us.gcr.io/osdu-anthos-02/os-indexer-queue/anthos-indexer-queue-reference:bcb1a0f-dirty
             name: indexer-queue-reference
 ---
 apiVersion: v1
@@ -118,8 +122,8 @@ spec:
 ---
 apiVersion: v1
 data:
-  mongo.db.password: YWRtaW4xMjM=
-  reference.rabbitmq.uri: YW1xcDovL2FkbWluOm9zZHVwYXNzQDM1LjE5My4yNS44OTo1Njcy
+  mongo.db.password: ${mongo.db.password}
+  reference.rabbitmq.uri: ${reference.rabbitmq.uri}
 kind: Secret
 metadata:
   name: indexer-queue-secret
