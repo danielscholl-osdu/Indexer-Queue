@@ -15,7 +15,8 @@
         <module>indexer-queue-ibm</module>
         <module>indexer-queue-azure-enqueue</module>
         <module>indexer-queue-azure-requeue</module>
-    </modules>
+		<module>indexer-queue-gcp-cloudrun</module>
+	</modules>
     <packaging>pom</packaging>
 
 
