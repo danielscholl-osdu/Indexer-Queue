@@ -40,6 +40,8 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 public class RecordChangedMessagesProvider {
 
+	private static final String INVALID_RECORD_CHANGE_MESSAGE = "Invalid record change message";
+
 	private final Gson gson = new Gson();
 
 	@Bean
@@ -52,7 +54,7 @@ public class RecordChangedMessagesProvider {
 			JsonElement jsonRoot = JsonParser.parseString(requestBody);
 			JsonElement message = jsonRoot.getAsJsonObject().get("message");
 			if (message == null) {
-				throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message",
+				throw new AppException(HttpStatus.SC_BAD_REQUEST, INVALID_RECORD_CHANGE_MESSAGE,
 					"message object not found", "'message' object not found in PubSub message");
 			}
 
@@ -60,7 +62,7 @@ public class RecordChangedMessagesProvider {
 				.fromJson(message.toString(), RecordChangedMessages.class);
 			String payload = recordChangedMessages.getData();
 			if (Strings.isNullOrEmpty(payload)) {
-				throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message",
+				throw new AppException(HttpStatus.SC_BAD_REQUEST, INVALID_RECORD_CHANGE_MESSAGE,
 					"message data not found", "'message.data' not found in PubSub message");
 			}
 
@@ -69,7 +71,7 @@ public class RecordChangedMessagesProvider {
 
 			Map<String, String> attributes = recordChangedMessages.getAttributes();
 			if (attributes == null || attributes.size() == 0) {
-				throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message",
+				throw new AppException(HttpStatus.SC_BAD_REQUEST, INVALID_RECORD_CHANGE_MESSAGE,
 					"attribute map not found", String.format("PubSub message: %s", recordChangedMessages));
 			}
 			Map<String, String> lowerCase = new HashMap<>();
