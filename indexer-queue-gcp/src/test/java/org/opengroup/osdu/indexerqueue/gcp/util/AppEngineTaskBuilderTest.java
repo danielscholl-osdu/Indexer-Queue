@@ -25,8 +25,8 @@ import org.mockito.Mock;
 import org.opengroup.osdu.core.common.Constants;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
-import org.opengroup.osdu.core.common.search.Config;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
+import org.opengroup.osdu.indexerqueue.gcp.config.IndexerQueueConfigurationPropertiesGcp;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,9 +43,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ Config.class, CloudTasksClient.class})
+@PrepareForTest({CloudTasksClient.class})
 public class AppEngineTaskBuilderTest {
 
+    @Mock
+    private IndexerQueueConfigurationPropertiesGcp configurationProperties;
     @Mock
     private javax.inject.Provider<IndexerQueueIdentifier> indexerQueueProvider;
     @Mock
@@ -64,7 +66,6 @@ public class AppEngineTaskBuilderTest {
     @Before
     public void setup() throws IOException {
         initMocks(this);
-        mockStatic(Config.class);
         mockStatic(CloudTasksClient.class);
 
         client = mock(CloudTasksClient.class);
@@ -73,9 +74,9 @@ public class AppEngineTaskBuilderTest {
 
         when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(dpsHeaders.getHeaders()).thenReturn(headers);
-        when(Config.getIndexerHostUrl()).thenReturn("indexer-dot-test-ddl-us-services.appspot.com");
-        when(Config.getGoogleCloudProjectId()).thenReturn("test-ddl-us-services");
-        when(Config.getDeploymentLocation()).thenReturn("us-central1");
+        when(configurationProperties.getIndexerHost()).thenReturn("indexer-dot-test-ddl-us-services.appspot.com");
+        when(configurationProperties.getGoogleCloudProject()).thenReturn("test-ddl-us-services");
+        when(configurationProperties.getDeploymentLocation()).thenReturn("us-central1");
         when(this.indexerQueueProvider.get()).thenReturn(this.indexerQueue);
         when(this.indexerQueue.getQueueId()).thenReturn("test-queue");
         when(CloudTasksClient.create()).thenReturn(client);
