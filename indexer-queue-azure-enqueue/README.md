@@ -47,6 +47,7 @@ az keyvault secret show --vault-name $KEY_VAULT_NAME --name $KEY_VAULT_SECRET_NA
 | `SERVICE_BUS_ENDPOINT` | `********` | Service Bus connection string | yes | output of infrastructure deployment |
 | `TOPIC_NAME` | `recordstopic` | Service Bus topic to listen on | yes | output of infrastructure deployment |
 | `INDEXER_WORKER_URL` | ex `https://indexer.azurewebsites.net` | Indexer endpoint | no | output of infrastructure deployment |
+| `azure.application-insights.instrumentation-key` | `********` | Instrumentation key of the associated application insights resource | yes | output of infrastructure deployment | 
 
 ### Configure Maven
 
