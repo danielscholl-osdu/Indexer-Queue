@@ -28,7 +28,6 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.opengroup.osdu.indexerqueue.azure.ReEnqueueApplication;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -39,7 +38,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.*;
 
