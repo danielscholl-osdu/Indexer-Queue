@@ -18,7 +18,7 @@
 package org.opengroup.osdu.indexerqueue.reference.messagebus;
 
 public interface IMessageFactory {
-	String DEFAULT_QUEUE_NAME = "indexer-reference";
+	String DEFAULT_QUEUE_NAME = "records";
 
 	void sendMessage(String queueName, String msg);
 }

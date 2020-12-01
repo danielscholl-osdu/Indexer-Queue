@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.util.EntityUtils;
 import org.opengroup.osdu.core.common.Constants;
 import org.opengroup.osdu.core.common.http.HttpClient;
 import org.opengroup.osdu.core.common.http.HttpRequest;
@@ -60,9 +61,16 @@ public class Subcriber {
   public void recievedMessage(Message message) {
     byte[] body = message.getBody();
     String msg = new String(body);
+
     logger.info("Recieved Message: " + msg);
+    JsonObject jsonContent = new JsonParser().parse(msg)
+        .getAsJsonObject();
+    String authorization = jsonContent.get("authorization").getAsString();
 
     RecordChangedMessages recordMessage = getTaskQueueMessage(msg);
+    Map<String, String> attributes = recordMessage.getAttributes();
+    attributes.put("authorization", authorization);
+
     logger.info(String.format("recordMessage: %s", recordMessage.toString()));
 
     dpsHeaders.getHeaders().put(DpsHeaders.ACCOUNT_ID, recordMessage.getDataPartitionId());
