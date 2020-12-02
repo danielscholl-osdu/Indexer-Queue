@@ -17,7 +17,6 @@
 
 package org.opengroup.osdu.indexerqueue.reference;
 
-import java.util.Base64;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,7 @@ public class MessagingConfiguration {
       throws Exception {
 
     CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-    connectionFactory.getRabbitConnectionFactory().setUri(new String(Base64.getDecoder().decode(RABBITMQ_ADDRESS)));
+    connectionFactory.getRabbitConnectionFactory().setUri(RABBITMQ_ADDRESS);
 
     return connectionFactory;
   }
