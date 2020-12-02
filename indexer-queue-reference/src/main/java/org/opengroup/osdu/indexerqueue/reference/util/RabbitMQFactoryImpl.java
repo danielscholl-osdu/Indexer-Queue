@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
 import org.opengroup.osdu.indexerqueue.reference.messagebus.IMessageFactory;
@@ -47,7 +46,7 @@ public class RabbitMQFactoryImpl implements IMessageFactory {
 	private void init() {
 		ConnectionFactory factory = new ConnectionFactory();
 		try {
-			factory.setUri(new String(Base64.getDecoder().decode(uri)));
+			factory.setUri(uri);
 			factory.setAutomaticRecoveryEnabled(true);
 			Connection conn = factory.newConnection();
 			channel = conn.createChannel();
