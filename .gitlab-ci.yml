@@ -92,7 +92,7 @@ osdu-gcp-containerize:
     - gcloud auth activate-service-account --key-file $OSDU_GCP_DEPLOY_FILE
     - gcloud config set project $OSDU_GCP_PROJECT
     - touch .gcloudignore
-    - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
+    - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_GCP_SERVICE=$OSDU_GCP_SERVICE,_APPLICATION_NAME=$OSDU_GCP_APPLICATION_NAME,_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
   only:
     variables:
       - $OSDU_GCP == 'true'
