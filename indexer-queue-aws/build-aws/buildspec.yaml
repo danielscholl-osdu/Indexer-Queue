@@ -29,8 +29,8 @@ phases:
       java: corretto8
     commands:
       - if [ $(echo $CODEBUILD_SOURCE_VERSION | grep -c  ^refs/heads.*) -eq 1 ]; then echo "Branch name found"; else echo "This build only supports branch builds" && exit 1; fi
-      - apt-get update -y
-      - apt-get install -y maven
+      - apt-get update -y -qq > /dev/null
+      - apt-get install -y maven -qq > /dev/null
       - java -version
       - mvn -version
       - echo $JAVA_HOME #WHY
@@ -56,7 +56,7 @@ phases:
       - printenv
 
       - echo "Building primary service assemblies..."
-      - mvn -B test install -pl indexer-queue-aws -Ddeployment.environment=prod
+      - mvn -ntp -B test install -pl indexer-queue-aws -Ddeployment.environment=prod
 
 #      - echo "Copying assemblies to dist..."
 #      - cp ./indexer-queue-aws/target/indexer-queue*.jar ${OUTPUT_DIR}/bin # copy aws jars
