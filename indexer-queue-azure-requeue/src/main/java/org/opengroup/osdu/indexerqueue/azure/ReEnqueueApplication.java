@@ -83,6 +83,7 @@ public class ReEnqueueApplication {
         } catch (AppException e) {
             throw new AppException(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Could not send to SB.", "/nProblem sending request to SB: \" + e.getMessage()");
         }
+
         return request.createResponseBuilder(com.microsoft.azure.functions.HttpStatus.OK)
                 .header("Content-Type", "application/json")
                 .build();

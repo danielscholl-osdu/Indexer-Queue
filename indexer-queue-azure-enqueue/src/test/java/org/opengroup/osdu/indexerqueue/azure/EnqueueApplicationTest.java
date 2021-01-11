@@ -25,7 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.search.DeploymentEnvironment;
-import org.opengroup.osdu.core.common.search.Config;
+import org.opengroup.osdu.indexerqueue.azure.config.IndexerQueueConfigurationPropertiesAzure;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -42,7 +42,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ Config.class, HttpClientBuilder.class })
+@PrepareForTest({HttpClientBuilder.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class EnqueueApplicationTest {
 
@@ -57,6 +57,8 @@ public class EnqueueApplicationTest {
 
   private final String ACCOUNT_ID = "any-account";
 
+  @Mock
+  private IndexerQueueConfigurationPropertiesAzure configurationProperties;
   @Mock
   private HttpServletRequest request;
   @Mock
@@ -83,12 +85,11 @@ public class EnqueueApplicationTest {
   public void setup() throws Exception {
     initMocks(this);
 
-    mockStatic(Config.class);
     environmentVariables.set("INDEXER_WORKER_URL", "index-worker-url");
     executionContext = mock(ExecutionContext.class);
 
     when(request.getReader()).thenReturn(bufferReader);
-    when(Config.getDeploymentEnvironment()).thenReturn(DeploymentEnvironment.LOCAL);
+    when(configurationProperties.getDeploymentEnvironment()).thenReturn(DeploymentEnvironment.LOCAL);
     when(executionContext.getLogger()).thenReturn(Logger.getGlobal());
     when(httpClient.execute(httpPost)).thenReturn(httpResponse);
   }

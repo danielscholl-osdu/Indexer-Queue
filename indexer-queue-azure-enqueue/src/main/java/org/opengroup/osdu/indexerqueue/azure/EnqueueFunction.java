@@ -25,6 +25,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.util.SBMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.MDCContextMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -47,6 +51,9 @@ public class EnqueueFunction {
 
   private final Gson gson = new Gson();
   private HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+  private final static Logger LOGGER = LoggerFactory.getLogger(EnqueueFunction.class);
+  private MDCContextMap mdcContextMap = new MDCContextMap();
+  private String log_prefix = "queue";
 
   public EnqueueFunction() {
   }
@@ -59,18 +66,21 @@ public class EnqueueFunction {
 
     // TODO: this should be moved to Azure client-lib
     final String INDEXER_QUEUE_KEY = "x-functions-key";
-
     sbMessageBuilder = new SBMessageBuilder();
-    context.getLogger().info("serviceBusRequest: " + serviceBusRequest);
-
     recordChangedMessage = sbMessageBuilder.getServiceBusMessage(serviceBusRequest);
+
+    String correlationId = recordChangedMessage.getCorrelationId();
+    String dataPartitionId = recordChangedMessage.getDataPartitionId();
+    MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));
+    LOGGER.info("{} {} {}", new Object[]{log_prefix, "serviceBusRequest: ", serviceBusRequest});
+
     recordChangedMessage.setMessageId(messageId);
     recordChangedMessage.setPublishTime(enqueuedTimeUtc);
     int currentTry = Integer.parseInt(deliveryCount);
 
     try (CloseableHttpClient indexWorkerClient = httpClientBuilder.build()) {
-      context.getLogger().info("INDEXER_WORKER_URL: " + System.getenv("INDEXER_WORKER_URL"));
-      context.getLogger().info("recordChangedMessage: " + this.gson.toJson(recordChangedMessage));
+      LOGGER.info("{} {} {}", new Object[]{log_prefix,"INDEXER_WORKER_URL: ", System.getenv("INDEXER_WORKER_URL")});
+      LOGGER.info("{} {} {}", new Object[]{log_prefix,"recordChangedMessage: ", this.gson.toJson(recordChangedMessage)});
       indexWorkerRequest = new HttpPost(System.getenv("INDEXER_WORKER_URL"));
       indexWorkerRequest.setEntity(new StringEntity(this.gson.toJson(recordChangedMessage)));
       indexWorkerRequest.setHeader(INDEXER_QUEUE_KEY, System.getenv("INDEXER_QUEUE_KEY"));
@@ -87,11 +97,12 @@ public class EnqueueFunction {
       java.sql.Timestamp before = new java.sql.Timestamp(new Date().getTime());
       Thread.sleep(waitTime);
       java.sql.Timestamp after = new java.sql.Timestamp(new Date().getTime());
-      context.getLogger().info("wait time: " + (after.getTime() - before.getTime()));
+      LOGGER.info("{} {} {}", new Object[]{log_prefix,"wait time: ", (after.getTime() - before.getTime())});
 
       throw new Exception("Error creating request to index worker: " + e.getMessage());
     }
 
+    MDC.clear();
     return Response.status(HttpStatus.SC_OK).type(String.valueOf(MediaType.APPLICATION_JSON)).build();
 
     /*

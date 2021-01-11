@@ -21,10 +21,14 @@ variables:
 
   OSDU_GCP_BUILD_SUBDIR: indexer-queue-gcp
   OSDU_GCP_INT_TEST_SUBDIR: indexer-queue-gcp # Fix as soon as integration tests are added
-  OSDU_GCP_APPLICATION_NAME: os-indexer-queue
   OSDU_GCP_ENVIRONMENT: osdu-gcp
   OSDU_GCP_TENANT_NAME: osdu
-  OSDU_GCP_DEPLOY_ENV: empty
+  OSDU_GCP_SERVICE: indexer-queue
+  OSDU_GCP_APPLICATION_NAME: indexer-queue
+  OSDU_GCP_VENDOR: gcp-cloudrun
+  OSDU_GCP_INDEXER_HOST_4Q: https://os-indexer-attcrcktoa-uc.a.run.app
+  OSDU_GCP_IQ_SA: pub-sub-indexer-queue@nice-etching-277309.iam.gserviceaccount.com
+  OSDU_GCP_ENV_VARS: GOOGLE_AUDIENCES=$GOOGLE_AUDIENCE,GOOGLE_CLOUD_PROJECT_REGION=$OSDU_GCP_CLOUDRUN_REGION,GOOGLE_CLOUD_PROJECT=$OSDU_GCP_PROJECT,INDEXER_HOST=$OSDU_GCP_INDEXER_HOST_4Q,SERVICE_MAIL=$OSDU_GCP_IQ_SA,OSDU_ENTITLEMENTS_URL=$OSDU_GCP_ENTITLEMENTS_URL --vpc-connector=$OSDU_GCP_VPC_CONNECTOR
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
@@ -52,7 +56,7 @@ include:
     file: "cloud-providers/gcp.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/osdu-gcp.yml"
+    file: "cloud-providers/osdu-gcp-cloudrun.yml"
 
 gcp-deploy:
   image: divido2/gcp-maven
@@ -78,25 +82,25 @@ gcp-test:
   script:
     - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
 
-osdu-gcp-deploy:
-  image: divido2/gcp-maven
-  stage: deploy
+osdu-gcp-containerize:
+  stage: containerize
   needs: ["compile-and-unit-test"]
-  extends:
-    - .osdu-gcp
-    - .maven
-
+  extends: .osdu-gcp-variables
+  image: google/cloud-sdk
+  cache: {}
   script:
-    - mkdir -p "$OSDU_GCP_DEPLOY_DIR"
-    - gcloud auth activate-service-account --key-file="$OSDU_GCP_DEPLOY_FILE"
-    - cat $OSDU_GCP_APP_YAML > indexer-queue-gcp/src/main/webapp/WEB-INF/appengine-web.xml
-    - $MAVEN package appengine:deploy -pl org.opengroup.osdu.indexerqueue:indexer-queue-gcp -Dapp.deploy.project=$OSDU_GCP_PROJECT -Dapp.deploy.version=$CI_COMMIT_SHORT_SHA -DskipTests=true
+    - gcloud auth activate-service-account --key-file $OSDU_GCP_DEPLOY_FILE
+    - gcloud config set project $OSDU_GCP_PROJECT
+    - touch .gcloudignore
+    - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_GCP_SERVICE=$OSDU_GCP_SERVICE,_APPLICATION_NAME=$OSDU_GCP_APPLICATION_NAME,_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
+  only:
+    variables:
+      - $OSDU_GCP == 'true'
 
 osdu-gcp-test:
   extends:
-    - .osdu-gcp
     - .maven
-    - .OSDU_GCP_variables
+    - .osdu-gcp-variables
   stage: integration
   needs: ["osdu-gcp-deploy"]
   allow_failure: true

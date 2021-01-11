@@ -47,6 +47,11 @@ spec:
               secretKeyRef:
                 name: airflow
                 key: storage-key
+          - name: appinsights_key
+            valueFrom:
+              secretKeyRef:
+                name: central-logging
+                key: appinsights
           - name: AzureWebJobsStorage
             value: DefaultEndpointsProtocol=https;AccountName=$(storage_account);AccountKey=$(storage_account_key);EndpointSuffix=core.windows.net
           - name: INDEXER_WORKER_URL

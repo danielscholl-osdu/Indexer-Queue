@@ -18,6 +18,11 @@
 
 version: 0.2
 
+env:
+  secrets-manager:
+    DOCKER_USERNAME: /osdu/devops/docker_credentials:username
+    DOCKER_PASSWORD: /osdu/devops/docker_credentials:password
+
 phases:
   install:
     runtime-versions:
@@ -55,6 +60,9 @@ phases:
 
 #      - echo "Copying assemblies to dist..."
 #      - cp ./indexer-queue-aws/target/indexer-queue*.jar ${OUTPUT_DIR}/bin # copy aws jars
+
+      - echo "Logging into Docker Hub..."
+      - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
 
       - echo "Building docker image..."
       - docker build -f indexer-queue-aws/build-aws/Dockerfile -t ${ECR_IMAGE} .

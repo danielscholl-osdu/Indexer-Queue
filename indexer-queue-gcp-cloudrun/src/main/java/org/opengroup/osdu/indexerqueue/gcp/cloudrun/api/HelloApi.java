@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloApi {
 
 	@GetMapping("/")
-	public String Hello() {
+	public String hello() {
 		return "Hello Indexer Queue";
 	}
 }

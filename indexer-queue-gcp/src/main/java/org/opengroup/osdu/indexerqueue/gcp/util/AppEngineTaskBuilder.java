@@ -19,8 +19,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import lombok.extern.java.Log;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
-import org.opengroup.osdu.core.common.search.Config;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
+import org.opengroup.osdu.indexerqueue.gcp.config.IndexerQueueConfigurationPropertiesGcp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,15 +34,26 @@ import java.time.Instant;
 public class AppEngineTaskBuilder {
 
     @Autowired
+    private IndexerQueueConfigurationPropertiesGcp configurationProperties;
+    @Autowired
     private IndexerQueueIdentifier indexerQueueProvider;
     @Autowired
     private HeadersInfo headersInfo;
 
     public Task createTask(CloudTaskRequest request) throws IOException {
         this.log.info(String.format("project-id: %s | location: %s | queue-id: %s | indexer-host: %s | message: %s",
-                Config.getGoogleCloudProjectId(), Config.getDeploymentLocation(), indexerQueueProvider.getQueueId(), Config.getIndexerHostUrl(), request.getMessage()));
-        String queuePath = QueueName.of(Config.getGoogleCloudProjectId(), Config.getDeploymentLocation(), indexerQueueProvider.getQueueId()).toString();
-        AppEngineRouting routing = AppEngineRouting.newBuilder().setHost(Config.getIndexerHostUrl()).build();
+                configurationProperties.getGoogleCloudProject(),
+                configurationProperties.getDeploymentLocation(),
+                indexerQueueProvider.getQueueId(),
+                configurationProperties.getIndexerHost(),
+                request.getMessage()));
+        String queuePath = QueueName.of(
+                configurationProperties.getGoogleCloudProject(),
+                configurationProperties.getDeploymentLocation(),
+                indexerQueueProvider.getQueueId()).toString();
+        AppEngineRouting routing = AppEngineRouting.newBuilder()
+                .setHost(configurationProperties.getIndexerHost())
+                .build();
         Task.Builder taskBuilder = Task
                 .newBuilder()
                 .setScheduleTime(Timestamp.newBuilder()

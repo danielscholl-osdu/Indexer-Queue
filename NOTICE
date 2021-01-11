@@ -182,7 +182,10 @@ The following software have components provided under the terms of this license:
 - Apache Log4j API (from )
 - Apache Log4j API (from )
 - Apache Log4j API (from )
+- Apache Log4j API (from )
 - Apache Log4j Core (from )
+- Apache Log4j Core (from )
+- Apache Log4j SLF4J Binding (from )
 - Apache Log4j to SLF4J Adapter (from )
 - Apache Log4j to SLF4J Adapter (from )
 - Apache Maven Shared Utils (from )
@@ -356,10 +359,13 @@ The following software have components provided under the terms of this license:
 - Maven Repository Metadata Model (from )
 - Maven Settings (from )
 - Maven Settings Builder (from )
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web with Auto Registration Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java)
+- Mockito (from http://mockito.org)
+- Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
-- Mockito (from http://mockito.org)
-- Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
 - Netty/Buffer (from http://netty.io/)
 - Netty/Buffer (from http://netty.io/)
@@ -430,6 +436,7 @@ The following software have components provided under the terms of this license:
 - Spring AOP (from https://github.com/spring-projects/spring-framework)
 - Spring Beans (from https://github.com/spring-projects/spring-framework)
 - Spring Beans (from https://github.com/spring-projects/spring-framework)
+- Spring Beans (from https://github.com/spring-projects/spring-framework)
 - Spring Boot (from http://projects.spring.io/spring-boot/)
 - Spring Boot (from http://projects.spring.io/spring-boot/)
 - Spring Boot Actuator (from http://projects.spring.io/spring-boot/)
@@ -441,7 +448,6 @@ The following software have components provided under the terms of this license:
 - Spring Boot Jersey Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Json Starter (from https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-json)
 - Spring Boot Json Starter (from https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-json)
-- Spring Boot Logging Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Logging Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Security Starter (from http://projects.spring.io/spring-boot/)
 - Spring Boot Starter (from http://projects.spring.io/spring-boot/)
@@ -456,8 +462,10 @@ The following software have components provided under the terms of this license:
 - Spring Boot Web Starter (from http://projects.spring.io/spring-boot/)
 - Spring Commons Logging Bridge (from https://github.com/spring-projects/spring-framework)
 - Spring Commons Logging Bridge (from https://github.com/spring-projects/spring-framework)
+- Spring Commons Logging Bridge (from https://github.com/spring-projects/spring-framework)
 - Spring Context (from https://github.com/spring-projects/spring-framework)
 - Spring Context (from https://github.com/spring-projects/spring-framework)
+- Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Expression Language (SpEL) (from https://github.com/spring-projects/spring-framework)
@@ -634,8 +642,11 @@ The following software have components provided under the terms of this license:
 - Lucene Suggest (from )
 - Lucene Suggest (from )
 - Lucene Suggest (from )
-- Mockito (from http://mockito.org)
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web with Auto Registration Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Mockito (from http://www.mockito.org)
+- Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
 - Netty/Codec/HTTP (from )
 - Netty/Codec/HTTP (from )
@@ -647,6 +658,7 @@ The following software have components provided under the terms of this license:
 - SnakeYAML (from http://www.snakeyaml.org)
 - SnakeYAML (from http://www.snakeyaml.org)
 - SnakeYAML (from http://www.snakeyaml.org)
+- Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Core (from https://github.com/spring-projects/spring-framework)
 - Spring Core (from https://github.com/spring-projects/spring-framework)
 - ThreeTen backport (from https://www.threeten.org/threetenbp)
@@ -663,16 +675,25 @@ CC-BY-2.5
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- "Java Concurrency in Practice" book annotations (from http://jcip.net/)
 - Checker Qual (from https://checkerframework.org)
+- FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
 
 ========================================================================
 CC-BY-3.0
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- "Java Concurrency in Practice" book annotations (from http://jcip.net/)
 - Apache HttpCore (from http://hc.apache.org/httpcomponents-core-ga)
-- FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
+
+========================================================================
+CC-BY-4.0
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web with Auto Registration Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 
 ========================================================================
 CC0-1.0
@@ -699,9 +720,7 @@ The following software have components provided under the terms of this license:
 - HK2 module of HK2 itself (from )
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from )
 - Java EE Transaction API (from http://jcp.org/en/jsr/detail?id=907)
-- Java Servlet API (from http://servlet-spec.java.net)
 - JavaBeans Activation Framework API jar (from )
-- JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - JavaMail API (compat) (from http://kenai.com/projects/javamail/mail)
 - Run Level Service (from )
 - ServiceLocator Default Implementation (from git://java.net/hk2~git/hk2-locator)
@@ -732,6 +751,8 @@ The following software have components provided under the terms of this license:
 - Java Architecture For XML Binding (from )
 - Java Architecture for XML Binding 2.3 (from )
 - Java Servlet API (from http://servlet-spec.java.net)
+- Java Servlet API (from http://servlet-spec.java.net)
+- JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - OSGi resource locator (from )
 - jersey-ext-bean-validation (from )
@@ -745,6 +766,7 @@ CPL-1.0
 The following software have components provided under the terms of this license:
 
 - Apache HttpCore (from http://hc.apache.org/httpcomponents-core-ga)
+- JUnit (from http://junit.org)
 - System Rules (from http://stefanbirkner.github.io/system-rules/)
 
 ========================================================================
@@ -758,9 +780,11 @@ The following software have components provided under the terms of this license:
 - Aether :: Utilities (from )
 - Common Annotations 1.3 API (from )
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from )
-- JUnit (from http://junit.org)
 - Logback Classic Module (from )
 - Logback Core Module (from )
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web with Auto Registration Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - SnakeYAML (from http://www.snakeyaml.org)
 - SnakeYAML (from http://www.snakeyaml.org)
 - SnakeYAML (from http://www.snakeyaml.org)
@@ -899,12 +923,17 @@ LGPL-2.1-only
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- Apache Log4j API (from )
+- Apache Log4j Core (from )
 - Elastic JNA Distribution (from https://github.com/java-native-access/jna)
 - JTS Topology Suite (from http://sourceforge.net/projects/jts-topo-suite)
 - Javassist (from http://www.javassist.org/)
 - Javassist (from http://www.javassist.org/)
 - Logback Classic Module (from )
 - Logback Core Module (from )
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web with Auto Registration Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - SnakeYAML (from http://www.snakeyaml.org)
 
 ========================================================================
@@ -948,19 +977,21 @@ The following software have components provided under the terms of this license:
 - Elasticsearch: 5.0.0-alpha5 (from https://github.com/elastic/elasticsearch)
 - JOpt Simple (from http://pholser.github.io/jopt-simple)
 - JUL to SLF4J bridge (from http://www.slf4j.org)
-- JUL to SLF4J bridge (from http://www.slf4j.org)
 - Java JWT (from http://www.jwt.io)
 - Lucene Core (from )
 - Lucene Core (from )
 - Lucene Core (from )
 - Lucene Sandbox (from )
 - Lucene Sandbox (from )
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web with Auto Registration Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Azure Functions Java Core Types (from https://azure.microsoft.com/en-us/services/functions)
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java)
-- Mockito (from http://www.mockito.org)
+- Mockito (from http://mockito.org)
 - Mockito (from http://mockito.org)
 - Mockito (from http://www.mockito.org)
-- Mockito (from http://mockito.org)
+- Mockito (from http://www.mockito.org)
 - Netty/Codec/HTTP (from )
 - Netty/Codec/HTTP (from )
 - Netty/Common (from )
@@ -972,6 +1003,8 @@ The following software have components provided under the terms of this license:
 - Plexus Javac Component (from )
 - Project Lombok (from https://projectlombok.org)
 - Project Lombok (from https://projectlombok.org)
+- SLF4J API Module (from http://www.slf4j.org)
+- SLF4J API Module (from http://www.slf4j.org)
 - SLF4J API Module (from http://www.slf4j.org)
 - SLF4J API Module (from http://www.slf4j.org)
 - SLF4J API Module (from http://www.slf4j.org)
@@ -1011,7 +1044,6 @@ Public-Domain
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- AOP alliance (from http://aopalliance.sourceforge.net)
 - HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
 - LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils)
@@ -1039,6 +1071,7 @@ public-domain
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- AOP alliance (from http://aopalliance.sourceforge.net)
 - AWS SDK for Java - Models (from https://aws.amazon.com/sdkforjava)
 - Guava: Google Core Libraries for Java (from https://github.com/google/guava.git)
 - Guava: Google Core Libraries for Java (from https://github.com/google/guava.git)
@@ -1046,6 +1079,7 @@ The following software have components provided under the terms of this license:
 - Joda-Time (from http://www.joda.org/joda-time/)
 - Joda-Time (from http://www.joda.org/joda-time/)
 - LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Project Lombok (from https://projectlombok.org)
 - Project Lombok (from https://projectlombok.org)
 - RESTEasy JAX-RS Implementation (from )
@@ -1059,8 +1093,10 @@ unknown
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- "Java Concurrency in Practice" book annotations (from http://jcip.net/)
 - Byte Buddy (without dependencies) (from )
 - Byte Buddy (without dependencies) (from )
+- JUnit (from http://junit.org)
 - Java Architecture for XML Binding 2.3 (from )
 - JavaBeans Activation Framework (from )
 - Objenesis (from http://objenesis.org)
