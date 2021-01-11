@@ -1,0 +1,131 @@
+apiVersion: v1
+data:
+  AUTHORIZE_API: ${AUTHORIZE_API}
+  LEGALTAG_API: ${LEGALTAG_API}
+  STORAGE_HOSTNAME: ${STORAGE_HOSTNAME}
+  MONGO_DB_URL: ${MONGO_DB_URL}
+  MONGO_DB_USER: ${MONGO_DB_USER}
+  MONGO_DB_NAME: ${MONGO_DB_NAME}
+  INDEXER_URL: ${INDEXER_URL}
+  GOOGLE_AUDIENCES: ${GOOGLE_AUDIENCES}
+  CRS_API: ${CRS_API}
+  GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
+  GOOGLE_CLOUD_PROJECT_REGION: ${GOOGLE_CLOUD_PROJECT_REGION}
+kind: ConfigMap
+metadata:
+  labels:
+    app: indexer-queue-reference
+  name: indexer-queue-config
+  namespace: default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generateName: indexer-queue-reference-anthos
+  labels:
+    app: indexer-queue-reference
+  name: indexer-queue-reference
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: indexer-queue-reference
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: indexer-queue-reference
+    spec:
+      containers:
+        -   env:
+              -   name: AUTHORIZE_API
+                  valueFrom:
+                    configMapKeyRef:
+                      key: AUTHORIZE_API
+                      name: indexer-queue-config
+              -   name: LEGALTAG_API
+                  valueFrom:
+                    configMapKeyRef:
+                      key: LEGALTAG_API
+                      name: indexer-queue-config
+              -   name: GOOGLE_CLOUD_PROJECT_REGION
+                  valueFrom:
+                    configMapKeyRef:
+                      key: GOOGLE_CLOUD_PROJECT_REGION
+                      name: indexer-queue-config
+              -   name: STORAGE_HOSTNAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: STORAGE_HOSTNAME
+                      name: indexer-queue-config
+              -   name: MONGO_DB_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: MONGO_DB_URL
+                      name: indexer-queue-config
+              -   name: MONGO_DB_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: MONGO_DB_USER
+                      name: indexer-queue-config
+              -   name: MONGO_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: indexer-queue-secret
+                      key: mongo.db.password
+              -   name: MONGO_DB_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: MONGO_DB_NAME
+                      name: indexer-queue-config
+              -   name: reference.rabbitmq.uri
+                  valueFrom:
+                    secretKeyRef:
+                      name: indexer-queue-secret
+                      key: reference.rabbitmq.uri
+              -   name: INDEXER_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      key: INDEXER_URL
+                      name: indexer-queue-config
+              -   name: GOOGLE_AUDIENCES
+                  valueFrom:
+                    configMapKeyRef:
+                      key: GOOGLE_AUDIENCES
+                      name: indexer-queue-config
+              -   name: CRS_API
+                  valueFrom:
+                    configMapKeyRef:
+                      key: CRS_API
+                      name: indexer-queue-config
+              -   name: GOOGLE_CLOUD_PROJECT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: GOOGLE_CLOUD_PROJECT
+                      name: indexer-queue-config
+            image: us.gcr.io/osdu-anthos-02/os-indexer-queue/anthos-indexer-queue-reference:bcb1a0f-dirty
+            name: indexer-queue-reference
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: indexer-queue-reference
+  namespace: default
+spec:
+  ports:
+    -   protocol: TCP
+        port: 80
+        targetPort: 8080
+  selector:
+    app: indexer-queue-reference
+  type: LoadBalancer
+---
+apiVersion: v1
+data:
+  mongo.db.password: ${mongo.db.password}
+  reference.rabbitmq.uri: ${reference.rabbitmq.uri}
+kind: Secret
+metadata:
+  name: indexer-queue-secret
+  namespace: default
+type: Opaque
