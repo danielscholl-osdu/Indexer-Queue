@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/_ah/push-handlers")
 public class EnqueueApi {
 
+    public static final String INVALID_RECORD_CHANGE_MSG = "Invalid record change message";
     private final Gson gson = new Gson();
 
     @Autowired
@@ -67,8 +68,8 @@ public class EnqueueApi {
         }
         log.info(String.format("message headers: %s", this.headersInfo.toString()));
 
-        CloudTaskRequest request = CloudTaskRequest.builder().message(this.gson.toJson(message)).url(Constants.WORKER_RELATIVE_URL).build();
-        this.appEngineTaskBuilder.createTask(request);
+        CloudTaskRequest cloudTaskRequest = CloudTaskRequest.builder().message(this.gson.toJson(message)).url(Constants.WORKER_RELATIVE_URL).build();
+        this.appEngineTaskBuilder.createTask(cloudTaskRequest);
 
         return new ResponseEntity(org.springframework.http.HttpStatus.OK);
     }
@@ -80,13 +81,13 @@ public class EnqueueApi {
             JsonElement jsonRoot = jsonParser.parse(requestBody);
             JsonElement message = jsonRoot.getAsJsonObject().get("message");
             if (message == null) {
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message", "message object not found", "'message' object not found in PubSub message");
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, INVALID_RECORD_CHANGE_MSG, "message object not found", "'message' object not found in PubSub message");
             }
 
             RecordChangedMessages recordChangedMessages = this.gson.fromJson(message.toString(), RecordChangedMessages.class);
             String payload = recordChangedMessages.getData();
             if(Strings.isNullOrEmpty(payload)) {
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message", "message data not found", "'message.data' not found in PubSub message");
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, INVALID_RECORD_CHANGE_MSG, "message data not found", "'message.data' not found in PubSub message");
             }
 
             String decodedPayload = new String(Base64.getDecoder().decode(payload));
@@ -94,7 +95,7 @@ public class EnqueueApi {
 
             Map<String, String> attributes = recordChangedMessages.getAttributes();
             if (attributes == null || attributes.size() == 0) {
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message", "attribute map not found", String.format("PubSub message: %s", recordChangedMessages));
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, INVALID_RECORD_CHANGE_MSG, "attribute map not found", String.format("PubSub message: %s", recordChangedMessages));
             }
             Map<String, String> lowerCase = new HashMap<>();
             attributes.forEach((key, value) -> lowerCase.put(key.toLowerCase(), value));

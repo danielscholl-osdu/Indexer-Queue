@@ -34,6 +34,10 @@
                     <id>gitlab-os-core-common-maven</id>
                     <url>https://community.opengroup.org/api/v4/projects/67/packages/maven</url>
                 </repository>
+                 <repository>
+                    <id>gitlab-os-core-lib-aws-maven</id>
+                    <url>https://community.opengroup.org/api/v4/projects/68/packages/maven</url>
+                </repository>
             </repositories>
         </profile>
         <profile>

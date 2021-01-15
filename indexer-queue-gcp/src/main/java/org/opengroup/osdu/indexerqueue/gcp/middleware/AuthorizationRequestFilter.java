@@ -22,12 +22,12 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.apache.http.HttpStatus;
-import org.opengroup.osdu.core.common.model.http.DpsHeaders;
-import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.http.ResponseHeaders;
+import org.opengroup.osdu.core.common.model.http.AppException;
+import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
+import org.opengroup.osdu.indexerqueue.gcp.config.IndexerQueueConfigurationPropertiesGcp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -40,17 +40,18 @@ import java.util.*;
 @Component
 public class AuthorizationRequestFilter implements Filter {
 
-    private static final String PATH_PUSH_HANDLERS = "push-handlers";
     private static final String PATH_TASK_HANDLERS = "task-handlers";
+    public static final String ACCESS_DENIED_MSG = "Access denied";
+    public static final String NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION_MSG = "The user or service is not authorized to perform this action";
 
-    private final JsonFactory JSON_FACTORY = new JacksonFactory();
+    private final JsonFactory jsonFactory = new JacksonFactory();
     private FilterConfig filterConfig;
 
     @Autowired
     private HeadersInfo headersInfo;
 
-    @Value("${GOOGLE_AUDIENCES}")
-    private String GOOGLE_AUDIENCES;
+    @Autowired
+    private IndexerQueueConfigurationPropertiesGcp configurationProperties;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -78,10 +79,12 @@ public class AuthorizationRequestFilter implements Filter {
         httpResponse.setContentType("application/json");
     }
 
+    @Override
     public void init(final FilterConfig filterConfig) {
         this.filterConfig = filterConfig;
     }
 
+    @Override
     public void destroy() {
         this.filterConfig = null;
     }
@@ -92,12 +95,12 @@ public class AuthorizationRequestFilter implements Filter {
 
         try {
             if (request == null || request.getHeaderNames() == null) {
-                throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "The user or service is not authorized to perform this action", "Request headers are either null or empty");
+                throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, NOT_AUTHORIZED_TO_PERFORM_THIS_ACTION_MSG, "Request headers are either null or empty");
             }
             Map<String, String> requestHeaders = getHeaders(request);
 
             if (!requestHeaders.containsKey("Authorization") && !requestHeaders.containsKey("authorization")) {
-                throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "Empty authorization header");
+                throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, "Empty authorization header");
             }
 
             String authHdr = requestHeaders.get(DpsHeaders.AUTHORIZATION);
@@ -107,13 +110,13 @@ public class AuthorizationRequestFilter implements Filter {
 
             String[] bearerIdTokenParts = authHdr.split(" ");
             if (bearerIdTokenParts.length != 2) {
-                throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "Invalid authorization header", "Invalid authorization header");
+                throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, "Invalid authorization header", "Invalid authorization header");
             }
 
             HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            String[] targetAudience = {GOOGLE_AUDIENCES};
+            String[] targetAudience = {configurationProperties.getGoogleAudiences()};
 
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(httpTransport, JSON_FACTORY)
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(httpTransport, jsonFactory)
                     .setIssuer("https://accounts.google.com")
                     .setAudience(Arrays.asList(targetAudience))
                     .build();
@@ -122,17 +125,17 @@ public class AuthorizationRequestFilter implements Filter {
             if (idToken != null) {
                 boolean expVerificationResult = idToken.verifyExpirationTime(System.currentTimeMillis(), 60);
                 if (!expVerificationResult) {
-                    throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "The user or service is not authorized to perform this action", "Authorization token is expired");
+                    throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, "The user or service is not authorized to perform this action", "Authorization token is expired");
                 }
                 String email = idToken.getPayload().getEmail();
                 if (!email.startsWith("datafier@")) {
-                    throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "The user or service is not authorized to perform this action", "Authorization token has invalid email claim");
+                    throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, "The user or service is not authorized to perform this action", "Authorization token has invalid email claim");
                 }
             } else {
-                throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "The user or service is not authorized to perform this action", "Google cannot verify authorization token");
+                throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, "The user or service is not authorized to perform this action", "Google cannot verify authorization token");
             }
         } catch (GeneralSecurityException | IOException e) {
-            throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "The user or service is not authorized to perform this action", e);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, ACCESS_DENIED_MSG, "The user or service is not authorized to perform this action", e);
         }
     }
 

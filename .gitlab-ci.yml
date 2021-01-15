@@ -26,8 +26,9 @@ variables:
   OSDU_GCP_SERVICE: indexer-queue
   OSDU_GCP_APPLICATION_NAME: indexer-queue
   OSDU_GCP_VENDOR: gcp-cloudrun
+  OSDU_GCP_INDEXER_HOST_4Q: https://os-indexer-attcrcktoa-uc.a.run.app
   OSDU_GCP_IQ_SA: pub-sub-indexer-queue@nice-etching-277309.iam.gserviceaccount.com
-  OSDU_GCP_ENV_VARS: GOOGLE_AUDIENCES=$GOOGLE_AUDIENCE,GOOGLE_CLOUD_PROJECT_REGION=$OSDU_GCP_CLOUDRUN_REGION,GOOGLE_CLOUD_PROJECT=$OSDU_GCP_PROJECT,INDEXER_HOST=$OSDU_GCP_INDEXER_HOST,SERVICE_MAIL=$OSDU_GCP_IQ_SA,OSDU_ENTITLEMENTS_URL=$OSDU_GCP_ENTITLEMENTS_URL --vpc-connector=$OSDU_GCP_VPC_CONNECTOR
+  OSDU_GCP_ENV_VARS: GOOGLE_AUDIENCES=$GOOGLE_AUDIENCE,GOOGLE_CLOUD_PROJECT_REGION=$OSDU_GCP_CLOUDRUN_REGION,GOOGLE_CLOUD_PROJECT=$OSDU_GCP_PROJECT,INDEXER_HOST=$OSDU_GCP_INDEXER_HOST_4Q,SERVICE_MAIL=$OSDU_GCP_IQ_SA,OSDU_ENTITLEMENTS_URL=$OSDU_GCP_ENTITLEMENTS_URL --vpc-connector=$OSDU_GCP_VPC_CONNECTOR
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
@@ -91,7 +92,7 @@ osdu-gcp-containerize:
     - gcloud auth activate-service-account --key-file $OSDU_GCP_DEPLOY_FILE
     - gcloud config set project $OSDU_GCP_PROJECT
     - touch .gcloudignore
-    - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
+    - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_GCP_SERVICE=$OSDU_GCP_SERVICE,_APPLICATION_NAME=$OSDU_GCP_APPLICATION_NAME,_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
   only:
     variables:
       - $OSDU_GCP == 'true'
