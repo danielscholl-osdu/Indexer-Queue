@@ -1,6 +1,6 @@
 /*
- * Copyright 2020 Google LLC
- * Copyright 2020 EPAM Systems, Inc
+ * Copyright 2021 Google LLC
+ * Copyright 2021 EPAM Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,16 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan({"org.opengroup.osdu"})
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class })
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class,
+    ManagementWebSecurityAutoConfiguration.class})
 public class IndexerQueueReferenceApplication extends SpringBootServletInitializer {
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(IndexerQueueReferenceApplication.class);
-    }
+  @Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+    return application.sources(IndexerQueueReferenceApplication.class);
+  }
 
-    public static void main(String[] args) {
-        SpringApplication.run(IndexerQueueReferenceApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(IndexerQueueReferenceApplication.class, args);
+  }
 }
