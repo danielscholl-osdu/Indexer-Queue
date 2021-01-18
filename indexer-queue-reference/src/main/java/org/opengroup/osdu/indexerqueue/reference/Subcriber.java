@@ -17,12 +17,16 @@
 
 package org.opengroup.osdu.indexerqueue.reference;
 
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
 import org.opengroup.osdu.core.common.Constants;
 import org.opengroup.osdu.core.common.http.HttpClient;
 import org.opengroup.osdu.core.common.http.HttpRequest;
@@ -30,20 +34,14 @@ import org.opengroup.osdu.core.common.http.HttpResponse;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
+import org.opengroup.osdu.indexerqueue.reference.config.IndexerQueueConfigProperties;
 import org.opengroup.osdu.indexerqueue.reference.messagebus.IMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 @Component
 public class Subcriber {
@@ -53,9 +51,12 @@ public class Subcriber {
   private static final Logger logger = LoggerFactory.getLogger(Subcriber.class);
 
   private final DpsHeaders dpsHeaders = new DpsHeaders();
+  private final IndexerQueueConfigProperties indexerQueueConfigProperties;
 
-  @Value("${INDEXER_URL}")
-  private String INDEXER_URL;
+  @Autowired
+  public Subcriber(IndexerQueueConfigProperties indexerQueueConfigProperties) {
+    this.indexerQueueConfigProperties = indexerQueueConfigProperties;
+  }
 
   @RabbitListener(queues = IMessageFactory.DEFAULT_QUEUE_NAME)
   public void recievedMessage(Message message) {
@@ -83,7 +84,8 @@ public class Subcriber {
     logger.info(String.format("message headers: %s", dpsHeaders.toString()));
     logger.info(String.format("message body: %s", gson.toJson(recordMessage)));
 
-    String url = StringUtils.join(INDEXER_URL, Constants.WORKER_RELATIVE_URL);
+    String url = StringUtils
+        .join(indexerQueueConfigProperties.getIndexerUrl(), Constants.WORKER_RELATIVE_URL);
     HttpClient httpClient = new HttpClient();
     HttpRequest rq = HttpRequest.post(recordMessage).url(url).headers(dpsHeaders.getHeaders())
         .build();

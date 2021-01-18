@@ -15,11 +15,18 @@
  * limitations under the License.
  */
 
-package org.opengroup.osdu.indexerqueue.reference.messagebus;
+package org.opengroup.osdu.indexerqueue.reference.config;
 
-public interface IMessageFactory {
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-  String DEFAULT_QUEUE_NAME = "records";
+@Configuration
+@ConfigurationProperties
+@Getter
+@Setter
+public class RabbitMqConfigProperties {
 
-  void sendMessage(String queueName, String msg);
+  private String mbRabbitMqUri;
 }
