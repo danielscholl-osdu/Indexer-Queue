@@ -1,6 +1,6 @@
 /*
- * Copyright 2020 Google LLC
- * Copyright 2020 EPAM Systems, Inc
+ * Copyright 2021 Google LLC
+ * Copyright 2021 EPAM Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,10 @@
 
 package org.opengroup.osdu.indexerqueue.reference;
 
+import org.opengroup.osdu.indexerqueue.reference.config.RabbitMqConfigProperties;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,16 +29,16 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class MessagingConfiguration {
 
-  @Value("${reference.rabbitmq.uri}")
-  private String RABBITMQ_ADDRESS;
+  @Autowired
+  RabbitMqConfigProperties rabbitMqConfigProperties;
 
   @Bean
   public CachingConnectionFactory rabbitConnectionFactory(RabbitProperties config)
       throws Exception {
 
     CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-    connectionFactory.getRabbitConnectionFactory().setUri(RABBITMQ_ADDRESS);
-
+    connectionFactory.getRabbitConnectionFactory()
+        .setUri(rabbitMqConfigProperties.getMbRabbitMqUri());
     return connectionFactory;
   }
 }

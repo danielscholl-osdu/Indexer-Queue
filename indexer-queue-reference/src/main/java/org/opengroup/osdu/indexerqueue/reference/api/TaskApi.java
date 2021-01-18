@@ -1,6 +1,6 @@
 /*
- * Copyright 2020 Google LLC
- * Copyright 2020 EPAM Systems, Inc
+ * Copyright 2021 Google LLC
+ * Copyright 2021 EPAM Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/_dps/task-handlers")
 public class TaskApi {
 
-    @Autowired
-    private TaskBuilder taskBuilder;
+  @Autowired
+  private TaskBuilder taskBuilder;
 
-    @PostMapping("/enqueue")
-    public ResponseEntity enqueueTask(@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY)
-                                          @Valid @RequestBody CloudTaskRequest request) {
-        HttpStatus status = taskBuilder.createTask(request);
-        return new ResponseEntity(status);
-    }
+  @PostMapping("/enqueue")
+  public ResponseEntity enqueueTask(@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY)
+  @Valid @RequestBody CloudTaskRequest request) {
+    HttpStatus status = taskBuilder.createTask(request);
+    return new ResponseEntity(status);
+  }
 }

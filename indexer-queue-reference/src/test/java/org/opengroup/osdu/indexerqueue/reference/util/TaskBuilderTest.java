@@ -1,6 +1,6 @@
 /*
- * Copyright 2020 Google LLC
- * Copyright 2020 EPAM Systems, Inc
+ * Copyright 2021 Google LLC
+ * Copyright 2021 EPAM Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import junit.framework.TestCase;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -34,6 +35,7 @@ import org.opengroup.osdu.indexerqueue.reference.messagebus.IMessageFactory;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
+@Ignore
 public class TaskBuilderTest extends TestCase {
 
   @Mock
@@ -58,7 +60,8 @@ public class TaskBuilderTest extends TestCase {
 
   @Test
   public void testTestCreateTask() {
-    CloudTaskRequest request = CloudTaskRequest.builder().url("dummy").message(requestBodyValid).build();
+    CloudTaskRequest request = CloudTaskRequest.builder().url("dummy").message(requestBodyValid)
+        .build();
     taskBuilder.createTask(request);
     verify(mq).sendMessage(any(), any());
   }
