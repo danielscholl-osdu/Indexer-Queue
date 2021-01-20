@@ -27,6 +27,7 @@ import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
 import org.opengroup.osdu.core.common.model.search.SearchServiceRole;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.util.TaskBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,14 +43,14 @@ public class TaskApi {
 
 	final TaskBuilder taskBuilder;
 
-	@PostMapping("/enqueue")
+	@PostMapping(value = "/enqueue",produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("@authorizationFilter.hasRole('" + SearchServiceRole.ADMIN + "')")
-	public ResponseEntity enqueueTask(
+	public ResponseEntity<String> enqueueTask(
 		@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
 		throws IOException {
 
 		this.taskBuilder.createTask(request);
 
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity("",HttpStatus.OK);
 	}
 }

@@ -17,12 +17,12 @@
 
 package org.opengroup.osdu.indexerqueue.gcp.cloudrun.util;
 
+import com.google.cloud.tasks.v2.CloudTasksClient;
+import com.google.cloud.tasks.v2.HttpRequest;
+import com.google.cloud.tasks.v2.OidcToken;
 import com.google.cloud.tasks.v2.QueueName;
-import com.google.cloud.tasks.v2beta3.CloudTasksClient;
-import com.google.cloud.tasks.v2beta3.HttpRequest;
-import com.google.cloud.tasks.v2beta3.OidcToken;
-import com.google.cloud.tasks.v2beta3.Task;
-import com.google.cloud.tasks.v2beta3.Task.Builder;
+import com.google.cloud.tasks.v2.Task;
+import com.google.cloud.tasks.v2.Task.Builder;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import java.io.IOException;
@@ -41,8 +41,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CloudTaskBuilder implements TaskBuilder {
 
-	private static final String WORKER_ENDPOINT = "/api/indexer/v2/_dps/task-handlers/index-worker";
-
 	final IndexerQueueIdentifier indexerQueueProvider;
 
 	final HeadersInfo headersInfo;
@@ -52,7 +50,7 @@ public class CloudTaskBuilder implements TaskBuilder {
 	public Task createTask(CloudTaskRequest request) throws IOException {
 		log.info(String.format("project-id: %s | location: %s | queue-id: %s | indexer-host: %s | message: %s",
 			config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId(),
-			config.getIndexerHost() + WORKER_ENDPOINT, request.getMessage()));
+			config.getIndexerHost() + request.getUrl(), request.getMessage()));
 
 		String queuePath = QueueName
 			.of(config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId())
@@ -62,7 +60,7 @@ public class CloudTaskBuilder implements TaskBuilder {
 			.setServiceAccountEmail(config.getServiceMail()).setAudience(config.getGoogleAudience());
 
 		HttpRequest httpRequest = HttpRequest.newBuilder()
-			.setUrl(config.getIndexerHost() + WORKER_ENDPOINT)
+			.setUrl(config.getIndexerHost() + request.getUrl())
 			.setBody(ByteString.copyFrom(request.getMessage(), Charset.defaultCharset()))
 			.setOidcToken(oidcTokenBuilder)
 			.putAllHeaders(this.headersInfo.getHeaders().getHeaders())
