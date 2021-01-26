@@ -18,7 +18,7 @@
 package org.opengroup.osdu.indexerqueue.gcp.cloudrun.util;
 
 
-import com.google.cloud.tasks.v2beta3.Task;
+import com.google.cloud.tasks.v2.Task;
 import java.io.IOException;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
 
