@@ -30,6 +30,7 @@ import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.common.model.search.SearchServiceRole;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.util.TaskBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,9 +54,9 @@ public class EnqueueApi {
 
 	final RecordChangedMessages message;
 
-	@PostMapping("/enqueue")
+	@PostMapping(value = "/enqueue",produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("@authorizationFilter.pubSubTaskHasRole('" + SearchServiceRole.ADMIN + "')")
-	public ResponseEntity enqueueTask() throws IOException {
+	public ResponseEntity<String> enqueueTask() throws IOException {
 		this.headersInfo.getHeaders().getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
 		this.headersInfo.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
 		if (message.hasCorrelationId()) {
@@ -67,7 +68,7 @@ public class EnqueueApi {
 			.url(Constants.WORKER_RELATIVE_URL).build();
 		this.taskBuilder.createTask(cloudTaskRequest);
 
-		return new ResponseEntity(org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity("",org.springframework.http.HttpStatus.OK);
 	}
 
 
