@@ -113,6 +113,21 @@ public class IndexerQueue {
                     System.out.println(String.format("%s Messages Processed", indexProcessors.size()));
 
                     List<IndexProcessor> failedProcessors =  indexProcessors.stream().filter(indexProcessor -> indexProcessor.result == CallableResult.Fail || indexProcessor.exception != null).collect(Collectors.toList());
+                    List<IndexProcessor> failed500Processors = failedProcessors.stream().filter(
+                            indexProcessor ->
+                            {
+                                if (indexProcessor.exception.getMessage().contains("500")){
+                                    if (indexProcessor.message.getMessageAttributes().containsKey("retry")){
+                                        int retryCount = Integer.parseInt(indexProcessor.message.getMessageAttributes().get("retry").getStringValue());
+                                        if (retryCount >9){
+                                            return false;
+                                        }
+                                    }
+                            }
+                                return true;
+                            }).collect(Collectors.toList());
+
+
                     failedProcessors.addAll(nonAuthorizedProcessors);
                     failedProcessors.addAll(maxedRetryFailedProcessors);
                     System.out.println(String.format("%s Messages Failed", failedProcessors.size()));
@@ -128,6 +143,8 @@ public class IndexerQueue {
 
                     List<DeleteMessageBatchResult> deleteMessageBatchResults = IndexerQueueService.deleteMessages(deleteBatchRequests, sqsClient);
                     System.out.println(String.format("%s Requests Deleted", deleteMessageBatchResults.size()));
+
+                    List<SendMessageResult> retry500Results = IndexerQueueService.sendMsgsToRetry(environmentVariables.queueUrl, failed500Processors, sqsClient);
                 }
 
                 Thread.sleep(5000);

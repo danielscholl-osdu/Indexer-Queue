@@ -16,6 +16,7 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import org.apache.commons.collections4.ListUtils;
 
 import java.util.ArrayList;
@@ -110,6 +111,27 @@ public class IndexerQueueService {
         messageAttributes.put("Exception", exceptionAttribute);
         SendMessageRequest send_msg_request = new SendMessageRequest()
                 .withQueueUrl(deadLetterQueueUrl)
+                .withMessageBody(indexProcessor.message.getBody())
+                .withMessageAttributes(messageAttributes);
+        return sqsClient.sendMessage(send_msg_request);
+    }
+    public static List<SendMessageResult> sendMsgsToRetry(String queueUrl, List<IndexProcessor> indexProcessors, AmazonSQS sqsClient){
+        return indexProcessors.stream().map(indexProcessor -> sendMsgToRetry(queueUrl, indexProcessor, sqsClient)).collect(Collectors.toList());
+    }
+    private static SendMessageResult sendMsgToRetry(String queueUrl, IndexProcessor indexProcessor, AmazonSQS sqsClient){
+        String exceptionMessage;
+        Map<String, MessageAttributeValue> messageAttributes = indexProcessor.message.getMessageAttributes();
+        MessageAttributeValue retryAttribute = new MessageAttributeValue()
+                .withDataType("String");
+        if (messageAttributes.containsKey("retry")){
+            Integer retryCount = 1 + Integer.parseInt(indexProcessor.message.getMessageAttributes().get("retry").getStringValue());
+            retryAttribute.setStringValue(retryCount.toString());
+        }else{
+            retryAttribute.setStringValue("1");
+        }
+        messageAttributes.put("retry", retryAttribute);
+        SendMessageRequest send_msg_request = new SendMessageRequest()
+                .withQueueUrl(queueUrl)
                 .withMessageBody(indexProcessor.message.getBody())
                 .withMessageAttributes(messageAttributes);
         return sqsClient.sendMessage(send_msg_request);
