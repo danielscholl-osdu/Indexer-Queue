@@ -16,7 +16,6 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import org.apache.commons.collections4.ListUtils;
 
 import java.util.ArrayList;
