@@ -62,8 +62,6 @@ public class IndexerQueueService {
 
         for (final Message message : messages) {
             String indexerServiceAccountJWT = message.getMessageAttributes().get("authorization").getStringValue();
-            System.out.println(message);
-            System.out.println(url);
             IndexProcessor processor = new IndexProcessor(message, url, indexerServiceAccountJWT);
             CompletableFuture<IndexProcessor> future = CompletableFuture.supplyAsync(processor::call, executorPool);
             futures.add(future);
@@ -72,14 +70,13 @@ public class IndexerQueueService {
     }
 
     public static List<Message> getMessages(AmazonSQS sqsClient, String sqsQueueUrl, int numOfmessages, int maxMessageCount){
-        System.out.println("inside get messages");
-        System.out.println(sqsQueueUrl);
         int numOfMessages = numOfmessages;
         List<Message> messages = new ArrayList<>();
         do {
             ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsQueueUrl);
             receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
             receiveMessageRequest.withMessageAttributeNames("All");
+            receiveMessageRequest.withAttributeNames("All");
             List<Message> retrievedMessages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
             messages.addAll(retrievedMessages);
             numOfMessages = retrievedMessages.size();
@@ -114,25 +111,45 @@ public class IndexerQueueService {
                 .withMessageAttributes(messageAttributes);
         return sqsClient.sendMessage(send_msg_request);
     }
-    public static List<SendMessageResult> sendMsgsToRetry(String queueUrl, List<IndexProcessor> indexProcessors, AmazonSQS sqsClient){
-        return indexProcessors.stream().map(indexProcessor -> sendMsgToRetry(queueUrl, indexProcessor, sqsClient)).collect(Collectors.toList());
-    }
-    private static SendMessageResult sendMsgToRetry(String queueUrl, IndexProcessor indexProcessor, AmazonSQS sqsClient){
-        String exceptionMessage;
-        Map<String, MessageAttributeValue> messageAttributes = indexProcessor.message.getMessageAttributes();
-        MessageAttributeValue retryAttribute = new MessageAttributeValue()
-                .withDataType("String");
-        if (messageAttributes.containsKey("retry")){
-            Integer retryCount = 1 + Integer.parseInt(indexProcessor.message.getMessageAttributes().get("retry").getStringValue());
-            retryAttribute.setStringValue(retryCount.toString());
-        }else{
-            retryAttribute.setStringValue("1");
+    public static void ChangeMessageVisibilityTimeout(AmazonSQS sqsClient, String sqsQueueUrl,List<IndexProcessor> indexProcessors){    
+
+        List<ChangeMessageVisibilityBatchRequestEntry> entries =
+                new ArrayList<ChangeMessageVisibilityBatchRequestEntry>();
+        for (IndexProcessor indexProcessor : indexProcessors){
+            entries.add(
+                    new ChangeMessageVisibilityBatchRequestEntry(indexProcessor.messageId, indexProcessor.message.getReceiptHandle())
+                            .withVisibilityTimeout(
+                                    exponentialTimeOutWindow(parseIntOrDefault(indexProcessor.message.getAttributes().get("ApproximateReceiveCount"), 0))
+                            )
+            );
+
+            if (entries.size() == 10) { //max batch size for message visibility is 10, split entries by that amount
+                sqsClient.changeMessageVisibilityBatch(sqsQueueUrl, entries);
+                entries.clear();
+            }
         }
-        messageAttributes.put("retry", retryAttribute);
-        SendMessageRequest send_msg_request = new SendMessageRequest()
-                .withQueueUrl(queueUrl)
-                .withMessageBody(indexProcessor.message.getBody())
-                .withMessageAttributes(messageAttributes);
-        return sqsClient.sendMessage(send_msg_request);
+
+        if (entries.size() > 0)
+            sqsClient.changeMessageVisibilityBatch(sqsQueueUrl, entries);
+
+    }
+    private static Integer exponentialTimeOutWindow(int ReceiveCount){
+        // max receive count to 10 in SQS setting
+        switch (ReceiveCount){
+            case 0: case 1: case 2: return 5;
+            case 3: case 4: return 10;
+            case 5: case 6: return 30;
+            case 7: case 8: return 60;
+            case 9: case 10: return 90;
+            default: return 120;
+        }
+    }
+
+    private static Integer parseIntOrDefault(String toParse, int defaultValue) {
+        try {
+            return Integer.parseInt(toParse);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 }
