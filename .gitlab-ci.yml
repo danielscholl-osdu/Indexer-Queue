@@ -32,55 +32,40 @@ variables:
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "standard-setup.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "build/maven.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "scanners/fossa.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "scanners/gitlab-ultimate.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "cloud-providers/aws.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "cloud-providers/ibm.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "cloud-providers/azure-function.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "cloud-providers/gcp.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
+    ref: "deprecate-gcp-provider"
     file: "cloud-providers/osdu-gcp-cloudrun.yml"
-
-gcp-deploy:
-  image: divido2/gcp-maven
-  stage: deploy
-  extends:
-    - .gcp
-    - .maven
-
-  script:
-    - mkdir -p gcp_deploy_dir
-    - gcloud auth activate-service-account --key-file="$GCP_DEPLOY_FILE"
-    - sed -e "s|ENVIRONMENT|$GCP_ENVIRONMENT|g" "$GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml"
-    - cat $GCP_BUILD_SUBDIR/src/main/webapp/WEB-INF/appengine-web.xml
-    - $MAVEN package appengine:deploy -pl org.opengroup.osdu.indexerqueue:indexer-queue-gcp -Dapp.deploy.project=$GCP_PROJECT -Dapp.deploy.version=$CI_COMMIT_SHORT_SHA -DskipTests=true
-
-gcp-test:
-  extends:
-    - .gcp
-    - .maven
-    - .gcp_variables
-  stage: integration
-  needs: ["gcp-deploy"]
-  script:
-    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
 
 osdu-gcp-containerize:
   stage: containerize
