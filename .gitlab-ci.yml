@@ -46,8 +46,8 @@ include:
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/aws.yml"
 
-  - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/ibm.yml"
+  - project: 'osdu/platform/ci-cd-pipelines'
+    file: 'cloud-providers/ibm-deploy-only.yml'
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/azure-function.yml"
