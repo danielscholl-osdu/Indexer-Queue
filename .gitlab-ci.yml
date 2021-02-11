@@ -32,39 +32,27 @@ variables:
 
 include:
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "standard-setup.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "build/maven.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "scanners/fossa.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "scanners/gitlab-ultimate.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "cloud-providers/aws.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "cloud-providers/ibm.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "cloud-providers/azure-function.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
-    file: "cloud-providers/gcp.yml"
-
-  - project: "osdu/platform/ci-cd-pipelines"
-    ref: "deprecate-gcp-provider"
     file: "cloud-providers/osdu-gcp-cloudrun.yml"
 
 osdu-gcp-containerize:
