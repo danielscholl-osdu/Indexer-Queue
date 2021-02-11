@@ -38,7 +38,7 @@ include:
     file: "build/maven.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "scanners/fossa.yml"
+    file: "scanners/fossa-maven.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "scanners/gitlab-ultimate.yml"
