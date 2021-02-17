@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
-import org.opengroup.osdu.core.gcp.model.AppEngineHeaders;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -39,6 +38,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 public class RedirectHttpRequestsHandlerTest {
+    private static final String TASK_QUEUE_NAME = "x-appengine-queuename";
     @Mock
     private DpsHeaders dpsHeaders;
     @Mock
@@ -72,7 +72,7 @@ public class RedirectHttpRequestsHandlerTest {
 
     @Test
     public void should_throwAppException302WithHttpsLocation_when_using_notIndexerTaskQueue() throws IOException, ServletException {
-        headers.put(AppEngineHeaders.TASK_QUEUE_NAME, "poller-queue");
+        headers.put(TASK_QUEUE_NAME, "poller-queue");
         when(httpServletRequest.isSecure()).thenReturn(false);
 
         try {
@@ -85,7 +85,7 @@ public class RedirectHttpRequestsHandlerTest {
 
     @Test
     public void should_notThrowAppException302WithHttpsLocation_when_isAHttpsRequest() throws IOException, ServletException {
-        headers.put(AppEngineHeaders.TASK_QUEUE_NAME, "dummyTenant");
+        headers.put(TASK_QUEUE_NAME, "dummyTenant");
         when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(dpsHeaders.getHeaders()).thenReturn(headers);
         when(httpServletRequest.isSecure()).thenReturn(true);
@@ -94,7 +94,7 @@ public class RedirectHttpRequestsHandlerTest {
 
     @Test
     public void should_notThrowAppException302WithHttpsLocation_when_isATaskQueue() throws IOException, ServletException {
-        headers.put(AppEngineHeaders.TASK_QUEUE_NAME, "dummyTenant-os-indexer-queue");
+        headers.put(TASK_QUEUE_NAME, "dummyTenant-os-indexer-queue");
         when(this.headersInfo.getHeaders()).thenReturn(dpsHeaders);
         when(httpServletRequest.isSecure()).thenReturn(true);
         sut.doFilter(httpServletRequest, httpServletResponse, filterChain);
