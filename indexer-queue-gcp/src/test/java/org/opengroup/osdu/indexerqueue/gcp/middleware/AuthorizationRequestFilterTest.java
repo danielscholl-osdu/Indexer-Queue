@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.AppException;
-import org.opengroup.osdu.core.gcp.model.AppEngineHeaders;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -40,7 +39,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @RunWith(SpringRunner.class)
 @PrepareForTest({HttpServletRequest.class})
 public class AuthorizationRequestFilterTest {
-
+    private String CLOUD_TRACE_CONTEXT = "x-cloud-trace-context";
     @Mock
     private HttpServletRequest httpServletRequest;
     @Mock
@@ -70,7 +69,7 @@ public class AuthorizationRequestFilterTest {
 
         this.filter.doFilter(this.httpServletRequest, this.httpServletResponse, this.filterChain);
         assertFalse(headers.containsKey(DpsHeaders.CORRELATION_ID));
-        assertFalse(headers.containsKey(AppEngineHeaders.CLOUD_TRACE_CONTEXT));
+        assertFalse(headers.containsKey(CLOUD_TRACE_CONTEXT));
     }
 
     @Test

@@ -1,6 +1,6 @@
 # Indexer-queue-gcp
 
-indexer-queue-gcp-cloudrunis a service that is woken up in response to messages emitted by os-storage onto Service Bus. It is responsible for calling the os-indexer to trigger re-indexing events.
+indexer-queue-gcp-cloudrun is a service that is woken up in response to messages emitted by os-storage onto Service Bus. It is responsible for calling the os-indexer to trigger re-indexing events.
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ In order to run the service locally or remotely, you will need to have the follo
 | name | value | description | sensitive? | source |
 | ---  | ---   | ---         | ---        | ---    |
 | `OSDU_ENTITLEMENTS_URL` | ex `https://entitlements.com/entitlements/v1` | Entitlements API endpoint | no | output of infrastructure deployment |
-| `SERVICE_MAIL` | ex `service@osdu.iam.gserviceaccount.com` | Indexer Que Service mail with which token will be created for cloud tasks must match with variable in `INDEXER_QUE_SERVICE_MAIL` Indexer Service | no | - |
+| `SERVICE_MAIL` | ex `service@osdu.iam.gserviceaccount.com` | Indexer Queue Service mail with which token will be created for cloud tasks must match with variable in `INDEXER_QUEUE_SERVICE_MAIL` Indexer Service | no | - |
 | `INDEXER_HOST` | ex `https://indexer.a.run.app` | Indexer Service host  | no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT_REGION` | ex `us-central1` | Service deployment region | no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT` | ex `opendes` | Google Cloud Project Id| no | output of infrastructure deployment |
@@ -90,7 +90,7 @@ gcloud auth application-default login
 ```
 
 ## Testing
-* Navigate to Indexer-queue service's root folder and run:
+* Navigate to Indexer-queue service root folder and run:
  
 ```bash
 mvn clean install   
@@ -115,7 +115,7 @@ cd indexer-queue-gcp-cloudrun/ && mvn spring-boot:run
 * Google Documentation: https://cloud.google.com/cloud-build/docs/deploying-builds/deploy-cloud-run
 
 ## PubSub
-For authentication indexer-que-cloudrun rely on entitlements service, 
+For authentication indexer-queue-gcp-cloudrun rely on entitlements service, 
 that mean Pubsub push subscription must be configured to use service account
 
 **Entitlements configuration for pubsub account**
