@@ -47,3 +47,4 @@ indexer-queue-aws/dependency-reduced-pom.xml
 .classpath
 .factorypath
 .sts4*
+.vscode/launch.json

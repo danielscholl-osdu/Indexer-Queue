@@ -60,7 +60,7 @@ public class IndexerQueueServiceTest {
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
         receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
         receiveMessageRequest.withMessageAttributeNames("All");
-
+        receiveMessageRequest.withAttributeNames("All");
         List<Message> messages = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Message msg = new Message();
@@ -89,6 +89,7 @@ public class IndexerQueueServiceTest {
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
         receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
         receiveMessageRequest.withMessageAttributeNames("All");
+        receiveMessageRequest.withAttributeNames("All");
 
         List<Message> messages = new ArrayList<>();
 
