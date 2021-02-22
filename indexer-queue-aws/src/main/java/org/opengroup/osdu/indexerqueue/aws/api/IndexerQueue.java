@@ -19,6 +19,7 @@ import com.amazonaws.services.sqs.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.opengroup.osdu.core.aws.sqs.AmazonSQSConfig;
 
+import javax.jdo.annotations.Index;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -67,61 +68,53 @@ public class IndexerQueue {
 
 
                 if (!messages.isEmpty()) {
-
+                    /*
+                    Messages without authorization attributes will be removed them from queue and send directly to DLQ
+                     */
+                    ArrayList<IndexProcessor> deleteMessageList=  new ArrayList<IndexProcessor>();
+                    ArrayList<IndexProcessor> deadletters = new ArrayList<>();
                     List<IndexProcessor> nonAuthorizedProcessors = messages
                             .stream()
                             .filter(msg -> !msg.getMessageAttributes().containsKey("authorization"))
                             .map(msg -> new IndexProcessor(msg, indexerUrl, "", CallableResult.Fail))
                             .collect(Collectors.toList());
 
+
+                    // batching messages for deletion
+
+                    deleteMessageList.addAll(nonAuthorizedProcessors);
+                    deadletters.addAll(nonAuthorizedProcessors);
+
+
                     List<Message> authorizedMessages = messages
                             .stream()
-                            .filter(msg -> msg.getMessageAttributes().containsKey("authorization"))
-                            .collect(Collectors.toList());
-
-                    List<Message> freshMessages = authorizedMessages
-                            .stream()
                             .filter(msg -> {
-                                if(msg.getMessageAttributes().containsKey("retry")) {
-                                    int retryCount = Integer.parseInt(msg.getMessageAttributes().get("retry").getStringValue());
-                                    if (retryCount < 10)
-                                    {
-                                        return true;
-                                    }
-                                } else {
-                                    return true;
-                                }
-                                return false;
-                            }).collect(Collectors.toList());
+                                System.out.println(msg.getMessageAttributes());
+                                return msg.getMessageAttributes().containsKey("authorization");
 
-                    List<IndexProcessor> maxedRetryFailedProcessors= authorizedMessages
-                            .stream()
-                            .filter(msg -> {
-                                if(msg.getMessageAttributes().containsKey("retry")) {
-                                    int retryCount = Integer.parseInt(msg.getMessageAttributes().get("retry").getStringValue());
-                                    if (retryCount > 9)
-                                    {
-                                        return true;
-                                    }
-                                }
-                                return false;
                             })
-                            .map(msg -> new IndexProcessor(msg, indexerUrl, "", CallableResult.Fail))
                             .collect(Collectors.toList());
 
-                    List<IndexProcessor> indexProcessors = IndexerQueueService.processQueue(freshMessages,  indexerUrl, executorPool);
-                    System.out.println(String.format("%s Messages Processed", indexProcessors.size()));
+                    /*
+                        Max retry handles by AWS SQS. If max number of reads from queue failed to process a given message,
+                        the message is automatically sent to DLQ by SQS policy.
+                        As long as the IndexerService doesn't add more stuff back to the queue with retry counter and new message ID
+                     */
+                    // process only authorized messages
+                    List<IndexProcessor> indexProcessors = IndexerQueueService.processQueue(authorizedMessages,  indexerUrl, executorPool);
+                    System.out.println(String.format("%s Authorized Messages Processed", indexProcessors.size()));
 
                     List<IndexProcessor> failedProcessors =  indexProcessors.stream().filter(indexProcessor -> indexProcessor.result == CallableResult.Fail || indexProcessor.exception != null).collect(Collectors.toList());
-                    failedProcessors.addAll(nonAuthorizedProcessors);
-                    failedProcessors.addAll(maxedRetryFailedProcessors);
-                    System.out.println(String.format("%s Messages Failed", failedProcessors.size()));
+                    System.out.println(String.format("Total %s Messages Failed", failedProcessors.size()));
 
-                    List<SendMessageResult> deadLetterResults = IndexerQueueService.sendMsgsToDeadLetterQueue(environmentVariables.deadLetterQueueUrl, failedProcessors, sqsClient);
+                    // check if the message exponential visibility timeout
+                    IndexerQueueService.ChangeMessageVisibilityTimeout(sqsClient, environmentVariables.queueUrl, failedProcessors);
+                    List<SendMessageResult> deadLetterResults = IndexerQueueService.sendMsgsToDeadLetterQueue(environmentVariables.deadLetterQueueUrl, deadletters, sqsClient);
                     System.out.println(String.format("%s Messages Dead Lettered", deadLetterResults.size()));
+                    deleteMessageList.addAll(indexProcessors.stream().filter(indexProcessor -> indexProcessor.result==CallableResult.Pass).collect(Collectors.toList()));
+                    List<DeleteMessageBatchRequestEntry> deleteEntries = deleteMessageList.stream().map(indexProcessor -> new DeleteMessageBatchRequestEntry(indexProcessor.messageId, indexProcessor.receiptHandle)).collect(Collectors.toList());
+                    System.out.println(String.format("%s Messages Deleting (Succeeded and Non-Authorized)", deleteEntries.size()));
 
-                    List<DeleteMessageBatchRequestEntry> deleteEntries = indexProcessors.stream().map(indexProcessor -> new DeleteMessageBatchRequestEntry(indexProcessor.messageId, indexProcessor.receiptHandle)).collect(Collectors.toList());
-                    System.out.println(String.format("%s Messages Deleting", deleteEntries.size()));
 
                     List<DeleteMessageBatchRequest> deleteBatchRequests = IndexerQueueService.createMultipleBatchDeleteRequest(environmentVariables.queueUrl, deleteEntries, MAX_BATCH_REQUEST_COUNT);
                     System.out.println(String.format("%s Delete Batch Request Created", deleteBatchRequests.size()));
@@ -143,4 +136,7 @@ public class IndexerQueue {
             }
         }
     }
+
 }
+
+
