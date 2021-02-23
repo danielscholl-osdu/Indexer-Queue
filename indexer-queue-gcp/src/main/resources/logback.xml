@@ -2,8 +2,12 @@
 <configuration>
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
   <springProfile name="local">
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%yellow([%thread]) %highlight(| %-5level |) %green(%d) %cyan(| %logger{15} |) %highlight(%msg) %n</pattern>
+        <charset>utf8</charset>
+      </encoder>
+    </appender>
     <root level="DEBUG">
       <appender-ref ref="CONSOLE"/>
     </root>
@@ -17,7 +21,7 @@
           <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>
           <appendLineSeparator>true</appendLineSeparator>
 
-          <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+          <jsonFormatter class="org.opengroup.osdu.core.gcp.logging.formatter.GoogleJsonFormatter">
             <prettyPrint>false</prettyPrint>
           </jsonFormatter>
         </layout>
