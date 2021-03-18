@@ -30,12 +30,12 @@ public class EnvironmentVariables {
 
         Boolean ssmEnabled = System.getenv("SSM_ENABLED") != null ? Boolean.parseBoolean(System.getenv("SSM_ENABLED")) : false;
         this.region = System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "us-east-1";
-            String environment =  ssmEnabled ? System.getenv("ENVIRONMENT") : "";
-            String parameterPrefix = String.format("/%s/%s", prefix, environment);
-            SSMConfig ssmConfig = new SSMConfig();
-            ssm = ssmConfig.amazonSSM();
-            this.queueUrl = ssmEnabled ? ssm.getProperty(String.format("%s/%s", parameterPrefix, "storage/storage-sqs-url")).toString() : System.getenv("AWS_STORAGE_QUEUE_URL")  != null ? System.getenv("AWS_STORAGE_QUEUE_URL") : "dev-osdu-storage-queue";
-            this.targetURL = System.getenv("AWS_INDEXER_INDEX_API") != null ? System.getenv("AWS_INDEXER_INDEX_API"): "ECSALB-os-indexer-355262993.us-east-1.elb.amazonaws.com/api/indexer/v2/_dps/task-handlers/index-worker";
-        this.deadLetterQueueUrl = ssmEnabled ? ssm.getProperty(String.format("%s/%s", parameterPrefix, "indexer-queue/indexer-deadletter-queue-sqs-url")).toString() :System.getenv("AWS_DEADLETTER_QUEUE_URL") != null ? System.getenv("AWS_DEADLETTER_QUEUE_URL") : "https://sqs.us-east-1.amazonaws.com/888733619319/dev-osdu-storage-dead-letter-queue";
+        this.targetURL =System.getenv("AWS_INDEXER_INDEX_API");
+        String environment = ssmEnabled ? System.getenv("ENVIRONMENT") : "";
+        String parameterPrefix = String.format("/%s/%s", prefix, environment);
+        SSMConfig ssmConfig = new SSMConfig();
+        ssm = ssmConfig.amazonSSM();
+        this.queueUrl = ssmEnabled ? ssm.getProperty(String.format("%s/%s", parameterPrefix, "storage/storage-sqs-url")).toString() : System.getenv("AWS_STORAGE_QUEUE_URL") != null ? System.getenv("AWS_STORAGE_QUEUE_URL") : "dev-osdu-storage-queue";
+        this.deadLetterQueueUrl = ssmEnabled ? ssm.getProperty(String.format("%s/%s", parameterPrefix, "indexer-queue/indexer-deadletter-queue-sqs-url")).toString() : System.getenv("AWS_DEADLETTER_QUEUE_URL") != null ? System.getenv("AWS_DEADLETTER_QUEUE_URL") : "https://sqs.us-east-1.amazonaws.com/888733619319/dev-osdu-storage-dead-letter-queue";
     }
 }
