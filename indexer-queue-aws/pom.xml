@@ -19,7 +19,7 @@
   <parent>
     <artifactId>indexer-queue</artifactId>
     <groupId>org.opengroup.osdu.indexerqueue</groupId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -28,7 +28,7 @@
   <artifactId>indexer-queue-aws</artifactId>
   <description>Indexer Queue Service on AWS</description>
   <packaging>jar</packaging>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>0.10.0-SNAPSHOT</version>
 
   <name>indexer-queue-aws</name>
 
