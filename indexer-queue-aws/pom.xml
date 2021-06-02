@@ -36,7 +36,6 @@
     <aws.version>1.11.637</aws.version>
     <deployment.environment>dev</deployment.environment>
     <deployment.repositorybucket>osdu-local-maven-repository</deployment.repositorybucket>
-    <version.number>1.0.2-SNAPSHOT</version.number>
   </properties>
 
     <dependencies>
