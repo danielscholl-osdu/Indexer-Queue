@@ -70,6 +70,23 @@ osdu-gcp-containerize-gcloud:
     variables:
       - $OSDU_GCP == 'true'
 
+osdu-gcp-containerize-gitlab:
+  stage: containerize
+  needs: ["compile-and-unit-test"]
+  tags: ["osdu-medium"]
+  extends: .osdu-gcp-variables
+  image: docker:19.03
+  cache: {}
+  allow_failure: true
+  script:
+    - export EXTRA_DOCKER_TAG=""; if [ "$CI_COMMIT_TAG" != "" ] ; then EXTRA_DOCKER_TAG="-t $CI_REGISTRY_IMAGE/osdu-gcp:$CI_COMMIT_TAG" ; elif [ "$CI_COMMIT_REF_NAME" = "master" ] ; then EXTRA_DOCKER_TAG="-t $CI_REGISTRY_IMAGE/osdu-gcp:latest" ; fi
+    - docker build -t $OSDU_GCP_LOCAL_IMAGE_TAG_SHA $EXTRA_DOCKER_TAG --file $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/Dockerfile.cloudbuild --build-arg PROVIDER_NAME=$OSDU_GCP_VENDOR --build-arg PORT=$OSDU_GCP_PORT .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/osdu-gcp
+  only:
+    variables:
+      - $OSDU_GCP == 'true'
+
 osdu-gcp-test:
   extends:
     - .maven
