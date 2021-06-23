@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "{{ .Values.conf.app_name }}"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - service-gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/api/indexer/v1"
+      route:
+        - destination:
+            port:
+              number: 80
+            host: "{{ .Values.conf.app_name }}.{{ .Release.Namespace }}.svc.cluster.local"

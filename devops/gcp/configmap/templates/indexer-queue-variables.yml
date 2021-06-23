@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: "{{ .Values.conf.app_name }}"
+  name: "{{ .Values.conf.configmap }}"
+  namespace: "{{ .Release.Namespace }}"
+data:
+  LOG_LEVEL: "{{ .Values.data.log_level }}"
+  OSDU_ENTITLEMENTS_URL: "{{ .Values.data.osdu_entitlements_url }}"
+  GOOGLE_CLOUD_PROJECT: "{{ .Values.data.google_cloud_project }}"
+  GOOGLE_CLOUD_PROJECT_REGION: "{{ .Values.data.google_cloud_project_region }}"
+  INDEXER_HOST: "{{ .Values.conf.indexer_host }}"
+  PARTITION_API: "{{ .Values.data.partition_api }}"
+  GOOGLE_AUDIENCES: "{{ .Values.data.google_audiences }}"
+  SERVICE_MAIL: "{{ .Values.data.service_mail }}"
+  INDEXER_QUEUE_IDENTIFIER: "{{ .Values.data.indexer_queue_identifier }}"

@@ -1,0 +1,15 @@
+# Default values for indexer-queue-deploy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+data:
+  requests_cpu: "0.25"
+  requests_memory: "128M"
+  limits_cpu: "1"
+  limits_memory: "1G"
+  serviceAccountName: ""
+  image: ""
+
+conf:
+  configmap: "indexer-queue-config"
+  app_name: "indexer-queue"
