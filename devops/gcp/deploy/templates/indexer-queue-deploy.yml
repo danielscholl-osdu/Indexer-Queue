@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: "{{ .Values.conf.app_name }}"
+  name: "{{ .Values.conf.app_name }}"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ .Values.conf.app_name }}"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.conf.app_name }}"
+    spec:
+      containers:
+      - name: "{{ .Values.conf.app_name }}"
+        image: "{{ .Values.data.image }}"
+        envFrom:
+        - configMapRef:
+            name: "{{ .Values.conf.configmap }}"                       
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "{{ .Values.data.requests_cpu }}"
+            memory: "{{ .Values.data.requests_memory }}"
+          limits:
+            cpu: "{{ .Values.data.limits_cpu }}"
+            memory: "{{ .Values.data.limits_memory }}"
+      serviceAccountName: "{{ .Values.data.serviceAccountName }}"

@@ -1,0 +1,18 @@
+# Default values for indexer-queue-configmap.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+data:
+  log_level: ""
+  osdu_entitlements_url: ""
+  google_cloud_project: ""
+  google_cloud_project_region: ""
+  indexer_host: ""
+  partition_api: ""
+  google_audiences: ""
+  service_mail: ""
+  indexer_queue_identifier: ""
+
+conf:
+  configmap: "indexer-queue-config"
+  app_name: "indexer-queue"
