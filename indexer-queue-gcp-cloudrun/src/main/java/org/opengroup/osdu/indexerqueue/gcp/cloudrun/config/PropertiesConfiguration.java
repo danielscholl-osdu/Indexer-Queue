@@ -36,4 +36,5 @@ public class PropertiesConfiguration {
 
 	private String indexerHost;
 
+	private String indexerQueueIdentifier;
 }

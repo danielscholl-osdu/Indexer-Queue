@@ -25,6 +25,7 @@ import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
+import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.PropertiesConfiguration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -37,6 +38,8 @@ public class IndexerQueueIdentifier {
 	private final ITenantFactory tenantInfoServiceProvider;
 
 	private final HeadersInfo headersInfo;
+
+	private final PropertiesConfiguration configuration;
 
 	private TenantInfo tenant;
 
@@ -52,6 +55,6 @@ public class IndexerQueueIdentifier {
 			return ("common");
 		}
 
-		return String.format("%s-os-%s", tenant.getName(), Constants.INDEXER_QUEUE_IDENTIFIER);
+		return String.format("%s-%s", tenant.getName(), configuration.getIndexerQueueIdentifier());
 	}
 }
