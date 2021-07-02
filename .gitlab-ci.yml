@@ -45,7 +45,10 @@ include:
     file: "scanners/gitlab-ultimate.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/aws.yml"
+    file: "cloud-providers/aws-global.yml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "cloud-providers/aws-maven.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/ibm-deploy-only.yml"
