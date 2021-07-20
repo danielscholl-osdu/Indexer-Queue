@@ -22,7 +22,9 @@ env:
   secrets-manager:
     DOCKER_USERNAME: /osdu/devops/docker_credentials:username
     DOCKER_PASSWORD: /osdu/devops/docker_credentials:password
-
+    SONAR_USERNAME: /osdu/devops/sonar_credentials:username
+    SONAR_PASSWORD: /osdu/devops/sonar_credentials:password
+  
   parameter-store:
     SONAR_URL: /osdu/devops/sonar_url
 
