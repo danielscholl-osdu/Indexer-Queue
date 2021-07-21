@@ -83,6 +83,11 @@
 			<artifactId>os-core-lib-ibm</artifactId>
 			<version>${os-core-lib-ibm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opengroup.osdu</groupId>
+			<artifactId>os-core-common</artifactId>
+			<version>0.9.0</version>
+		</dependency>
 		<!-- spring boot dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
