@@ -49,7 +49,7 @@
     <azure.functions.indexerqueuekey />
 
 
-    <os-core-common.vesrion>0.9.0</os-core-common.vesrion>
+    <os-core-common.vesrion>0.10.0</os-core-common.vesrion>
     <jackson.version>2.11.2</jackson.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <elasticsearch.version>6.8.1</elasticsearch.version>

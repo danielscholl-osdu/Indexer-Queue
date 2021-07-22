@@ -48,7 +48,7 @@
       <dependency>
         <groupId>org.opengroup.osdu</groupId>
         <artifactId>os-core-common</artifactId>
-        <version>0.9.0</version>
+        <version>0.10.0</version>
       </dependency>
 
       <!-- AWS managed packages -->
