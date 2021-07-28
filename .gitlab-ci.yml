@@ -28,7 +28,7 @@ variables:
   OSDU_GCP_VENDOR: gcp-cloudrun
   OSDU_GCP_INDEXER_HOST_4Q: https://os-indexer-attcrcktoa-uc.a.run.app
   OSDU_GCP_IQ_SA: pub-sub-indexer-queue@nice-etching-277309.iam.gserviceaccount.com
-  OSDU_GCP_ENV_VARS: GOOGLE_AUDIENCES=$GOOGLE_AUDIENCE,PARTITION_API=$OSDU_GCP_PARTITION_API,GOOGLE_CLOUD_PROJECT_REGION=$OSDU_GCP_CLOUDRUN_REGION,GOOGLE_CLOUD_PROJECT=$OSDU_GCP_PROJECT,INDEXER_HOST=$OSDU_GCP_INDEXER_HOST_4Q,SERVICE_MAIL=$OSDU_GCP_IQ_SA,OSDU_ENTITLEMENTS_URL=$OSDU_GCP_ENTITLEMENTS_URL,INDEXER_QUEUE_IDENTIFIER=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME --vpc-connector=$OSDU_GCP_VPC_CONNECTOR
+  OSDU_GCP_ENV_VARS: GOOGLE_AUDIENCES=$GOOGLE_AUDIENCE,PARTITION_API=$OSDU_GCP_PARTITION_API,GOOGLE_CLOUD_PROJECT_REGION=$OSDU_GCP_CLOUDRUN_REGION,GOOGLE_CLOUD_PROJECT=$OSDU_GCP_PROJECT,INDEXER_HOST=$OSDU_GCP_INDEXER_HOST_4Q,SERVICE_MAIL=$OSDU_GCP_IQ_SA,OSDU_ENTITLEMENTS_URL=$OSDU_GCP_ENTITLEMENTS_V2_URL,INDEXER_QUEUE_IDENTIFIER=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME --vpc-connector=$OSDU_GCP_VPC_CONNECTOR
   OSDU_GCP_HELM_PACKAGE_CHARTS: "devops/gcp/deploy devops/gcp/configmap"
 
 include:
@@ -45,7 +45,10 @@ include:
     file: "scanners/gitlab-ultimate.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/aws.yml"
+    file: "cloud-providers/aws-global.yml"
+
+  - project: "osdu/platform/ci-cd-pipelines"
+    file: "cloud-providers/aws-maven.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/ibm-deploy-only.yml"

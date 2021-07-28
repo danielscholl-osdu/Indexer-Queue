@@ -10,7 +10,7 @@
 
 	<groupId>org.opengroup.osdu.indexerqueue.ibm</groupId>
 	<artifactId>indexer-queue-ibm</artifactId>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>0.11.0-SNAPSHOT</version>
 	<name>indexer-queue-ibm</name>
 	<description>Indexer Queue IBM</description>
 	<packaging>jar</packaging>
@@ -82,6 +82,11 @@
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>os-core-lib-ibm</artifactId>
 			<version>${os-core-lib-ibm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opengroup.osdu</groupId>
+			<artifactId>os-core-common</artifactId>
+			<version>0.10.0</version>
 		</dependency>
 		<!-- spring boot dependencies -->
 		<dependency>
