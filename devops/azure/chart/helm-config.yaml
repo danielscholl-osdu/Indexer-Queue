@@ -16,3 +16,9 @@ image:
 azure:
   servicebusSubscription: recordstopicsubscription
   servicebusTopic: recordstopic
+
+################################################################################
+# Specify KEDA configuration
+#
+keda:
+  version_2_enabled: false
