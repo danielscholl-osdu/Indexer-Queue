@@ -78,16 +78,14 @@ spec:
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-apiVersion: keda.k8s.io/v1alpha1
+apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: indexer-queue
   namespace: osdu
-  labels:
-    deploymentName: indexer-queue
 spec:
   scaleTargetRef:
-    deploymentName: indexer-queue
+    name: indexer-queue
   triggers:
   - type: azure-servicebus
     metadata:

@@ -12,16 +12,29 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+{{- $isKedaV2Enabled := .Values.keda.version_2_enabled | default false -}}
+
+{{- if $isKedaV2Enabled }}
+apiVersion: keda.sh/v1alpha1
+{{- else }}
 apiVersion: keda.k8s.io/v1alpha1
+{{- end }}
 kind: ScaledObject
 metadata:
   name: {{ .Chart.Name }}
   namespace: osdu
+  {{- if $isKedaV2Enabled }}
+  {{- else }}
   labels:
     deploymentName: {{ .Chart.Name }}
+  {{- end}}
 spec:
   scaleTargetRef:
+    {{- if $isKedaV2Enabled }}
+    name: {{ .Chart.Name }}
+    {{- else }}
     deploymentName: {{ .Chart.Name }}
+    {{- end}}
   pollingInterval: 30  # Optional. Default: 30 seconds
   cooldownPeriod:  60  # Optional. Default: 300 seconds
   minReplicaCount: 1   # Optional. Default: 0
@@ -29,9 +42,13 @@ spec:
   triggers:
   - type: azure-servicebus
     metadata:
+      subscriptionName: {{ .servicebusSubscription }}
+      topicName: {{ .servicebusTopic }}
+      {{- if $isKedaV2Enabled }}
+      connectionFromEnv: SERVICE_BUS # This must be a connection string for a queue itself, and not a namespace level (e.g. RootAccessPolicy) connection string [#215](https://github.com/kedacore/keda/issues/215)
+      {{- else }}
       type: serviceBusTrigger
       direction: in
       name: message
-      subscriptionName: {{ .Values.azure.servicebusSubscription }}
-      topicName: {{ .Values.azure.servicebusTopic }}
       connection: SERVICE_BUS
+      {{- end }}

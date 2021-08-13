@@ -15,6 +15,13 @@
 global:
   replicaCount: 1
 
+################################################################################
+# Specify KEDA configuration
+#
+keda:
+  version_2_enabled: false
+
+
 image:
   repository: community.opengroup.org:5555/osdu/platform/system/indexer-queue
   branch: master
