@@ -3,6 +3,8 @@ global:
 
   # Service(s) Replica Count
   replicaCount: 2
+  nodepool: services
+  isAutoscalingEnabled: false
 
 ################################################################################
 # Specify the Gitlab branch being used for image creation
