@@ -5,8 +5,10 @@ import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MDCContextMap {
-
+/*
+ Context Map to set the thread context.
+ */
+public class MdcContextMap {
     public Map<String, String> getContextMap(String correlationId, String dataPartitionId) {
         final Map<String, String> contextMap = new HashMap<>();
         contextMap.put(DpsHeaders.CORRELATION_ID, correlationId);
