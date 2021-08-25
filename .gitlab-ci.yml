@@ -3,6 +3,8 @@ variables:
   AWS_TEST_SUBDIR: indexer-queue-aws
   AWS_SERVICE: indexer-queue
   AWS_ENVIRONMENT: dev
+  AWS_DEPLOY_TARGET: EKS
+  AWS_EKS_DEPLOYMENT_NAME: indexer-queue
 
   IBM_BUILD_SUBDIR: indexer-queue-ibm
 
