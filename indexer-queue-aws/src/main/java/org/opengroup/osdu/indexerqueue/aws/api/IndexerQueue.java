@@ -17,6 +17,7 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import org.opengroup.osdu.core.aws.sqs.AmazonSQSConfig;
+import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class IndexerQueue {
     private static final int MAX_INDEX_THREADS = 50;
     private static final int MAX_BATCH_REQUEST_COUNT = 10;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws K8sParameterNotFoundException {
         EnvironmentVariables environmentVariables = new EnvironmentVariables();
         List<Message> messages;
         String indexerUrl = String.format("%s/%s", environmentVariables.targetURL, "api/indexer/v2/_dps/task-handlers/index-worker");
