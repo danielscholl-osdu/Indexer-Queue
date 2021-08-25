@@ -13,22 +13,15 @@
 #  limitations under the License.
 
 global:
-  replicaCount: 1
+  replicaCount: 2
   nodepool: services
   isAutoscalingEnabled: false
 
-################################################################################
-# Specify KEDA configuration
-#
-keda:
-  version_2_enabled: false
-
+azure:
+  servicebusSubscription: recordstopicsubscription
+  servicebusTopic: recordstopic
 
 image:
   repository: community.opengroup.org:5555/osdu/platform/system/indexer-queue
   branch: master
   tag: latest
-
-azure:
-  servicebusSubscription: recordstopicsubscription
-  servicebusTopic: recordstopic

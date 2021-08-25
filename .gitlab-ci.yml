@@ -6,9 +6,9 @@ variables:
 
   IBM_BUILD_SUBDIR: indexer-queue-ibm
 
-  AZURE_SERVICE: enque
+  AZURE_SERVICE: indexer-queue
   AZURE_BUILD_SUBDIR: indexer-queue-azure-enqueue
-  AZURE_TEST_SUBDIR: indexer-queue-azure-enqueue
+  AZURE_TEST_SUBDIR: testing/indexer-queue-azure-enqueue
 
   GCP_BUILD_SUBDIR: indexer-queue-gcp
   GCP_INT_TEST_SUBDIR: indexer-queue-gcp # Fix as soon as integration tests are added
@@ -57,7 +57,7 @@ include:
     file: "cloud-providers/ibm-deploy-only.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/azure-function.yml"
+    file: "cloud-providers/azure.yml"
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "publishing/pages.yml"
