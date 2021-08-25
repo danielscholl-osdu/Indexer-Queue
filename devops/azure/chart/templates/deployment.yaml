@@ -18,6 +18,7 @@ metadata:
   name: {{ .Release.Name }}
   namespace: osdu
 spec:
+  replicas: {{ .Values.global.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
@@ -27,40 +28,87 @@ spec:
         app: {{ .Chart.Name }}
         aadpodidbinding: osdu-identity
     spec:
+      volumes:
+        - name: azure-keyvault
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: azure-keyvault
+{{- if .Values.global.isAutoscalingEnabled }}
+      nodeSelector:
+        nodepool: {{ .Values.global.nodepool }} 
+{{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.image.repository }}/{{ .Chart.Name }}-{{ .Values.image.branch }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          volumeMounts:
+            - name: azure-keyvault
+              mountPath: "/mnt/azure-keyvault"
+              readOnly: true
           env:
-          - name: SERVICE_BUS
-            valueFrom:
-              secretKeyRef:
-                name: servicebus
-                key: servicebus-connection
-          - name: storage_account
-            valueFrom:
-              secretKeyRef:
-                name: airflow
-                key: storage-account
-          - name: storage_account_key
-            valueFrom:
-              secretKeyRef:
-                name: airflow
-                key: storage-key
-          - name: appinsights_key
-            valueFrom:
-              secretKeyRef:
-                name: central-logging
-                key: appinsights
-          - name: AzureWebJobsStorage
-            value: DefaultEndpointsProtocol=https;AccountName=$(storage_account);AccountKey=$(storage_account_key);EndpointSuffix=core.windows.net
-          - name: INDEXER_WORKER_URL
-            value: http://indexer-service/api/indexer/v2/_dps/task-handlers/index-worker
-          - name: AzureFunctionsJobHost__functions__0
-            value: enqueue
-          - name: FUNCTIONS_WORKER_RUNTIME
-            value: java
-          - name: TOPIC_NAME
-            value: recordstopic
-          - name: SUBSCRIPTION_NAME
-            value: recordstopicsubscription
+            - name: spring_application_name
+              value: indexer-queue
+            - name: azure_application_insights_instrumentation_key
+              valueFrom:
+                secretKeyRef:
+                  name: central-logging
+                  key: appinsights
+            - name: indexer_worker_url
+              value: http://indexer-service/api/indexer/v2/_dps/task-handlers/index-worker
+            - name: azure_servicebus_topic_name
+              value: {{ .Values.azure.servicebusTopic }}
+            - name: azure_servicebus_topic_subscription
+              value: {{ .Values.azure.servicebusSubscription }}
+            - name: AZURE_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: tenantid
+            - name: AZURE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: principal-clientid
+            - name: AZURE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: principal-clientpassword
+            - name: KEYVAULT_URI
+              valueFrom:
+                 configMapKeyRef:
+                   name: osdu-svc-properties
+                   key: ENV_KEYVAULT
+            - name: aad_client_id
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: application-appid
+            - name: AZURE_APP_RESOURCE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: application-appid
+            - name: server_port
+              value: "80"
+            - name: PARTITION_API
+              value: http://partition/api/partition/v1
+            - name: executor_n_threads
+              value: "32"
+            - name: max_concurrent_calls
+              value: "32"
+            - name: max_lock_renew_duration_seconds
+              value: "600"
+            - name: max_delivery_count
+              value: "5"

@@ -1,6 +1,6 @@
 # os-indexer-queue-azure
 
-os-indexer-queue-azure is an [Azure Function](https://docs.microsoft.com/en-us/azure/azure-functions/) service that is woken up in response to messages emitted by `os-storage-azure` onto Service Bus. It is responsible for calling the `os-indexer` to trigger re-indexing events.
+os-indexer-queue-azure is a spring boot service that is woken up in response to messages emitted by `os-storage-azure` onto Service Bus. It is responsible for calling the `os-indexer` to trigger re-indexing events.
 
 ## Running Locally
 
@@ -10,15 +10,17 @@ In order to run this service locally, you will need the following:
 
 - [Maven 3.6.0+](https://maven.apache.org/download.cgi)
 - [AdoptOpenJDK8](https://adoptopenjdk.net/)
-- [Docker](https://www.docker.com/)
-- Infrastructure dependencies, deployable through the relevant [infrastructure template](https://dev.azure.com/slb-des-ext-collaboration/open-data-ecosystem/_git/infrastructure-templates?path=%2Finfra&version=GBmaster&_a=contents)
-- While not a strict dependency, example commands in this document use [bash](https://www.gnu.org/software/bash/)
 
 ### General Tips
 
 **Environment Variable Management**
 
-Because this service is Dockerized, you will want to keep all environment variables inside of a file called `.env`
+The following tools make environment variable configuration simpler
+
+
+* [direnv](https://direnv.net/) - for a shell/terminal environment
+* [EnvFile](https://plugins.jetbrains.com/plugin/7861-envfile) - for [Intellij IDEA](https://www.jetbrains.com/idea/)
+
 
 **Lombok**
 
@@ -40,14 +42,39 @@ az keyvault secret show --vault-name $KEY_VAULT_NAME --name $KEY_VAULT_SECRET_NA
 
 | name | value | description | sensitive? | source |
 | ---  | ---   | ---         | ---        | ---    |
-| `REGISTRY` | `localhost:5000` | Container registry endpoint. Localhost is fine for local development | no | - |
-| `VSTS_FEED_TOKEN` | `********` | Access token that grants access to Maven repository | yes | Azure DevOps web UI |
-| `SUBSCRIPTION_NAME` | ex `foosubscription` | Azure subscription name | no | - |
-| `STORAGE_CONNECTION_STRING` | `********` | Azure storage connection string | yes | output of infrastructure deployment |
-| `SERVICE_BUS_ENDPOINT` | `********` | Service Bus connection string | yes | output of infrastructure deployment |
-| `TOPIC_NAME` | `recordstopic` | Service Bus topic to listen on | yes | output of infrastructure deployment |
-| `INDEXER_WORKER_URL` | ex `https://indexer.azurewebsites.net` | Indexer endpoint | no | output of infrastructure deployment |
-| `azure.application-insights.instrumentation-key` | `********` | Instrumentation key of the associated application insights resource | yes | output of infrastructure deployment | 
+| `azure_servicebus_topic_name` | `recordstopic` | Service Bus topic to listen on | no | output of infrastructure deployment |
+| `azure_servicebus_topic_subscription` | `recordstopicsubscription` | Service Bus subscription to listen from | no | output of infrastructure deployment |
+| `indexer_worker_url` | ex `https://indexer.azurewebsites.net/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer endpoint | no | output of infrastructure deployment |
+| `azure_application_insights_instrumentation_key` | `********` | Instrumentation key of the associated application insights resource | yes | output of infrastructure deployment |
+| `AZURE_TENANT_ID` | `*******` | AD tenant to authenticate users from | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-tenant-id` |
+| `AZURE_CLIENT_ID` | `******` | Identity to run the service locally. This enables access to Azure resources. You only need this if running locally | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-username` |
+| `AZURE_CLIENT_SECRET` | `******` | Secret for `$AZURE_CLIENT_ID` | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-password` |
+| `KEYVAULT_URI` | ex `https://foo-keyvault.vault.azure.net/` | URI of KeyVault that holds application secrets | no | output of infrastructure deployment |
+| `AZURE_APP_RESOURCE_ID` | `******` | AAD client application ID | yes | output of infrastructure deployment |
+| `aad_client_id` | `*****` | | yes | output of infrastructure deployment |
+| `partition_api` | ex `https://partition.azurewebsites.net/api/partition/v1` | partition service endpoint | no | |
+| `executor_n_threads` | 32 | Max no of threads used concurrently  | no | | 
+| `max_concurrent_calls` | 32 | Max no of concurrent calls to service bus | no | | 
+| `max_lock_renew_duration_seconds` | 600 | Message lock will be released after this duration | no | | 
+| `max_delivery_count` | 5 | Man no of times service bus re-tries a message before dead-lettering it | no | | 
+| `azure_istioauth_enabled` | `true` (depends on if service is running in Kubernetes environment with Istio installed) | Configuring use of Istio | no | Set to false if running locally | 
+| `server_port` | 8080 | | | |
+
+**Required to run integration test**
+
+| name | value | description | 
+| ---  | ---   | ---         | 
+| `STORAGE_URL` | ex: `https://storage.azurewebsites.net/api/storage/v2`| storage service endpoint | 
+| `LEGAL_URL` | ex: `https://legal.azurewebsites.net/api/legal/v1/` | | | |
+| `SEARCH_URL` | ex: `https://search.azurewebsites.net/api/search/v2/` | | | |
+| `TENANT_NAME` | ex: `opendes` | OSDU tenant used for testing |
+| `AZURE_AD_TENANT_ID` | `*****` | AD tenant to authenticate users from |
+| `INTEGRATION_TESTER` | `*****`| System identity to assume for API calls. Note: this user must have entitlements configured already |
+| `TESTER_SERVICEPRINCIPAL_SECRET` | `*****` | Secret for `$INTEGRATION_TESTER` |
+| `AZURE_AD_APP_RESOURCE_ID` | `*****` | AAD client application ID |
+| `NO_DATA_ACCESS_TESTER` | `*****` | Service principal ID of a service principal without entitlements |
+| `NO_DATA_ACCESS_TESTER_SERVICEPRINCIPAL_SECRET` | `*****` | Secret for `$NO_DATA_ACCESS_TESTER` |
+| `DOMAIN` | ex: `contoso.com` | domain name |
 
 ### Configure Maven
 
@@ -81,97 +108,32 @@ $ cat ~/.m2/settings.xml
 
 ### Build and run the application
 
-In order to build the application, you can run the following commands. These commands should be run from the same folder as this file.
+Build and run the application
+After configuring your environment as specified above, you can follow these steps to build and run the application. These steps should be invoked from the repository root.
 
-> Note: `os-indexer-queue-azure` listens for messages on a Service Bus subscription. If you are running this service locally,
-> be aware that there is likely an Azure deployed version of this listening on the same subscription. Take care to do one
-> of the following when testing locally:
->   - Stop the `os-indexer-queue-azure` function in the Azure portal and run it locally. You'll need to remember to restart the Azure deployed `os-indexer-queue-azure` when you are finished testing
->   - Deploy your own infrastructure stack and configure all the services *except* `os-indexer-queue-azure`
+# build + test + package azure service code
+$ cd indexer-queue-azure-enqueue && mvn clean package
 
-```bash
-cp .env.template .env
-vim .env # configure as needed
-
-# Build the docker image and start it
-docker-compose build
-docker-compose up -d
-
-# Stop and Remove the image
-docker-compose kill
-docker-compose rm
-```
+# run service
+#
+# Note: this assumes that the environment variables for running the service as outlined
+#       above are already exported in your environment.
+$ mvn spring-boot:run -Dspring-boot.run.profiles=local   
+# or directly run the jar file  
+$ cd indexer-queue-azure-enqueue && java -jar target\indexer-queue-azure-enqueue-1.0.0-spring-boot.jar
 
 ### Test the application
-
-As of today, this Azure Function has no integration tests.
-
+```# build + install integration test core
+   $ (cd testing/indexer-queue-azure-enqueue/ && mvn clean install)
+   
+   # build + run Azure integration tests.
+   #
+   # Note: this assumes that the environment variables for integration tests as outlined above are already exported in your environment.
+   $ (cd testing/indexer-queue-azure-enqueue/ && mvn clean test)
+```
 ## Debugging
 
 Jet Brains - the authors of Intellij IDEA, have written an [excellent guide](https://www.jetbrains.com/help/idea/debugging-your-first-java-application.html) on how to debug java programs.
-
-## Deploying service to Azure
-
-Service deployments into Azure are standardized to make the process the same for all services if using ADO and are closely related to the infrastructure deployed. The steps to deploy into Azure can be [found here](https://github.com/azure/osdu-infrastructure)
-
-Note: The pipeline for `os-indexer-queue-azure` is slightly different than noted above because it is an Azure Function.
-The correct pipeline for Azure is [azure-pipeline.yml](./azure-pipeline.yml).
-
-### Manual Deployment Steps
-
-__Environment Settings__
-
-The following environment variables are necessary to properly deploy a service to an Azure OSDU Environment.
-
-```bash
-# Group Level Variables
-export AZURE_TENANT_ID=""
-export AZURE_SUBSCRIPTION_ID=""
-export AZURE_SUBSCRIPTION_NAME=""
-export AZURE_PRINCIPAL_ID=""
-export AZURE_PRINCIPAL_SECRET=""
-export AZURE_APP_ID=""
-export AZURE_BASENAME_21=""
-export AZURE_BASENAME=""
-export AZURE_BASE=""
-export AZURE_STORAGE_ACCOUNT=""
-export AZURE_NO_ACCESS_ID=""
-
-# Required for Azure Deployment
-export AZURE_CLIENT_ID="${AZURE_PRINCIPAL_ID}"
-export AZURE_CLIENT_SECRET="${AZURE_PRINCIPAL_SECRET}"
-export AZURE_RESOURCE_GROUP="${AZURE_BASENAME}-osdu-r2-app-rg"
-export AZURE_FUNCTIONAPP_NAME="${AZURE_BASENAME}-enque"
-export AZURE_CONTAINER_REGISTRY="${AZURE_BASE}cr"
-
-```
-
-__Azure Service Deployment__
-
-1. Log in to the Azure CLI
-  `az login --service-principal -u $AZURE_PRINCIPAL_ID -p $AZURE_PRINCIPAL_SECRET --tenant $AZURE_TENANT_ID`
-
-2. Log in to the ACR Registry
-  `az acr login -n $AZURE_CONTAINER_REGISTRY`
-
-3. Build the Docker Image
-  `docker-compose build`
-
-4. Tag the Image to the Container Registry
-  `docker tag indexer-enqueue:latest ${AZURE_CONTAINER_REGISTRY}.azurecr.io/indexer-enqueue:latest`
-
-5. Push the Image to the Container Registry
-  `docker push ${AZURE_CONTAINER_REGISTRY}.azurecr.io/indexer-enqueue:latest`
-
-6. Deploy the Function App
-
-```bash
-az functionapp config container set \
-        --docker-custom-image-name ${AZURE_CONTAINER_REGISTRY}.azurecr.io/indexer-enqueue:latest \
-        --name $AZURE_FUNCTIONAPP_NAME \
-        --resource-group $AZURE_RESOURCE_GROUP \
-        -ojsonc
-```
 
 ## License
 Copyright © Microsoft Corporation
