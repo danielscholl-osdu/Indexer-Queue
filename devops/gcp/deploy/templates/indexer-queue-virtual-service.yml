@@ -11,7 +11,7 @@ spec:
   http:
     - match:
         - uri:
-            prefix: "/api/indexer/v1"
+            prefix: "/api/indexer-queue/v1"
       route:
         - destination:
             port:
