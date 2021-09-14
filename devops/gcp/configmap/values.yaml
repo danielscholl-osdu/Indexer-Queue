@@ -7,11 +7,12 @@ data:
   osdu_entitlements_url: ""
   google_cloud_project: ""
   google_cloud_project_region: ""
-  indexer_host: ""
+  #indexer_host: ""
   partition_api: ""
   google_audiences: ""
-  service_mail: ""
+  #service_mail: ""
   indexer_queue_identifier: ""
+  cloud_task_target_host: ""
 
 conf:
   configmap: "indexer-queue-config"
