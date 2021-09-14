@@ -19,7 +19,6 @@ package org.opengroup.osdu.indexerqueue.gcp.cloudrun.util;
 
 import com.google.cloud.tasks.v2.CloudTasksClient;
 import com.google.cloud.tasks.v2.HttpRequest;
-import com.google.cloud.tasks.v2.OidcToken;
 import com.google.cloud.tasks.v2.QueueName;
 import com.google.cloud.tasks.v2.Task;
 import com.google.cloud.tasks.v2.Task.Builder;
@@ -50,19 +49,15 @@ public class CloudTaskBuilder implements TaskBuilder {
 	public Task createTask(CloudTaskRequest request) throws IOException {
 		log.info(String.format("project-id: %s | location: %s | queue-id: %s | indexer-host: %s | message: %s",
 			config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId(),
-			config.getIndexerHost() + request.getUrl(), request.getMessage()));
+			config.getCloudTaskTargetHost(), request.getMessage()));
 
 		String queuePath = QueueName
 			.of(config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId())
 			.toString();
 
-		OidcToken.Builder oidcTokenBuilder = OidcToken.newBuilder()
-			.setServiceAccountEmail(config.getServiceMail()).setAudience(config.getGoogleAudience());
-
 		HttpRequest httpRequest = HttpRequest.newBuilder()
-			.setUrl(config.getIndexerHost() + request.getUrl())
+			.setUrl(config.getCloudTaskTargetHost())
 			.setBody(ByteString.copyFrom(request.getMessage(), Charset.defaultCharset()))
-			.setOidcToken(oidcTokenBuilder)
 			.putAllHeaders(this.headersInfo.getHeaders().getHeaders())
 			.build();
 

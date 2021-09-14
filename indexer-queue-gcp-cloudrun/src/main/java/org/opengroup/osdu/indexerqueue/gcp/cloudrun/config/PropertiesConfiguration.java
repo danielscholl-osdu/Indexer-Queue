@@ -26,15 +26,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties
 public class PropertiesConfiguration {
 
-	private String googleAudience;
-
-	private String serviceMail;
-
 	private String googleCloudProject;
 
 	private String googleCloudProjectRegion;
 
-	private String indexerHost;
+	private String cloudTaskTargetHost;
 
 	private String indexerQueueIdentifier;
 }
