@@ -28,12 +28,9 @@ variables:
   OSDU_GCP_SERVICE: indexer-queue
   OSDU_GCP_APPLICATION_NAME: indexer-queue
   OSDU_GCP_VENDOR: gcp-cloudrun
-  #OSDU_GCP_IQ_SA: pub-sub-indexer-queue@nice-etching-277309.iam.gserviceaccount.com
-  #OSDU_GCP_ENV_VARS: GOOGLE_AUDIENCES=$GOOGLE_AUDIENCE,PARTITION_API=$OSDU_GCP_PARTITION_API,GOOGLE_CLOUD_PROJECT_REGION=$OSDU_GCP_CLOUDRUN_REGION,GOOGLE_CLOUD_PROJECT=$OSDU_GCP_PROJECT,INDEXER_HOST=$OSDU_GCP_INDEXER_HOST,SERVICE_MAIL=$OSDU_GCP_IQ_SA,OSDU_ENTITLEMENTS_URL=$OSDU_GCP_ENTITLEMENTS_V2_URL,INDEXER_QUEUE_IDENTIFIER=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME --vpc-connector=$OSDU_GCP_VPC_CONNECTOR
   OSDU_GCP_HELM_PACKAGE_CHARTS: "devops/gcp/deploy devops/gcp/configmap"
   OSDU_GCP_HELM_CONFIG_SERVICE: indexer-queue-config
   OSDU_GCP_HELM_DEPLOYMENT_SERVICE: indexer-queue-deploy
-  #OSDU_GCP_HELM_CONFIG_SERVICE_VARS: "--set data.log_level=DEBUG --set data.osdu_entitlements_url=$OSDU_GCP_AUTHORIZE_API --set data.google_cloud_project=$OSDU_GCP_PROJECT --set data.google_cloud_project_region=$OSDU_GCP_CLOUDRUN_REGION --set data.indexer_host=$OSDU_GCP_INDEXER_HOST --set data.partition_api=$OSDU_GCP_PARTITION_API --set data.google_audiences=$GOOGLE_AUDIENCE --set data.service_mail=$OSDU_GCP_IQ_SA --set data.indexer_queue_identifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME"
   OSDU_GCP_HELM_CONFIG_SERVICE_VARS: "--set data.log_level=DEBUG --set data.osdu_entitlements_url=$OSDU_GCP_AUTHORIZE_API --set data.google_cloud_project=$OSDU_GCP_PROJECT --set data.google_cloud_project_region=$OSDU_GCP_CLOUDRUN_REGION --set data.cloud_task_target_host=$OSDU_GCP_CLOUD_TASK_TARGET_HOST --set data.partition_api=$OSDU_GCP_PARTITION_API --set data.google_audiences=$GOOGLE_AUDIENCE --set data.indexer_queue_identifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME"
   OSDU_GCP_HELM_DEPLOYMENT_SERVICE_VARS: "--set data.image=$CI_REGISTRY_IMAGE/osdu-gcp:$CI_COMMIT_SHORT_SHA --set data.serviceAccountName=workload-identity-indexer-que"
 
@@ -67,7 +64,6 @@ include:
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/osdu-gcp-gke.yml"
-    ref: "gcp-remove-logic-of-act-as"
 
 osdu-gcp-containerize-gcloud:
   stage: containerize
@@ -106,7 +102,7 @@ osdu-gcp-test:
     - .maven
     - .osdu-gcp-variables
   stage: integration
-  needs: ["osdu-gcp-deploy-configmap"]
+  needs: ["osdu-gcp-deploy-deployment"]
   allow_failure: true
   script:
     - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
