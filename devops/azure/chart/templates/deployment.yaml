@@ -70,21 +70,6 @@ spec:
               value: {{ .Values.azure.servicebusTopic }}
             - name: azure_servicebus_topic_subscription
               value: {{ .Values.azure.servicebusSubscription }}
-            - name: AZURE_TENANT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: active-directory
-                  key: tenantid
-            - name: AZURE_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: active-directory
-                  key: principal-clientid
-            - name: AZURE_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: active-directory
-                  key: principal-clientpassword
             - name: KEYVAULT_URI
               valueFrom:
                  configMapKeyRef:
