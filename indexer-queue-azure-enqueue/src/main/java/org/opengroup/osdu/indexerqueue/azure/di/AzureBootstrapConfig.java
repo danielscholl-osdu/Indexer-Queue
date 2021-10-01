@@ -19,15 +19,6 @@ public class AzureBootstrapConfig {
     @Value("${azure.keyvault.url}")
     private String keyVaultURL;
 
-    @Value("${azure.client.id}")
-    private String clientId;
-
-    @Value("${azure.client.secret}")
-    private String clientSecret;
-
-    @Value("${azure.tenant.id}")
-    private String tenantId;
-
     @Value("${azure.app.resource.id}")
     private String appResourceId;
 
