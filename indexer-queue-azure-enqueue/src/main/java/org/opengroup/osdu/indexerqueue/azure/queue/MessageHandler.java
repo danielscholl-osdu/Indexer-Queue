@@ -1,3 +1,14 @@
+// Copyright © Microsoft Corporation
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//      http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.opengroup.osdu.indexerqueue.azure.queue;
 
 import com.microsoft.azure.servicebus.ExceptionPhase;
@@ -24,7 +35,6 @@ public class MessageHandler implements IMessageHandler {
     private SubscriptionClient receiveClient;
     private RecordChangedMessageHandler recordChangedMessageHandler;
     private SbMessageBuilder sbMessageBuilder;
-    private RecordChangedMessages recordChangedMessage;
     private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(MessageHandler.class.getName());
 
     MessageHandler(SubscriptionClient client, RecordChangedMessageHandler recordChangedMessageHandler, SbMessageBuilder sbMessageBuilder) {
@@ -44,7 +54,7 @@ public class MessageHandler implements IMessageHandler {
         long startTime = System.currentTimeMillis();
         long enqueueTime = message.getEnqueuedTimeUtc().toEpochMilli();
         try {
-            recordChangedMessage = sbMessageBuilder.getServiceBusMessage(messageBody);
+            RecordChangedMessages recordChangedMessage = sbMessageBuilder.getServiceBusMessage(messageBody);
             recordChangedMessage.setPublishTime(message.getEnqueuedTimeUtc().toString());
             recordChangedMessage.setMessageId(message.getMessageId());
             recordChangedMessageHandler.sendMessagesToIndexer(recordChangedMessage, message.getDeliveryCount());

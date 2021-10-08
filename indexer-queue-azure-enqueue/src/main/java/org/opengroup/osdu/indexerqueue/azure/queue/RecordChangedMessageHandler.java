@@ -38,7 +38,6 @@ import java.util.Map;
 @Component
 public class RecordChangedMessageHandler {
 
-  HttpPost indexWorkerRequest;
   @Autowired
   private AzureBootstrapConfig azureBootstrapConfig;
 
@@ -58,7 +57,7 @@ public class RecordChangedMessageHandler {
 
     try (CloseableHttpClient indexWorkerClient = httpClientBuilder.build()) {
       Logger.debug("Sending recordChangedMessages to indexer service {}: ", this.gson.toJson(recordChangedMessage));
-      indexWorkerRequest = new HttpPost(azureBootstrapConfig.getIndexerWorkerURL());
+      HttpPost indexWorkerRequest = new HttpPost(azureBootstrapConfig.getIndexerWorkerURL());
       indexWorkerRequest.setEntity(new StringEntity(this.gson.toJson(recordChangedMessage)));
       indexWorkerRequest.setHeader(DpsHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
