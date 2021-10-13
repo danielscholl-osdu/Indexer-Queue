@@ -22,8 +22,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.ClientResponse;
 import com.google.common.base.Strings;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,15 +39,14 @@ public class PubsubEndpointIntegrationTest {
     protected static final String KIND = TenantUtils.getTenantName() + ":ds:inttest:1.0."
             + System.currentTimeMillis();
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
-    protected static TestUtils testUtils = new TestUtils();
 
     /***
      * Create legal tag and create new unique record in storage service before running the test.
      * @throws Exception
      */
-    @BeforeClass
-    public static void setup() throws Exception {
-        String token = testUtils.getToken();
+    @Before
+    public void setup() throws Exception {
+        String token = TestUtils.getToken();
         ClientResponse resp = LegalTagUtils.create(LEGAL_TAG, token);
     }
 
@@ -55,9 +54,9 @@ public class PubsubEndpointIntegrationTest {
      * Delete the legal tag and record created after running the test.
      * @throws Exception
      */
-    @AfterClass
-    public static void tearDown() throws Exception {
-        String token = testUtils.getToken();
+    @After
+    public void tearDown() throws Exception {
+        String token = TestUtils.getToken();
         ClientResponse response = TestUtils.send("records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
         LegalTagUtils.delete(LEGAL_TAG, token);
     }
@@ -70,14 +69,14 @@ public class PubsubEndpointIntegrationTest {
     public void should_beAbleToSearch_newlyCreatedRecords() throws Exception {
         // Create record in storage service
         String jsonInput = createJsonBody(RECORD_ID, "tian");
-        ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), testUtils.getToken()), jsonInput, "");
+        ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
         // Sleep for one minute to wait for indexing to happen
         Thread.sleep(60000);
 
-        ClientResponse response = TestUtils.send(System.getenv("SEARCH_URL"), "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), testUtils.getToken()), getSearchQueryRequestBody(), "");
+        ClientResponse response = TestUtils.send(System.getenv("SEARCH_URL"), "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));

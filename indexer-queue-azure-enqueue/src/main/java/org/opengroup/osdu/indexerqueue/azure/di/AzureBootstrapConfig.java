@@ -43,6 +43,9 @@ public class AzureBootstrapConfig {
     @Value("${indexer.worker.url}")
     private String indexerWorkerURL;
 
+    @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
+    private Integer sleepDurationForMainThreadInSeconds;
+
     @Bean
     @Named("KEY_VAULT_URL")
     public String keyVaultURL() {
