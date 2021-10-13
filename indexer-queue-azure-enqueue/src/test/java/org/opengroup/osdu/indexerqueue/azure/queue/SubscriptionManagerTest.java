@@ -14,10 +14,13 @@ import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 
 import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +47,11 @@ public class SubscriptionManagerTest {
     private SubscriptionClientFactory clientFactory;
     @Mock
     private SubscriptionClient subscriptionClient;
+    @Mock
+    private ExecutorService executorService;
+
+    @Mock
+    private Set<String> partitions;
 
     private static final String dataPartition = "testTenant";
 
@@ -52,10 +60,10 @@ public class SubscriptionManagerTest {
         TenantInfo tenantInfo = new TenantInfo();
         tenantInfo.setDataPartitionId(dataPartition);
 
-        when(azureBootstrapConfig.getMaxConcurrentCalls()).thenReturn(maxConcurrentCalls);
-        when(azureBootstrapConfig.getNThreads()).thenReturn(nThreads);
-        when(azureBootstrapConfig.getMaxLockRenewDurationInSeconds()).thenReturn(maxLockRenewDuration);
-        when(tenantFactory.listTenantInfo()).thenReturn(Collections.singletonList(tenantInfo));
+        lenient().when(azureBootstrapConfig.getMaxConcurrentCalls()).thenReturn(maxConcurrentCalls);
+        lenient().when(azureBootstrapConfig.getNThreads()).thenReturn(nThreads);
+        lenient().when(azureBootstrapConfig.getMaxLockRenewDurationInSeconds()).thenReturn(maxLockRenewDuration);
+        lenient().when(tenantFactory.listTenantInfo()).thenReturn(Collections.singletonList(tenantInfo));
     }
 
     @Test
@@ -64,10 +72,9 @@ public class SubscriptionManagerTest {
         doNothing().when(subscriptionClient).registerMessageHandler(any(), any(), any());
         when(clientFactory.getSubscriptionClient(dataPartition)).thenReturn(subscriptionClient);
 
-        sut.subscribeRecordsTopic();
+        sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
         verify(azureBootstrapConfig, times(1)).getMaxConcurrentCalls();
-        verify(azureBootstrapConfig, times(1)).getNThreads();
         verify(azureBootstrapConfig, times(1)).getMaxLockRenewDurationInSeconds();
     }
 
@@ -77,10 +84,9 @@ public class SubscriptionManagerTest {
         doThrow(new InterruptedException(errorMessage)).when(subscriptionClient).registerMessageHandler(any(), any(), any());
         when(clientFactory.getSubscriptionClient(dataPartition)).thenReturn(subscriptionClient);
 
-        sut.subscribeRecordsTopic();
+        sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
         verify(azureBootstrapConfig, times(1)).getMaxConcurrentCalls();
-        verify(azureBootstrapConfig, times(1)).getNThreads();
         verify(azureBootstrapConfig, times(1)).getMaxLockRenewDurationInSeconds();
     }
 }

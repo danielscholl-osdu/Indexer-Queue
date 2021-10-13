@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -34,30 +36,62 @@ public class SubscriptionManager {
     private AzureBootstrapConfig azureBootstrapConfig;
     @Autowired
     private ITenantFactory tenantFactory;
-    private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(SubscriptionManager.class.getName());
+    private final ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(SubscriptionManager.class.getName());
 
     /***
      * Create subscription clients for service buses of different partitions to register them with message handling options.
      */
     public void subscribeRecordsTopic() {
+
+        Set<String> partitions = new HashSet<>();
+        ExecutorService executorService = Executors
+                .newFixedThreadPool(Integer.parseUnsignedInt(azureBootstrapConfig.getNThreads()));
+        Integer sleepMainThreadDuration = azureBootstrapConfig.getSleepDurationForMainThreadInSeconds();
+
+        while(true) {
+
+            try {
+                fetchPartitionsAndSubscribe(executorService, partitions);
+            }
+            catch (Exception e) {
+                Logger.error("Exception encountered while fetching partition information", e);
+            }
+
+            try {
+                Logger.info("Sleeping the main thread...");
+                Thread.sleep(sleepMainThreadDuration * 1000);
+            }
+            catch (Exception e) {
+                Logger.error("Exception encountered while sleeping the main thread", e);
+                break;
+            }
+        }
+
+    }
+
+    public void fetchPartitionsAndSubscribe(ExecutorService executorService, Set<String> partitions) {
         List<String> tenantList = tenantFactory.listTenantInfo().stream().map(TenantInfo::getDataPartitionId)
                 .collect(Collectors.toList());
 
-        ExecutorService executorService = Executors
-                .newFixedThreadPool(Integer.parseUnsignedInt(azureBootstrapConfig.getNThreads()));
+        Logger.info("Total number of partitions " + tenantList.size());
 
         for (String partition : tenantList) {
+
+            if(partitions.contains(partition)) {
+                continue;
+            }
             try {
                 SubscriptionClient subscriptionClient = this.clientFactory.getSubscriptionClient(partition);
                 registerMessageHandler(subscriptionClient, executorService);
-                Logger.info(String.format("Successfully registered subscription client for service bus of partition %s", partition));
+                partitions.add(partition);
             }
             catch (Exception e) {
-                Logger.warn("Error while creating or registering service bus subscription client for partition {}\n{}", partition, e);
+                Logger.error("Error while creating or registering subscription client", e);
             }
-
         }
     }
+
+
     /*
      * For the given subscriptionClient, register message handler with message handling options as mentioned below.
      * maxAutoRenewDuration --> Maximum duration within which the client keeps renewing the message lock if the processing of the message is not completed by the handler.
