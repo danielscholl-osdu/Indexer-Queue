@@ -20,14 +20,14 @@
   <parent>
     <artifactId>indexer-queue</artifactId>
     <groupId>org.opengroup.osdu.indexerqueue</groupId>
-    <version>0.11.0-SNAPSHOT</version>
+    <version>0.12.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.opengroup.osdu.indexerqueue</groupId>
   <artifactId>EnqueueFunction</artifactId>
-  <version>0.11.0-SNAPSHOT</version>
+  <version>0.12.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -38,7 +38,8 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <osdu.corelibazure.version>0.9.0</osdu.corelibazure.version>
+    <osdu.corelibazure.version>0.12.0-rc9</osdu.corelibazure.version>
+    <osdu.oscorecommon.version>0.12.0-rc3</osdu.oscorecommon.version>
     <jackson.version>2.11.2</jackson.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
@@ -72,6 +73,11 @@
         <version>${osdu.corelibazure.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.opengroup.osdu</groupId>
+        <artifactId>os-core-common</artifactId>
+        <version>${osdu.oscorecommon.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

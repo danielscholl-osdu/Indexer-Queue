@@ -65,7 +65,8 @@ public class EnqueueApi {
 
 		CloudTaskRequest cloudTaskRequest = CloudTaskRequest.builder()
 			.message(writer.writeValueAsString(message))
-			.url(Constants.WORKER_RELATIVE_URL).build();
+			.build();
+
 		this.taskBuilder.createTask(cloudTaskRequest);
 
 		return new ResponseEntity("",org.springframework.http.HttpStatus.OK);

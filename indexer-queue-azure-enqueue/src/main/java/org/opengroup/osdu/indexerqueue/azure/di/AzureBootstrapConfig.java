@@ -19,15 +19,6 @@ public class AzureBootstrapConfig {
     @Value("${azure.keyvault.url}")
     private String keyVaultURL;
 
-    @Value("${azure.client.id}")
-    private String clientId;
-
-    @Value("${azure.client.secret}")
-    private String clientSecret;
-
-    @Value("${azure.tenant.id}")
-    private String tenantId;
-
     @Value("${azure.app.resource.id}")
     private String appResourceId;
 
@@ -51,6 +42,9 @@ public class AzureBootstrapConfig {
 
     @Value("${indexer.worker.url}")
     private String indexerWorkerURL;
+
+    @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
+    private Integer sleepDurationForMainThreadInSeconds;
 
     @Bean
     @Named("KEY_VAULT_URL")

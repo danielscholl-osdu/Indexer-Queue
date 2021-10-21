@@ -42,6 +42,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @Component
 public class Subscriber {
@@ -126,11 +127,19 @@ public class Subscriber {
 		} else if (result.getResponseCode() != 200) {
 			// if AppException thrown from os-indexer module then add errorcode and errormessage into attributes
 			int retryCount = getRetryCount(recordMessage);
-			AppError error = gson.fromJson(result.getBody(), AppError.class);
-			logger.error(String.format("Error Response: %s",error.toString()));
-			attributes = recordMessage.getAttributes();
-			attributes.put(ERROR_MESSAGE, error.getMessage());
 			String responseCode = String.valueOf(result.getResponseCode());
+			logger.error(String.format("Error ResponseCode: %s", responseCode));
+			String errMsg = "";
+			try {
+				AppError error = gson.fromJson(result.getBody(), AppError.class);
+				logger.error(String.format("Error Response: %s", error.toString()));
+				errMsg = error.getMessage();
+			} catch (JsonSyntaxException e) {
+				logger.error(String.format("Failed to parse the error response body: %s encountered %s",
+						result.getBody(), e.getMessage()));
+			}
+			attributes = recordMessage.getAttributes();
+			attributes.put(ERROR_MESSAGE, errMsg);
 			attributes.put(ERROR_CODE, responseCode);
 			attributes.put(RETRY_STRING, String.valueOf(retryCount));
 			recordMessage.setAttributes(attributes);

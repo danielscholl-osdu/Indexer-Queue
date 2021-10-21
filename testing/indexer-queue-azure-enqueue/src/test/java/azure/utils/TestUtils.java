@@ -55,7 +55,7 @@ public class TestUtils {
         return mergedURL.toString();
     }
 
-    public synchronized String getToken() throws Exception {
+    public static synchronized String getToken() throws Exception {
         if (Strings.isNullOrEmpty(token)) {
             String sp_id = System.getProperty("INTEGRATION_TESTER", System.getenv("INTEGRATION_TESTER"));
             String sp_secret = System.getProperty("TESTER_SERVICEPRINCIPAL_SECRET", System.getenv("TESTER_SERVICEPRINCIPAL_SECRET"));

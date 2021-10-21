@@ -29,13 +29,13 @@ In order to run the service locally or remotely, you will need to have the follo
 | name | value | description | sensitive? | source |
 | ---  | ---   | ---         | ---        | ---    |
 | `OSDU_ENTITLEMENTS_URL` | ex `https://entitlements.com/entitlements/v1` | Entitlements API endpoint | no | output of infrastructure deployment |
-| `SERVICE_MAIL` | ex `service@osdu.iam.gserviceaccount.com` | Indexer Queue Service mail with which token will be created for cloud tasks must match with variable in `INDEXER_QUEUE_SERVICE_MAIL` Indexer Service | no | - |
-| `INDEXER_HOST` | ex `https://indexer.a.run.app` | Indexer Service host  | no | output of infrastructure deployment |
+| `CLOUD_TASK_TARGET_HOST` | ex `http://localhost:8080/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer Service host  | no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT_REGION` | ex `us-central1` | Service deployment region | no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT` | ex `opendes` | Google Cloud Project Id| no | output of infrastructure deployment |
 | `GOOGLE_AUDIENCES` | ex `*****.apps.googleusercontent.com` | Client ID for getting access to cloud resources | yes | https://console.cloud.google.com/apis/credentials |
 | `GOOGLE_APPLICATION_CREDENTIALS` | ex `/path/to/directory/service-key.json` | Service account credentials, you only need this if running locally | yes | https://console.cloud.google.com/iam-admin/serviceaccounts |
 | `PARTITION_API` | ex `http://localhost:8081/api/partition/v1` | Partition service endpoint | no | - |
+| `INDEXER_QUEUE_IDENTIFIER` | ex `os-indexer-queue-osdu` | Config for cloud tasks queue, will be used combination of `data-partition-id` and `INDEXER_QUEUE_IDENTIFIER` | no | - |
 
 Check that maven is installed:
 
@@ -128,7 +128,7 @@ that mean Pubsub push subscription must be configured to use service account
 Push endpoint must be service endpoint:
 
 Push endpoint
-https://indexer-queue-jvmvia5dea-uc.a.run.app/api/indexer/v1/_ah/push-handlers/enqueue
+https://indexer-queue-jvmvia5dea-uc.a.run.app/api/indexer-queue/v1/_ah/push-handlers/enqueue
 
 * Google Documentation: https://cloud.google.com/pubsub/docs/push#authentication_and_authorization
 
