@@ -43,7 +43,7 @@
       <dependency>
         <groupId>org.opengroup.osdu.core.aws</groupId>
         <artifactId>os-core-lib-aws</artifactId>
-        <version>0.11.0</version>
+        <version>0.12.0</version>
       </dependency>
 
       <!-- AWS managed packages -->
