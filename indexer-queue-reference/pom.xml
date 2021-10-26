@@ -10,7 +10,7 @@
 
   <groupId>org.opengroup.osdu.indexerqueue</groupId>
   <artifactId>indexer-queue-reference</artifactId>
-  <version>0.12.0-SNAPSHOT</version>
+  <version>0.13.0-SNAPSHOT</version>
   <name>indexer-queue-reference</name>
   <description>Indexer Queue Reference</description>
   <packaging>jar</packaging>
@@ -100,7 +100,7 @@
     <dependency>
       <groupId>org.opengroup.osdu</groupId>
       <artifactId>os-core-common</artifactId>
-      <version>0.11.0</version>
+      <version>0.12.0</version>
     </dependency>
   </dependencies>
 
