@@ -56,7 +56,7 @@ public class RabbitMQFactoryImpl implements IMessageFactory {
       Connection conn = factory.newConnection();
       channel = conn.createChannel();
       LOG.debug("RabbitMQ Channel was created.");
-      channel.queueDeclare(DEFAULT_QUEUE_NAME, false, false, false, null);
+      channel.queueDeclare(DEFAULT_QUEUE_NAME, true, false, false, null);
       LOG.debug(String.format("Queue [%s] was declared.", DEFAULT_QUEUE_NAME));
     } catch (KeyManagementException | NoSuchAlgorithmException | URISyntaxException | IOException | TimeoutException e) {
       LOG.error(e.getMessage(), e);
