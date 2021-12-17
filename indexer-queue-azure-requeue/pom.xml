@@ -45,6 +45,7 @@
         <azure.functions.topicname />
         <azure.functions.subscriptionname />
         <azure.functions.indexerqueuekey />
+        <osdu.oscorecommon.version>0.12.2</osdu.oscorecommon.version>
     </properties>
 
     <pluginRepositories>
@@ -60,6 +61,18 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opengroup.osdu</groupId>
+                <artifactId>os-core-common</artifactId>
+                <version>${osdu.oscorecommon.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 
@@ -78,7 +91,7 @@
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
             <artifactId>os-core-common</artifactId>
-            <version>0.12.0</version>
+            <version>${osdu.oscorecommon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
