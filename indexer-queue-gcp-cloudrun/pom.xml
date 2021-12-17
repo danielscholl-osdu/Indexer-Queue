@@ -25,6 +25,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
+	<properties>
+		<log4j.version>2.16.0</log4j.version>
+	</properties>
+
 	<groupId>org.opengroup.osdu.indexerqueue.cloudrun</groupId>
 	<artifactId>indexer-queue-gcp-cloudrun</artifactId>
 	<version>0.13.0-SNAPSHOT</version>
@@ -59,6 +63,21 @@
 			<url>${publish.snapshots.url}</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-api</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-to-slf4j</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
