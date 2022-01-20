@@ -32,6 +32,7 @@ variables:
   OSDU_GCP_HELM_CONFIG_SERVICE: indexer-queue-config
   OSDU_GCP_HELM_DEPLOYMENT_SERVICE: indexer-queue-deploy
   OSDU_GCP_HELM_CONFIG_SERVICE_VARS: "--set data.log_level=DEBUG --set data.osdu_entitlements_url=$OSDU_GCP_AUTHORIZE_API --set data.google_cloud_project=$OSDU_GCP_PROJECT --set data.google_cloud_project_region=$OSDU_GCP_CLOUDRUN_REGION --set data.cloud_task_target_host=$OSDU_GCP_CLOUD_TASK_TARGET_HOST --set data.partition_api=$OSDU_GCP_PARTITION_API --set data.google_audiences=$GOOGLE_AUDIENCE --set data.indexer_queue_identifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME"
+  OSDU_GCP_HELM_CONFIG_SERVICE_VARS_DEV2: "--set data.log_level=DEBUG --set data.osdu_entitlements_url=$OSDU_GCP_AUTHORIZE_API --set data.google_cloud_project=$OSDU_GCP_PROJECT --set data.google_cloud_project_region=$OSDU_GCP_CLOUDRUN_REGION --set data.cloud_task_target_host=$OSDU_GCP_CLOUD_TASK_TARGET_HOST --set data.partition_api=$OSDU_GCP_PARTITION_API --set data.google_audiences=$GOOGLE_AUDIENCE --set data.indexer_queue_identifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME"
   OSDU_GCP_HELM_DEPLOYMENT_SERVICE_VARS: "--set data.image=$CI_REGISTRY_IMAGE/osdu-gcp:$CI_COMMIT_SHORT_SHA --set data.serviceAccountName=$OSDU_GCP_SERVICE-k8s"
 
 include:
@@ -76,9 +77,8 @@ osdu-gcp-containerize-gcloud:
     - gcloud config set project $OSDU_GCP_PROJECT
     - touch .gcloudignore
     - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_GCP_SERVICE=$OSDU_GCP_SERVICE,_APPLICATION_NAME=$OSDU_GCP_APPLICATION_NAME,_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
-  only:
-    variables:
-      - $OSDU_GCP == 'true'
+  rules:
+    - if: $OSDU_GCP == 'true'
 
 osdu-gcp-containerize-gitlab:
   stage: containerize
@@ -93,9 +93,8 @@ osdu-gcp-containerize-gitlab:
     - docker build -t $OSDU_GCP_LOCAL_IMAGE_TAG_SHA $EXTRA_DOCKER_TAG --file $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/Dockerfile.cloudbuild --build-arg PROVIDER_NAME=$OSDU_GCP_VENDOR --build-arg PORT=$OSDU_GCP_PORT .
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push $CI_REGISTRY_IMAGE/osdu-gcp
-  only:
-    variables:
-      - $OSDU_GCP == 'true'
+  rules:
+    - if: $OSDU_GCP == 'true'
 
 osdu-gcp-test:
   extends:
@@ -103,6 +102,17 @@ osdu-gcp-test:
     - .osdu-gcp-variables
   stage: integration
   needs: ["osdu-gcp-deploy-deployment"]
+  allow_failure: true
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
+    - exit 1
+
+osdu-gcp-dev2-test:
+  extends:
+    - .maven
+    - .osdu-gcp-dev2-variables
+  stage: integration
+  needs: ["osdu-gcp-dev2-deploy-deployment"]
   allow_failure: true
   script:
     - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
