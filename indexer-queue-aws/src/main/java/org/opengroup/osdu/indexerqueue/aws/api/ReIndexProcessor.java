@@ -118,6 +118,7 @@ public class ReIndexProcessor implements Callable<ReIndexProcessor> {
         connection.setRequestProperty("data-partition-id", attributes.get("data-partition-id"));
         connection.setRequestProperty("Authorization", this.indexerServiceAccountJWT);
         connection.setRequestProperty("user", attributes.get("user"));
+        connection.setRequestProperty("x-user-id", attributes.get("user"));
         connection.setUseCaches(false);
         connection.setDoOutput(true);
         return connection;
