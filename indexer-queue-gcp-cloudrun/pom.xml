@@ -27,7 +27,7 @@
 
 	<properties>
 		<log4j.version>2.17.1</log4j.version>
-		<version>${json-smart.version}</version>
+		<json-smart.version>2.4.7</json-smart.version>
 	</properties>
 
 	<groupId>org.opengroup.osdu.indexerqueue.cloudrun</groupId>
