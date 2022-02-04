@@ -10,7 +10,7 @@
 
 	<groupId>org.opengroup.osdu.indexerqueue.ibm</groupId>
 	<artifactId>indexer-queue-ibm</artifactId>
-	<version>0.13.0-SNAPSHOT</version>
+	<version>0.14.0-SNAPSHOT</version>
 	<name>indexer-queue-ibm</name>
 	<description>Indexer Queue IBM</description>
 	<packaging>jar</packaging>
@@ -49,7 +49,18 @@
 		<os-core-lib-ibm.version>0.13.0</os-core-lib-ibm.version>
 		<spring-security-core.version>5.6.1</spring-security-core.version>
 		<jackson-databind.version>2.9.10.8</jackson-databind.version>
+		<json-smart.version>2.4.7</json-smart.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>${json-smart.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<repositories>
 		<repository>
