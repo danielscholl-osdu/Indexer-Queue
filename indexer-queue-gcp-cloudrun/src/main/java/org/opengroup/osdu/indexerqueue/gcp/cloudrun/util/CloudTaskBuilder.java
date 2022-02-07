@@ -17,61 +17,23 @@
 
 package org.opengroup.osdu.indexerqueue.gcp.cloudrun.util;
 
-import com.google.cloud.tasks.v2.CloudTasksClient;
-import com.google.cloud.tasks.v2.HttpRequest;
-import com.google.cloud.tasks.v2.QueueName;
-import com.google.cloud.tasks.v2.Task;
-import com.google.cloud.tasks.v2.Task.Builder;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Timestamp;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.time.Clock;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
-import org.opengroup.osdu.core.gcp.util.HeadersInfo;
-import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.PropertiesConfiguration;
+import org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.MessagePublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class CloudTaskBuilder implements TaskBuilder {
 
-	final IndexerQueueIdentifier indexerQueueProvider;
+	final MessagePublisher publisher;
 
-	final HeadersInfo headersInfo;
-
-	final PropertiesConfiguration config;
-
-	public Task createTask(CloudTaskRequest request) throws IOException {
-		log.info(String.format("project-id: %s | location: %s | queue-id: %s | indexer-host: %s | message: %s",
-			config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId(),
-			config.getCloudTaskTargetHost(), request.getMessage()));
-
-		String queuePath = QueueName
-			.of(config.getGoogleCloudProject(), config.getGoogleCloudProjectRegion(), indexerQueueProvider.getQueueId())
-			.toString();
-
-		HttpRequest httpRequest = HttpRequest.newBuilder()
-			.setUrl(config.getCloudTaskTargetHost())
-			.setBody(ByteString.copyFrom(request.getMessage(), Charset.defaultCharset()))
-			.putAllHeaders(this.headersInfo.getHeaders().getHeaders())
-			.build();
-
-		Builder taskBuilder = Task.newBuilder()
-			.setScheduleTime(Timestamp.newBuilder()
-				.setSeconds(Instant.now(Clock.systemUTC()).plusMillis(request.getInitialDelayMillis()).getEpochSecond())
-				.build())
-			.setHttpRequest(httpRequest);
-
-		// Execute the request and return the created Task
-		try (CloudTasksClient client = CloudTasksClient.create()) {
-			Task response = client.createTask(queuePath, taskBuilder.build());
-			log.info(String.format("task created: %s", response.getName()));
-			return response;
-		}
+	public HttpStatus createTask(CloudTaskRequest request) throws IOException {
+		return publisher.sendMessage(request.getMessage());
 	}
 }

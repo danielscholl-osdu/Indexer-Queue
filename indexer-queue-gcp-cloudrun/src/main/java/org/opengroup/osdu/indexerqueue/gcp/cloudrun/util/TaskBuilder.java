@@ -18,11 +18,13 @@
 package org.opengroup.osdu.indexerqueue.gcp.cloudrun.util;
 
 
-import com.google.cloud.tasks.v2.Task;
-import java.io.IOException;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
+import org.springframework.http.HttpStatus;
+
+import java.io.IOException;
 
 public interface TaskBuilder {
 
-	Task createTask(CloudTaskRequest request) throws IOException;
+
+	HttpStatus createTask(CloudTaskRequest request) throws IOException;
 }

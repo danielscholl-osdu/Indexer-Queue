@@ -30,6 +30,8 @@ import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.common.model.search.SearchServiceRole;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.util.TaskBuilder;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,9 +69,9 @@ public class EnqueueApi {
 			.message(writer.writeValueAsString(message))
 			.build();
 
-		this.taskBuilder.createTask(cloudTaskRequest);
+		HttpStatus response = this.taskBuilder.createTask(cloudTaskRequest);
 
-		return new ResponseEntity("",org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity<>(response);
 	}
 
 
