@@ -1,12 +1,12 @@
 /*
- * Copyright 2020 Google LLC
- * Copyright 2020 EPAM Systems, Inc
+ * Copyright 2020-2022 Google LLC
+ * Copyright 2020-2022 EPAM Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,20 +19,16 @@ package org.opengroup.osdu.indexerqueue.gcp.cloudrun.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@Setter
+@Configuration
+@ConditionalOnProperty(value = "oqmDriver", havingValue = "rabbitmq")
+@ConfigurationProperties("oqm.rabbitmq")
 @Getter
-@ConfigurationProperties
-public class PropertiesConfiguration {
+@Setter
+public class RabbitMqOqmConfiguration {
 
-	private String googleCloudProject;
-
-	private String googleCloudProjectRegion;
-
-	private String cloudTaskTargetHost;
-
-	private String indexerQueueIdentifier;
-
-	private String defaultQueueName;
+    private String partitionPropertiesPrefix = "oqm.rabbitmq";
 }
