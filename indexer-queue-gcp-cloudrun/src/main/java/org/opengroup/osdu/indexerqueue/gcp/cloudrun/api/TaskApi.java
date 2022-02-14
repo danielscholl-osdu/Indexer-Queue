@@ -49,8 +49,8 @@ public class TaskApi {
 		@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
 		throws IOException {
 
-		this.taskBuilder.createTask(request);
+		HttpStatus response = this.taskBuilder.createTask(request);
 
-		return new ResponseEntity("",HttpStatus.OK);
+		return new ResponseEntity<>(response);
 	}
 }
