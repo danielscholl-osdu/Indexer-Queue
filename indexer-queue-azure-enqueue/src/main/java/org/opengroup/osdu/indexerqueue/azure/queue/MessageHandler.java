@@ -44,10 +44,11 @@ public class MessageHandler implements IMessageHandler {
     private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(MessageHandler.class.getName());
     private IMetricService metricService;
 
-    MessageHandler(SubscriptionClient client, RecordChangedMessageHandler recordChangedMessageHandler, SbMessageBuilder sbMessageBuilder) {
+    MessageHandler(SubscriptionClient client, RecordChangedMessageHandler recordChangedMessageHandler, SbMessageBuilder sbMessageBuilder, IMetricService metricService) {
         this.receiveClient = client;
         this.recordChangedMessageHandler = recordChangedMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;
+        this.metricService = metricService;
     }
 
     /*
