@@ -17,9 +17,9 @@ package org.opengroup.osdu.indexerqueue.azure.metrics;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.MetricTelemetry;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class MetricServiceImpl implements IMetricService {
 
     @Autowired
