@@ -69,6 +69,7 @@ public class MessageHandler implements IMessageHandler {
             long stopTime = System.currentTimeMillis();
             Logger.info("Execution time: {}", stopTime - startTime);
             Logger.info("End-to-End execution time: {}", stopTime - enqueueTime);
+            this.captureMetrics(recordChangedMessage, enqueueTime, stopTime);
             ThreadScopeContextHolder.getContext().clear();
             MDC.clear();
             return receiveClient.completeAsync(message.getLockToken());
