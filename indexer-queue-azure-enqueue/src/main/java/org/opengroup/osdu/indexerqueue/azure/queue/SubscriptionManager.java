@@ -8,6 +8,7 @@ import org.opengroup.osdu.azure.logging.ICoreLogger;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
+import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,8 @@ public class SubscriptionManager {
     private AzureBootstrapConfig azureBootstrapConfig;
     @Autowired
     private ITenantFactory tenantFactory;
+    @Autowired
+    private IMetricService metricService;
     private final ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(SubscriptionManager.class.getName());
 
     /***
@@ -101,7 +104,7 @@ public class SubscriptionManager {
      */
     private void registerMessageHandler(SubscriptionClient subscriptionClient, ExecutorService executorService) {
         try {
-            MessageHandler messageHandler = new MessageHandler(subscriptionClient, recordChangedMessageHandler, sbMessageBuilder);
+            MessageHandler messageHandler = new MessageHandler(subscriptionClient, recordChangedMessageHandler, sbMessageBuilder, metricService);
             subscriptionClient.registerMessageHandler(
                     messageHandler,
                     new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),
