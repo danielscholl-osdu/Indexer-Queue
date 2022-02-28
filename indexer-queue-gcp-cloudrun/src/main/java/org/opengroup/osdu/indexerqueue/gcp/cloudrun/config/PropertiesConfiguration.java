@@ -35,4 +35,6 @@ public class PropertiesConfiguration {
 	private String indexerQueueIdentifier;
 
 	private String defaultQueueName;
+
+	private String defaultRelativeIndexerWorkerUrl;
 }
