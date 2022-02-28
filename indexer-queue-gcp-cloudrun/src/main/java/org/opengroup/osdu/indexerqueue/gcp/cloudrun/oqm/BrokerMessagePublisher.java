@@ -2,6 +2,7 @@ package org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
 import org.opengroup.osdu.core.gcp.oqm.driver.OqmDriver;
 import org.opengroup.osdu.core.gcp.oqm.model.OqmDestination;
 import org.opengroup.osdu.core.gcp.oqm.model.OqmMessage;
@@ -24,10 +25,10 @@ public class BrokerMessagePublisher implements MessagePublisher {
 
     private final PropertiesConfiguration config;
 
-    public HttpStatus sendMessage(String message){
+    public HttpStatus sendMessage(CloudTaskRequest request){
         OqmMessage oqmMessage = OqmMessage.builder()
                 .attributes(headersInfo.getHeaders().getHeaders())
-                .data(message)
+                .data(request.getMessage())
                 .build();
 
         try {

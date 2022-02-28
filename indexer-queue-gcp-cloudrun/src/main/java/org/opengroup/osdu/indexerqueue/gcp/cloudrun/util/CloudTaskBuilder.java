@@ -34,6 +34,6 @@ public class CloudTaskBuilder implements TaskBuilder {
 	final MessagePublisher publisher;
 
 	public HttpStatus createTask(CloudTaskRequest request) throws IOException {
-		return publisher.sendMessage(request.getMessage());
+		return publisher.sendMessage(request);
 	}
 }

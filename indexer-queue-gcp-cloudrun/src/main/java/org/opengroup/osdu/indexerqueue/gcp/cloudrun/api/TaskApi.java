@@ -33,6 +33,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -41,16 +42,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/_dps/task-handlers")
 public class TaskApi {
 
-	final TaskBuilder taskBuilder;
+    final TaskBuilder taskBuilder;
 
-	@PostMapping(value = "/enqueue",produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize("@authorizationFilter.hasRole('" + SearchServiceRole.ADMIN + "')")
-	public ResponseEntity<String> enqueueTask(
-		@NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
-		throws IOException {
+    @PostMapping(value = "/enqueue", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @PreAuthorize("@authorizationFilter.hasRole('" + SearchServiceRole.ADMIN + "')")
+    public ResponseEntity<String> enqueueTask(
+        @NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
+        throws IOException {
 
-		HttpStatus response = this.taskBuilder.createTask(request);
+        HttpStatus response = this.taskBuilder.createTask(request);
 
-		return new ResponseEntity<>(response);
-	}
+        //Spring MVC will set content-type as JSON only if the response body is present even empty, keep it for indexer service, he can't process text/plain responses
+        return new ResponseEntity<>("", response);
+    }
 }
