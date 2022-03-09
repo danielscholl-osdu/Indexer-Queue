@@ -79,6 +79,7 @@ osdu-gcp-containerize-gcloud:
     - gcloud builds submit --config $OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/cloudbuild.yaml --substitutions=_GCP_SERVICE=$OSDU_GCP_SERVICE,_APPLICATION_NAME=$OSDU_GCP_APPLICATION_NAME,_PROVIDER_NAME=$OSDU_GCP_VENDOR,_SHORT_SHA=$CI_COMMIT_SHORT_SHA,_PORT=$OSDU_GCP_PORT
   rules:
     - if: $OSDU_GCP == 'true'
+      when: on_success
 
 osdu-gcp-containerize-gitlab:
   stage: containerize
@@ -95,6 +96,7 @@ osdu-gcp-containerize-gitlab:
     - docker push $CI_REGISTRY_IMAGE/osdu-gcp
   rules:
     - if: $OSDU_GCP == 'true'
+      when: on_success
 
 osdu-gcp-test:
   extends:
