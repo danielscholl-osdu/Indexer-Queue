@@ -11,18 +11,24 @@
 
 package org.opengroup.osdu.indexerqueue.azure.queue;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.microsoft.azure.servicebus.ExceptionPhase;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.IMessageHandler;
 import com.microsoft.azure.servicebus.SubscriptionClient;
 import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
 import org.opengroup.osdu.azure.logging.ICoreLogger;
+import org.opengroup.osdu.core.common.model.indexer.RecordInfo;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
+import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHolder;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 import org.slf4j.MDC;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -36,11 +42,13 @@ public class MessageHandler implements IMessageHandler {
     private RecordChangedMessageHandler recordChangedMessageHandler;
     private SbMessageBuilder sbMessageBuilder;
     private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(MessageHandler.class.getName());
+    private IMetricService metricService;
 
-    MessageHandler(SubscriptionClient client, RecordChangedMessageHandler recordChangedMessageHandler, SbMessageBuilder sbMessageBuilder) {
+    MessageHandler(SubscriptionClient client, RecordChangedMessageHandler recordChangedMessageHandler, SbMessageBuilder sbMessageBuilder, IMetricService metricService) {
         this.receiveClient = client;
         this.recordChangedMessageHandler = recordChangedMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;
+        this.metricService = metricService;
     }
 
     /*
@@ -62,6 +70,7 @@ public class MessageHandler implements IMessageHandler {
             long stopTime = System.currentTimeMillis();
             Logger.info("Execution time: {}", stopTime - startTime);
             Logger.info("End-to-End execution time: {}", stopTime - enqueueTime);
+            this.captureMetrics(recordChangedMessage, enqueueTime, stopTime);
             ThreadScopeContextHolder.getContext().clear();
             MDC.clear();
             return receiveClient.completeAsync(message.getLockToken());
@@ -88,5 +97,17 @@ public class MessageHandler implements IMessageHandler {
     @Override
     public void notifyException(Throwable throwable, ExceptionPhase exceptionPhase) {
         Logger.error("Exception {} occurred in service bus message in exception phase {}.", exceptionPhase ,throwable.getMessage());
+    }
+
+    private void captureMetrics(RecordChangedMessages recordChangedMessage, long enqueueTime, long stopTime) {
+        try {
+            Type listType = new TypeToken<List<RecordInfo>>() {}.getType();
+            List<RecordInfo> recordInfos = new Gson().fromJson(recordChangedMessage.getData(), listType);
+            for(RecordInfo record: recordInfos) {
+                this.metricService.sendIndexLatencyMetric(stopTime - enqueueTime);
+            }
+        } catch (Exception e) {
+            Logger.error("Error recording metrics", e);
+        }
     }
 }

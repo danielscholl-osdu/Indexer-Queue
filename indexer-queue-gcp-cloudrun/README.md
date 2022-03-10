@@ -1,18 +1,20 @@
 # Indexer-queue-gcp
 
-indexer-queue-gcp-cloudrun is a service that is woken up in response to messages emitted by os-storage onto Service Bus. It is responsible for calling the os-indexer to trigger re-indexing events.
+indexer-queue-gcp-cloudrun is a service that is woken up in response to messages emitted by os-storage onto Service Bus.
+It is responsible for calling the os-indexer to trigger re-indexing events.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
- 
+These instructions will get you a copy of the project up and running on your local machine for development and testing
+purposes. See deployment for notes on how to deploy the project on a live system.
+
 ### Prerequisites
- 
+
 - [Maven 3.6.0+](https://maven.apache.org/download.cgi)
 - [AdoptOpenJDK8](https://adoptopenjdk.net/)
 - [Lombok 1.16 or later](https://projectlombok.org/setup/maven)
 - [GCloud SDK with java (latest version)](https://cloud.google.com/sdk/docs/install)
- 
+
 ### Installation
 
 - Setup Apache Maven
@@ -29,7 +31,8 @@ In order to run the service locally or remotely, you will need to have the follo
 | name | value | description | sensitive? | source |
 | ---  | ---   | ---         | ---        | ---    |
 | `OSDU_ENTITLEMENTS_URL` | ex `https://entitlements.com/entitlements/v1` | Entitlements API endpoint | no | output of infrastructure deployment |
-| `CLOUD_TASK_TARGET_HOST` | ex `http://localhost:8080/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer Service host  | no | output of infrastructure deployment |
+| `CLOUD_TASK_TARGET_HOST` | ex `http://indexer` | Indexer Service host, relative url will be used from incoming task, if no url present in task then will be used url from property `DEFAULT_RELATIVE_INDEXER_WORKER_URL` | no | output of infrastructure deployment |
+| `DEFAULT_RELATIVE_INDEXER_WORKER_URL` | default `/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer Service has two endpoints to process indexing tasks, `/index-worker` and `/reindex-worker` first serves to process requests with specific `storage-record-ids` and add those records to elasticsearch, second for reprocessing tasks it consumes `kind` and `cursor` to request more records from storage| no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT_REGION` | ex `us-central1` | Service deployment region | no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT` | ex `opendes` | Google Cloud Project Id| no | output of infrastructure deployment |
 | `GOOGLE_AUDIENCES` | ex `*****.apps.googleusercontent.com` | Client ID for getting access to cloud resources | yes | https://console.cloud.google.com/apis/credentials |
@@ -39,7 +42,6 @@ In order to run the service locally or remotely, you will need to have the follo
 | `DEFAULT_QUEUE_NAME` | ex `records` | The name for default queue that is used by service | no | - |
 | `OQMDRIVER` | `pubsub` OR `rabbitmq` | Oqm driver mode that defines which queue will be used | no | - |
 | `INDEXER_QUEUE_TASK_ENABLE` | `true` OR `false` | The property enables the support of Google Cloud Tasks. It is supported only when `OQM_DRIVER`==`pubsub` | no | - |
-
 
 Check that maven is installed:
 
@@ -51,7 +53,8 @@ Java version: 1.8.0_212, vendor: AdoptOpenJDK, runtime: /usr/lib/jvm/jdk8u212-b0
 ...
 ```
 
-You may need to configure access to the remote maven repository that holds the OSDU dependencies. This file should live within `~/.mvn/community-maven.settings.xml`:
+You may need to configure access to the remote maven repository that holds the OSDU dependencies. This file should live
+within `~/.mvn/community-maven.settings.xml`:
 
 ```bash
 $ cat ~/.m2/settings.xml
@@ -82,6 +85,7 @@ $ cat ~/.m2/settings.xml
 ```bash
 gcloud components update
 ```
+
 * Set Google Project Id:
 
 ```bash
@@ -95,8 +99,9 @@ gcloud auth application-default login
 ```
 
 ## Testing
+
 * Navigate to Indexer-queue service root folder and run:
- 
+
 ```bash
 mvn clean install   
 ```
@@ -109,7 +114,8 @@ mvn clean install
 mvn clean install -DskipTests
 ```
 
-After configuring your environment as specified above, you can follow these steps to build and run the application. These steps should be invoked from the *repository root.*
+After configuring your environment as specified above, you can follow these steps to build and run the application.
+These steps should be invoked from the *repository root.*
 
 ```bash
 cd indexer-queue-gcp-cloudrun/ && mvn spring-boot:run
@@ -120,8 +126,9 @@ cd indexer-queue-gcp-cloudrun/ && mvn spring-boot:run
 * Google Documentation: https://cloud.google.com/cloud-build/docs/deploying-builds/deploy-cloud-run
 
 ## PubSub
-For authentication indexer-queue-gcp-cloudrun rely on entitlements service, 
-that mean Pubsub push subscription must be configured to use service account
+
+For authentication indexer-queue-gcp-cloudrun rely on entitlements service, that mean Pubsub push subscription must be
+configured to use service account
 
 **Entitlements configuration for pubsub account**
 
@@ -137,17 +144,14 @@ https://indexer-queue-jvmvia5dea-uc.a.run.app/api/indexer-queue/v1/_ah/push-hand
 * Google Documentation: https://cloud.google.com/pubsub/docs/push#authentication_and_authorization
 
 ## Licence
-Copyright © Google LLC
-Copyright © EPAM Systems
- 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
- 
+
+Copyright © Google LLC Copyright © EPAM Systems
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+License. You may obtain a copy of the License at
+
 [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
- 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "
+AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+language governing permissions and limitations under the License.
