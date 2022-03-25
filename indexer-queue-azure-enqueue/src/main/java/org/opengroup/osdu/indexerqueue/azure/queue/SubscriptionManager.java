@@ -104,7 +104,7 @@ public class SubscriptionManager {
      */
     private void registerMessageHandler(SubscriptionClient subscriptionClient, ExecutorService executorService) {
         try {
-            MessageHandler messageHandler = new MessageHandler(subscriptionClient, recordChangedMessageHandler, sbMessageBuilder, metricService);
+            MessageHandler messageHandler = new MessageHandler(subscriptionClient, recordChangedMessageHandler, sbMessageBuilder, metricService, azureBootstrapConfig.getAppName());
             subscriptionClient.registerMessageHandler(
                     messageHandler,
                     new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),

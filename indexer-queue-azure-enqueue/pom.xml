@@ -38,7 +38,7 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <osdu.corelibazure.version>0.14.0-rc2</osdu.corelibazure.version>
+    <osdu.corelibazure.version>0.14.0-rc5</osdu.corelibazure.version>
     <osdu.oscorecommon.version>0.13.0</osdu.oscorecommon.version>
     <jackson.version>2.11.2</jackson.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
