@@ -20,6 +20,7 @@ public class SbMessageBuilderTest {
     private final String requestBodyMissingData = "{\"message\":{\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
     private final String requestBodyMissingCorrelationId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\"}}";
     private final String requestBodyMissingTenantId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
+    private final String messageId = "abc-1";
 
     @InjectMocks
     private SbMessageBuilder sut;
@@ -31,7 +32,7 @@ public class SbMessageBuilderTest {
     @Test
     public void shouldThrow_ForEmptyRequestBody() throws IOException {
         try {
-            sut.getServiceBusMessage(requestBodyEmpty);
+            sut.getServiceBusMessage(requestBodyEmpty, messageId);
         }
         catch (AppException e) {
             Assertions.assertEquals(e.getMessage(), "message object not found");
@@ -41,7 +42,7 @@ public class SbMessageBuilderTest {
     @Test
     public void shouldThrow_ForRequestBodyWith_NoData() throws IOException {
         try {
-            sut.getServiceBusMessage(requestBodyMissingData);
+            sut.getServiceBusMessage(requestBodyMissingData, messageId);
         }
         catch (AppException e) {
             Assertions.assertEquals(e.getMessage(), "message data not found");
@@ -51,7 +52,7 @@ public class SbMessageBuilderTest {
     @Test
     public void shouldThrow_ForInvalidJsonInRequest() throws IOException {
         try {
-            sut.getServiceBusMessage(requestBodyInvalidJson);
+            sut.getServiceBusMessage(requestBodyInvalidJson, messageId);
         }
         catch (AppException e) {
             Assertions.assertEquals(e.getMessage(),"Could not fetch JSON object");
@@ -61,7 +62,7 @@ public class SbMessageBuilderTest {
     @Test
     public void shouldThrow_ForMissingTenant() throws IOException {
         try {
-            sut.getServiceBusMessage(requestBodyMissingTenantId);
+            sut.getServiceBusMessage(requestBodyMissingTenantId, messageId);
         }
         catch (AppException e) {
             Assertions.assertEquals(e.getMessage(),"tenant-id missing");
@@ -69,18 +70,12 @@ public class SbMessageBuilderTest {
     }
 
     @Test
-    public void shouldGenerateCorrelationId_ForMissingCorrelationId() throws IOException {
-        RecordChangedMessages recordChangedMessages = sut.getServiceBusMessage(requestBodyMissingCorrelationId);
-        Assertions.assertNotNull(recordChangedMessages.getCorrelationId());
-    }
-
-    @Test
     public void shouldReturn_ValidRecordChangedMessage() throws IOException {
-        String expectedCorrelationId = "ee85038e-4510-49d9-b2ec-3651315a4d00";
+        String expectedCorrelationId = "abc-1";
         String expectedDataPartitionId = "common";
         String expectedData = "[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}]";
 
-        RecordChangedMessages recordChangedMessages = sut.getServiceBusMessage(requestBodyValid);
+        RecordChangedMessages recordChangedMessages = sut.getServiceBusMessage(requestBodyValid, messageId);
 
         Assertions.assertEquals(expectedCorrelationId, recordChangedMessages.getCorrelationId());
         Assertions.assertEquals(expectedDataPartitionId, recordChangedMessages.getDataPartitionId());
