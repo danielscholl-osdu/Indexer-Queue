@@ -46,6 +46,9 @@ public class AzureBootstrapConfig {
     @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
     private Integer sleepDurationForMainThreadInSeconds;
 
+    @Value("${spring.application.name}")
+    private String appName;
+
     @Bean
     @Named("KEY_VAULT_URL")
     public String keyVaultURL() {

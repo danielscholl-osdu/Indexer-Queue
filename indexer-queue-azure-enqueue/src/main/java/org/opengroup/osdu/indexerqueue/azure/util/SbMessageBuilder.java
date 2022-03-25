@@ -31,7 +31,7 @@ public class SbMessageBuilder {
     @Autowired
     private MdcContextMap mdcContextMap;
 
-    public RecordChangedMessages getServiceBusMessage(String serviceBusMessage) throws IOException {
+    public RecordChangedMessages getServiceBusMessage(String serviceBusMessage, String messageId) throws IOException {
 
         final Gson gson = new Gson();
         JsonParser jsonParser = new JsonParser();
@@ -70,27 +70,18 @@ public class SbMessageBuilder {
                     String.format("Service Bus message: %s", serviceBusMessage));
         }
 
-        String correlationId;
         String dataPartitionId = message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID).getAsString();
         String accountId = message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID).getAsString();
 
-        // Generate a correlation-id if it is null.
-        if (message.getAsJsonObject().get(DpsHeaders.CORRELATION_ID) != null) {
-            attributesMap.put(DpsHeaders.CORRELATION_ID,
-                     message.getAsJsonObject().get(DpsHeaders.CORRELATION_ID).getAsString());
-            correlationId = message.getAsJsonObject().get(DpsHeaders.CORRELATION_ID).getAsString();
-        } else {
-            correlationId = UUID.randomUUID().toString();
-        }
-
         // Set the context for this thread.
-        threadDpsHeaders.setThreadContext(dataPartitionId,correlationId,accountId);
-        MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));
+        // messageId is the correlation-id for the remaining workflow.
+        threadDpsHeaders.setThreadContext(dataPartitionId,messageId,accountId);
+        MDC.setContextMap(mdcContextMap.getContextMap(messageId, dataPartitionId));
 
         // Populate attributes map for the recordChangedMessage.
         attributesMap.put(DpsHeaders.ACCOUNT_ID, accountId);
         attributesMap.put(DpsHeaders.DATA_PARTITION_ID, dataPartitionId);
-        attributesMap.put(DpsHeaders.CORRELATION_ID, correlationId);
+        attributesMap.put(DpsHeaders.CORRELATION_ID, messageId);
 
         RecordChangedMessages recordChangedMessage = gson.fromJson(message.toString(), RecordChangedMessages.class);
         recordChangedMessage.setAttributes(attributesMap);
