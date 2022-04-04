@@ -32,7 +32,7 @@
 
 	<groupId>org.opengroup.osdu.indexerqueue.cloudrun</groupId>
 	<artifactId>indexer-queue-gcp-cloudrun</artifactId>
-	<version>0.14.0-SNAPSHOT</version>
+	<version>0.15.0-SNAPSHOT</version>
 	<name>indexer-queue-gcp-cloudrun</name>
 	<description>Indexer Queue Gcp CloudRun</description>
 	<packaging>jar</packaging>
@@ -97,12 +97,12 @@
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>core-lib-gcp</artifactId>
-			<version>0.13.0</version>
+			<version>0.14.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>os-core-common</artifactId>
-			<version>0.13.0</version>
+			<version>0.14.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.http-client</groupId>
@@ -113,7 +113,7 @@
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>oqm</artifactId>
-			<version>0.13.0-SNAPSHOT</version>
+			<version>0.14.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
