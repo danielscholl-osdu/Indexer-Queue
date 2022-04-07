@@ -1,6 +1,6 @@
 /*
- * Copyright 2020 Google LLC
- * Copyright 2020 EPAM Systems, Inc
+ * Copyright 2022 Google LLC
+ * Copyright 2022 EPAM Systems, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-package org.opengroup.osdu.indexerqueue.gcp.cloudrun.util;
+package org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.publish;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
-import org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.MessagePublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
-@Slf4j
-@RequiredArgsConstructor
 @Component
-public class CloudTaskBuilder implements TaskBuilder {
-
-	final MessagePublisher publisher;
-
-	public HttpStatus createTask(CloudTaskRequest request) throws IOException {
-		return publisher.sendMessage(request);
-	}
+public interface MessagePublisher {
+  HttpStatus sendMessage(CloudTaskRequest request, DpsHeaders headers) throws IOException;
 }

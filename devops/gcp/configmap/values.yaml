@@ -11,6 +11,7 @@ data:
   google_audiences: ""
   indexer_queue_identifier: ""
   cloud_task_target_host: ""
+  spring_profiles_active: "gcp"
 
 conf:
   configmap: "indexer-queue-config"
