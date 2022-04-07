@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EntitlementsClientFactory extends AbstractFactoryBean<IEntitlementsFactory> {
 
-	final EntitlementProperties entitlementProperties;
+	private final EntitlementProperties entitlementProperties;
 	private final HttpResponseBodyMapper mapper;
 
 	@Override

@@ -17,7 +17,6 @@
 
 package org.opengroup.osdu.indexerqueue.gcp.cloudrun.middleware;
 
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opengroup.osdu.core.common.model.entitlements.AuthorizationResponse;
@@ -33,23 +32,13 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class AuthorizationFilter {
 
-	final IAuthorizationService authorizationService;
-
-	final DpsHeaders headers;
-
-	final HttpServletRequest request;
-
-	final RecordChangedMessages message;
+	private final IAuthorizationService authorizationService;
+	private final DpsHeaders headers;
+	private final RecordChangedMessages message;
 
 	public boolean pubSubTaskHasRole(String... requiredRoles) {
-		headers.getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
-		headers.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
-		if (message.hasCorrelationId()) {
-			headers.getHeaders().put(DpsHeaders.CORRELATION_ID, message.getCorrelationId());
-		}
-		AuthorizationResponse authResponse = authorizationService.authorizeAny(headers, requiredRoles);
-		headers.put(DpsHeaders.USER_EMAIL, authResponse.getUser());
-		return true;
+		putAdditionalHeaders();
+		return hasRole(requiredRoles);
 	}
 
 	public boolean hasRole(String... requiredRoles) {
@@ -58,4 +47,11 @@ public class AuthorizationFilter {
 		return true;
 	}
 
+	private void putAdditionalHeaders() {
+		headers.getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
+		headers.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
+		if (message.hasCorrelationId()) {
+			headers.getHeaders().put(DpsHeaders.CORRELATION_ID, message.getCorrelationId());
+		}
+	}
 }

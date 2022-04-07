@@ -20,17 +20,15 @@ package org.opengroup.osdu.indexerqueue.gcp.cloudrun.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.opengroup.osdu.core.common.Constants;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.common.model.search.SearchServiceRole;
 import org.opengroup.osdu.core.gcp.util.HeadersInfo;
-import org.opengroup.osdu.indexerqueue.gcp.cloudrun.util.TaskBuilder;
-import org.springframework.http.HttpRequest;
+import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.IndexerQueueConfigProperties;
+import org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.publish.MessagePublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,32 +45,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class EnqueueApi {
 
 	private final ObjectWriter writer = new ObjectMapper().writerFor(RecordChangedMessages.class);
-
-	final HttpServletRequest request;
-
-	final HeadersInfo headersInfo;
-
-	final TaskBuilder taskBuilder;
-
-	final RecordChangedMessages message;
+	private final HeadersInfo headersInfo;
+	private final MessagePublisher publisher;
+	private final RecordChangedMessages message;
+	private final IndexerQueueConfigProperties properties;
 
 	@PostMapping(value = "/enqueue",produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("@authorizationFilter.pubSubTaskHasRole('" + SearchServiceRole.ADMIN + "')")
 	public ResponseEntity<String> enqueueTask() throws IOException {
-		this.headersInfo.getHeaders().getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
-		this.headersInfo.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
-		if (message.hasCorrelationId()) {
-			this.headersInfo.getHeaders().put(DpsHeaders.CORRELATION_ID, message.getCorrelationId());
-		}
+		putAdditionalHeaders();
 
 		CloudTaskRequest cloudTaskRequest = CloudTaskRequest.builder()
-			.message(writer.writeValueAsString(message))
-			.build();
+				.message(writer.writeValueAsString(message))
+				.url(properties.getDefaultRelativeIndexerWorkerUrl())
+				.build();
 
-		HttpStatus response = this.taskBuilder.createTask(cloudTaskRequest);
-
+		HttpStatus response = publisher.sendMessage(cloudTaskRequest, headersInfo.getHeaders());
 		return new ResponseEntity<>(response);
 	}
 
+	private void putAdditionalHeaders() {
+		DpsHeaders headers = this.headersInfo.getHeaders();
 
+		headers.getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
+		headers.put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
+		if (message.hasCorrelationId()) {
+			headers.put(DpsHeaders.CORRELATION_ID, message.getCorrelationId());
+		}
+	}
 }
