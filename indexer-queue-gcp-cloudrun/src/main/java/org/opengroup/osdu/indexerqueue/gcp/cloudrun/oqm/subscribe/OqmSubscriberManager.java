@@ -40,12 +40,13 @@ import org.opengroup.osdu.core.gcp.oqm.model.OqmSubscriptionQuery;
 import org.opengroup.osdu.core.gcp.oqm.model.OqmTopic;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.IndexerQueueConfigProperties;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.publish.MessagePublisher;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
- * Runs once on the service start.
+ * Runs once on the service start when PULL subscription type is activated.
  * Fetches all tenants' oqm destinations for TOPIC existence.
  * If exists - searches for pull SUBSCRIPTION existence.
  * Creates SUBSCRIPTION if it doesn't exist. Then subscribe itself on SUBSCRIPTION.
@@ -53,7 +54,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "oqmDriver")
+@ConditionalOnExpression("'${subscription-type}' == 'pull' and '${oqmDriver}' != null")
 public class OqmSubscriberManager {
 
   private static final String SUBSCRIPTION_PREFIX = "indexer-queue-oqm-";

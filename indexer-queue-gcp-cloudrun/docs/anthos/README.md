@@ -36,6 +36,7 @@
 | `DEFAULT_QUEUE_NAME` | ex `records` | Name of queue for sending messages with records info  to Indexer service | no | - |
 | `OQMDRIVER` | `pubsub` OR `rabbitmq` | Oqm driver mode that defines which queue will be used | no | - |
 | `INDEX_TASK_TYPE` | `cloud-task` OR `queue` OR `rest` | The property enables the support of Google Cloud Tasks / REST requests / Queue messaging. | no | - |
+| `SUBSCRIPTION_TYPE` | `push` OR `pull` | The property enables the support of PUSH or PULL subscribers | no | - |
 
 ### Properties set in Partition service:
 
