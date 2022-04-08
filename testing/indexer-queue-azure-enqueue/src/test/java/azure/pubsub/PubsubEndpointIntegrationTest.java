@@ -68,6 +68,7 @@ public class PubsubEndpointIntegrationTest {
     @Test
     public void should_beAbleToSearch_newlyCreatedRecords() throws Exception {
         // Create record in storage service
+
         String jsonInput = createJsonBody(RECORD_ID, "tian");
         ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
         assertEquals(201, storageServiceResponse.getStatus());
@@ -75,8 +76,8 @@ public class PubsubEndpointIntegrationTest {
 
         // Sleep for one minute to wait for indexing to happen
         Thread.sleep(60000);
-
-        ClientResponse response = TestUtils.send(System.getenv("SEARCH_URL"), "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
+        String searchUrl=System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
+        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));

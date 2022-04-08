@@ -19,14 +19,14 @@
     <parent>
         <artifactId>indexer-queue</artifactId>
         <groupId>org.opengroup.osdu.indexerqueue</groupId>
-        <version>0.14.0-SNAPSHOT</version>
+        <version>0.15.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.opengroup.osdu.indexerqueue</groupId>
     <artifactId>RequeueFunction</artifactId>
-    <version>0.14.0-SNAPSHOT</version>
+    <version>0.15.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -45,7 +45,7 @@
         <azure.functions.topicname />
         <azure.functions.subscriptionname />
         <azure.functions.indexerqueuekey />
-        <osdu.oscorecommon.version>0.13.0</osdu.oscorecommon.version>
+        <osdu.oscorecommon.version>0.14.0</osdu.oscorecommon.version>
     </properties>
 
     <pluginRepositories>

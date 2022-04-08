@@ -20,7 +20,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.4.RELEASE</version>
+		<version>2.4.12</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -32,7 +32,7 @@
 
 	<groupId>org.opengroup.osdu.indexerqueue.cloudrun</groupId>
 	<artifactId>indexer-queue-gcp-cloudrun</artifactId>
-	<version>0.14.0-SNAPSHOT</version>
+	<version>0.15.0-SNAPSHOT</version>
 	<name>indexer-queue-gcp-cloudrun</name>
 	<description>Indexer Queue Gcp CloudRun</description>
 	<packaging>jar</packaging>
@@ -95,25 +95,28 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.retry</groupId>
+			<artifactId>spring-retry</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>core-lib-gcp</artifactId>
-			<version>0.13.0</version>
+			<version>0.14.0-rc2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>os-core-common</artifactId>
-			<version>0.13.0</version>
+			<version>0.14.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.http-client</groupId>
 					<artifactId>google-http-client</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.opengroup.osdu</groupId>
-			<artifactId>oqm</artifactId>
-			<version>0.13.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

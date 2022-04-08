@@ -14,3 +14,4 @@ data:
   GOOGLE_AUDIENCES: "{{ .Values.data.google_audiences }}"
   INDEXER_QUEUE_IDENTIFIER: "{{ .Values.data.indexer_queue_identifier }}"
   CLOUD_TASK_TARGET_HOST: "{{ .Values.data.cloud_task_target_host }}"
+  SPRING_PROFILES_ACTIVE: "{{ .Values.data.spring_profiles_active }}"
