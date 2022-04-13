@@ -24,17 +24,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @Getter
 @ConfigurationProperties
-public class PropertiesConfiguration {
+public class IndexerQueueConfigProperties {
 
-	private String googleCloudProject;
-
-	private String googleCloudProjectRegion;
-
-	private String cloudTaskTargetHost;
-
-	private String indexerQueueIdentifier;
-
-	private String defaultQueueName;
-
-	private String defaultRelativeIndexerWorkerUrl;
+  private String googleCloudProject;
+  private String googleCloudProjectRegion;
+  private String cloudTaskTargetHost;
+  private String indexerQueueIdentifier;
+  private String recordsChangedTopicName;
+  private String recordsTopicName;
+  private String defaultRelativeIndexerWorkerUrl;
+  private String indexerHost;
 }

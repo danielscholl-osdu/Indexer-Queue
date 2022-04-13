@@ -3,45 +3,55 @@
 indexer-queue-gcp-cloudrun is a service that is woken up in response to messages emitted by os-storage onto Service Bus.
 It is responsible for calling the os-indexer to trigger re-indexing events.
 
+## Table of Contents <a name="TOC"></a>
+* [Getting started](#Getting-started)
+* [Mappers](#Mappers)
+* [Settings and Configuration](#Settings-and-Configuration)
+* [Run service](#Run-service)
+* [Testing](#Testing)
+* [Deployment](#Deployment)
+* [Entitlements groups](#Entitlements-groups)
+* [Licence](#Licence)
+
 ## Getting Started
+
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing
 purposes. See deployment for notes on how to deploy the project on a live system.
 
+## Mappers
+
+This is a universal solution created using EPAM OSM, OBM and OQM mappers technology. It allows you to work with various
+implementations of KV stores, Blob stores and message brokers.
+
+For more information about mappers:
+- [OQM Readme](https://community.opengroup.org/osdu/platform/system/lib/cloud/gcp/oqm/-/blob/master/README.md)
+
+### Limitations of the current version
+
+In the current version, the mappers are equipped with several drivers to the stores and the message broker:
+
+- OQM (mapper to message brokers): Google PubSub; RabbitMQ
+
+## Settings and Configuration
+
 ### Prerequisites
 
-- [Maven 3.6.0+](https://maven.apache.org/download.cgi)
-- [AdoptOpenJDK8](https://adoptopenjdk.net/)
-- [Lombok 1.16 or later](https://projectlombok.org/setup/maven)
-- [GCloud SDK with java (latest version)](https://cloud.google.com/sdk/docs/install)
+1. Mandatory
+    - [Maven 3.6.0+](https://maven.apache.org/download.cgi)
+    - [AdoptOpenJDK8](https://adoptopenjdk.net/)
+    - [Lombok 1.16 or later](https://projectlombok.org/setup/maven)
+2. For Google Cloud only
+    - [GCloud SDK with java (latest version)](https://cloud.google.com/sdk/docs/install)
 
-### Installation
+### Anthos Service Configuration:
+[Anthos service configuration ](docs/anthos/README.md)
+### GCP Service Configuration:
+[Gcp service configuration ](docs/gcp/README.md)
 
-- Setup Apache Maven
-- Setup AdoptOpenJDK
-- Setup GCloud SDK
-- Install Eclipse (or other IDE) to run applications
-- Set up environment variables for Apache Maven and AdoptOpenJDK. For example M2_HOME, JAVA_HOME, etc.
-- Add a configuration for build project in Eclipse(or other IDE)
+## Run service
 
 ### Run Locally
-
-In order to run the service locally or remotely, you will need to have the following environment variables defined.
-
-| name | value | description | sensitive? | source |
-| ---  | ---   | ---         | ---        | ---    |
-| `OSDU_ENTITLEMENTS_URL` | ex `https://entitlements.com/entitlements/v1` | Entitlements API endpoint | no | output of infrastructure deployment |
-| `CLOUD_TASK_TARGET_HOST` | ex `http://indexer` | Indexer Service host, relative url will be used from incoming task, if no url present in task then will be used url from property `DEFAULT_RELATIVE_INDEXER_WORKER_URL` | no | output of infrastructure deployment |
-| `DEFAULT_RELATIVE_INDEXER_WORKER_URL` | default `/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer Service has two endpoints to process indexing tasks, `/index-worker` and `/reindex-worker` first serves to process requests with specific `storage-record-ids` and add those records to elasticsearch, second for reprocessing tasks it consumes `kind` and `cursor` to request more records from storage| no | output of infrastructure deployment |
-| `GOOGLE_CLOUD_PROJECT_REGION` | ex `us-central1` | Service deployment region | no | output of infrastructure deployment |
-| `GOOGLE_CLOUD_PROJECT` | ex `opendes` | Google Cloud Project Id| no | output of infrastructure deployment |
-| `GOOGLE_AUDIENCES` | ex `*****.apps.googleusercontent.com` | Client ID for getting access to cloud resources | yes | https://console.cloud.google.com/apis/credentials |
-| `GOOGLE_APPLICATION_CREDENTIALS` | ex `/path/to/directory/service-key.json` | Service account credentials, you only need this if running locally | yes | https://console.cloud.google.com/iam-admin/serviceaccounts |
-| `PARTITION_API` | ex `http://localhost:8081/api/partition/v1` | Partition service endpoint | no | - |
-| `INDEXER_QUEUE_IDENTIFIER` | ex `os-indexer-queue-osdu` | Config for cloud tasks queue, will be used combination of `data-partition-id` and `INDEXER_QUEUE_IDENTIFIER` | no | - |
-| `DEFAULT_QUEUE_NAME` | ex `records` | The name for default queue that is used by service | no | - |
-| `OQMDRIVER` | `pubsub` OR `rabbitmq` | Oqm driver mode that defines which queue will be used | no | - |
-| `INDEXER_QUEUE_TASK_ENABLE` | `true` OR `false` | The property enables the support of Google Cloud Tasks. It is supported only when `OQM_DRIVER`==`pubsub` | no | - |
 
 Check that maven is installed:
 
@@ -125,10 +135,10 @@ cd indexer-queue-gcp-cloudrun/ && mvn spring-boot:run
 
 * Google Documentation: https://cloud.google.com/cloud-build/docs/deploying-builds/deploy-cloud-run
 
-## PubSub
+## Entitlements groups
 
-For authentication indexer-queue-gcp-cloudrun rely on entitlements service, that mean Pubsub push subscription must be
-configured to use service account
+For authentication indexer-queue-gcp-cloudrun rely on entitlements service, 
+that mean Pubsub push subscription must be configured to use service account
 
 **Entitlements configuration for pubsub account**
 

@@ -23,37 +23,33 @@ import org.apache.http.HttpStatus;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
-import org.opengroup.osdu.core.gcp.util.HeadersInfo;
-import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.PropertiesConfiguration;
+import org.opengroup.osdu.indexerqueue.gcp.cloudrun.config.IndexerQueueConfigProperties;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@RequestScope
-public class IndexerQueueIdentifier {
+public class CloudTaskIdResolver {
 
-	private final ITenantFactory tenantInfoServiceProvider;
+  private static final String DEFAULT_QUEUE_ID = "common";
 
-	private final HeadersInfo headersInfo;
+  private final ITenantFactory tenantInfoServiceProvider;
+  private final IndexerQueueConfigProperties configuration;
 
-	private final PropertiesConfiguration configuration;
+  public String getQueueId(String partitionId) {
+    TenantInfo tenant = getTenantInfo(partitionId);
+    return tenant != null
+        ? String.format("%s-%s", tenant.getName(), configuration.getIndexerQueueIdentifier())
+        : DEFAULT_QUEUE_ID;
+  }
 
-	private TenantInfo tenant;
+  private TenantInfo getTenantInfo(String partitionId) {
+    if (this.tenantInfoServiceProvider == null) {
+      log.info("ITENANT FACTORY OBJECT is NULL");
+      throw new AppException(HttpStatus.SC_BAD_REQUEST, "ITenant factory object is Null",
+          "ITenant factory object is Null");
+    }
 
-
-	public String getQueueId() {
-		if (this.tenantInfoServiceProvider == null) {
-			log.info("ITENANT FACTORY OBJECT is NULL");
-			throw new AppException(HttpStatus.SC_BAD_REQUEST, "ITenant factory object is Null",
-				"ITenant factory object is Null");
-		}
-		tenant = this.tenantInfoServiceProvider.getTenantInfo(headersInfo.getPartitionId());
-		if (tenant == null) {
-			return ("common");
-		}
-
-		return String.format("%s-%s", tenant.getName(), configuration.getIndexerQueueIdentifier());
-	}
+    return this.tenantInfoServiceProvider.getTenantInfo(partitionId);
+  }
 }

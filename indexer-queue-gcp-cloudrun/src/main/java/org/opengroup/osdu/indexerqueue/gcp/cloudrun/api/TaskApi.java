@@ -23,9 +23,11 @@ import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.opengroup.osdu.core.common.SwaggerDoc;
+import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
+import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.common.model.search.SearchServiceRole;
-import org.opengroup.osdu.indexerqueue.gcp.cloudrun.util.TaskBuilder;
+import org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.publish.MessagePublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,18 +44,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/_dps/task-handlers")
 public class TaskApi {
 
-    final TaskBuilder taskBuilder;
+  final MessagePublisher publisher;
+  private final RecordChangedMessages message;
+  private final DpsHeaders headers;
 
-    @PostMapping(value = "/enqueue", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @PreAuthorize("@authorizationFilter.hasRole('" + SearchServiceRole.ADMIN + "')")
-    public ResponseEntity<String> enqueueTask(
-        @NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
-        throws IOException {
+  @PostMapping(value = "/enqueue", produces = MediaType.APPLICATION_JSON_VALUE)
+  @ResponseBody
+  @PreAuthorize("@authorizationFilter.hasRole('" + SearchServiceRole.ADMIN + "')")
+  public ResponseEntity<String> enqueueTask(
+      @NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
+      throws IOException {
 
-        HttpStatus response = this.taskBuilder.createTask(request);
+    HttpStatus response = publisher.sendMessage(request, headers);
 
-        //Spring MVC will set content-type as JSON only if the response body is present even empty, keep it for indexer service, he can't process text/plain responses
-        return new ResponseEntity<>("", response);
-    }
+    // Spring MVC will set content-type as JSON only if the response body is present even empty,
+    // keep it for indexer service, he can't process text/plain responses
+    return new ResponseEntity<>("", response);
+  }
 }

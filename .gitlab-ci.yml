@@ -67,6 +67,7 @@ include:
     file: "cloud-providers/osdu-gcp-gke.yml"
 
 osdu-gcp-containerize-gcloud:
+  tags: ["osdu-small"]
   stage: containerize
   needs: ["compile-and-unit-test"]
   extends: .osdu-gcp-variables
@@ -84,7 +85,6 @@ osdu-gcp-containerize-gcloud:
 osdu-gcp-containerize-gitlab:
   stage: containerize
   needs: ["compile-and-unit-test"]
-  tags: ["osdu-medium"]
   extends: .osdu-gcp-variables
   image: docker:19.03
   cache: {}

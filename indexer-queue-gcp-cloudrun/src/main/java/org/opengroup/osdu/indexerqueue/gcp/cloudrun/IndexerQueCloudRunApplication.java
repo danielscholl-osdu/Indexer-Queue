@@ -20,9 +20,11 @@ package org.opengroup.osdu.indexerqueue.gcp.cloudrun;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.retry.annotation.EnableRetry;
 
 @ConfigurationPropertiesScan(basePackages = "org.opengroup")
 @SpringBootApplication(scanBasePackages = "org.opengroup")
+@EnableRetry
 public class IndexerQueCloudRunApplication {
 
 	public static void main(String[] args) {
