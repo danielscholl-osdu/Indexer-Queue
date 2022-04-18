@@ -8,10 +8,14 @@ metadata:
 data:
   LOG_LEVEL: "{{ .Values.data.log_level }}"
   OSDU_ENTITLEMENTS_URL: "{{ .Values.data.osdu_entitlements_url }}"
-  GOOGLE_CLOUD_PROJECT: "{{ .Values.data.google_cloud_project }}"
-  GOOGLE_CLOUD_PROJECT_REGION: "{{ .Values.data.google_cloud_project_region }}"
   PARTITION_API: "{{ .Values.data.partition_api }}"
-  GOOGLE_AUDIENCES: "{{ .Values.data.google_audiences }}"
-  INDEXER_QUEUE_IDENTIFIER: "{{ .Values.data.indexer_queue_identifier }}"
-  CLOUD_TASK_TARGET_HOST: "{{ .Values.data.cloud_task_target_host }}"
   SPRING_PROFILES_ACTIVE: "{{ .Values.data.spring_profiles_active }}"
+  {{- if .Values.conf.on_prem_enabled }}
+  INDEXER_HOST: "{{ .Values.data.indexer_host }}"
+  {{- else }}
+  CLOUD_TASK_TARGET_HOST: "{{ .Values.data.cloud_task_target_host }}"
+  GOOGLE_AUDIENCES: "{{ .Values.data.google_audiences }}"
+  GOOGLE_CLOUD_PROJECT: "{{ .Values.data.google_cloud_project }}"
+  GOOGLE_CLOUD_PROJECT_REGION: "{{ .Values.data.google_cloud_project_region }}"  
+  INDEXER_QUEUE_IDENTIFIER: "{{ .Values.data.indexer_queue_identifier }}"
+  {{- end }}
