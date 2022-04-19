@@ -23,7 +23,13 @@ spec:
         imagePullPolicy: "{{ .Values.data.imagePullPolicy }}"
         envFrom:
         - configMapRef:
-            name: "{{ .Values.conf.configmap }}"                       
+            name: "{{ .Values.conf.configmap }}"
+        {{- if .Values.conf.on_prem_enabled }}
+        - secretRef:
+            name: "{{ .Values.conf.keycloak_secret_name }}"
+        - secretRef:
+            name: "{{ .Values.conf.rabbitmq_secret_name }}"
+        {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
           runAsUser: 0

@@ -3,16 +3,20 @@
 # Declare variables to be passed into your templates.
 
 data:
-  log_level: ""
-  osdu_entitlements_url: ""
+  # common
+  log_level: "INFO"
+  osdu_entitlements_url: "http://entitlements/api/entitlements/v2"
+  partition_api: "http://partition/api/partition/v1/"
+  spring_profiles_active: "gcp"
+  # gcp
+  cloud_task_target_host: ""
+  google_audiences: ""
   google_cloud_project: ""
   google_cloud_project_region: ""
-  partition_api: ""
-  google_audiences: ""
   indexer_queue_identifier: ""
-  cloud_task_target_host: ""
-  spring_profiles_active: "gcp"
-
+  # anthos
+  indexer_host: "http://indexer"
 conf:
-  configmap: "indexer-queue-config"
   app_name: "indexer-queue"
+  configmap: "indexer-queue-config"
+  on_prem_enabled: false
