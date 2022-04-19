@@ -38,10 +38,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({RecordChangedMessageHandler.class})
-@PowerMockIgnore({"javax.net.ssl.*", "javax.management.*"})
-public class RecordChangedMessageHandlerTest {
+@RunWith(MockitoJUnitRunner.class)
+ public class RecordChangedMessageHandlerTest {
     private static final String indexerWorkerUrl = "indexer-worker-url";
     private static final int currentTry = 1;
     private static final int maxTry = 5;
@@ -124,42 +122,4 @@ public class RecordChangedMessageHandlerTest {
             assertTrue(actualWaitTime < backOffWaitTime);
         }
     }
-
-    @Test
-    public void shouldInvoke_httpPostMethod_whenHttpResponseCodeIsSuccess() throws Exception {
-        when(httpClientBuilder.build()).thenReturn(httpClient);
-        when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
-        whenNew(HttpPost.class).withArguments(indexerWorkerUrl).thenReturn(httpPost);
-        doNothing().when(httpPost).setEntity(any(HttpEntity.class));
-        doNothing().when(httpPost).setHeader(any());
-        when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
-        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),200,"success");
-        when(httpResponse.getStatusLine()).thenReturn(status);
-
-        sut.sendMessagesToIndexer(recordChangedMessages, currentTry);
-
-        verify(httpClient,times(1)).execute(httpPost);
-        verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
-    }
-
-    @Test
-    public void shouldThrow_whenHttpPostMethod_ReturnsErrorReponseCode() throws Exception {
-        when(httpClientBuilder.build()).thenReturn(httpClient);
-        when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
-        whenNew(HttpPost.class).withArguments(indexerWorkerUrl).thenReturn(httpPost);
-        doNothing().when(httpPost).setEntity(any(HttpEntity.class));
-        doNothing().when(httpPost).setHeader(any());
-        when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
-        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),400,"error");
-        when(httpResponse.getStatusLine()).thenReturn(status);
-
-        try {
-            sut.sendMessagesToIndexer(recordChangedMessages, currentTry);
-        } catch (Exception e) {
-            verify(httpClient,times(1)).execute(httpPost);
-            verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
-        }
-
-    }
-
 }

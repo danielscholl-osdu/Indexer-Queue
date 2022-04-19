@@ -5,7 +5,7 @@ public final class ThreadScopeContextHolder {
     private static final ThreadLocal<ThreadScopeContext> CONTEXT_HOLDER = ThreadLocal
             .withInitial(ThreadScopeContext::new);
 
-    private ThreadScopeContextHolder() {
+    public ThreadScopeContextHolder() {
         // utility object, not allowed to create instances
     }
 
