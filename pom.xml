@@ -31,6 +31,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <log4j.version>2.17.1</log4j.version>
         <json-smart.version>2.4.7</json-smart.version>
+        <jackson-databind.version>2.13.2.2</jackson-databind.version>
     </properties>
 
     <licenses>
@@ -113,7 +114,7 @@
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.11.4</version>
+        <version>${jackson-databind.version}</version>
     </dependency>
     <dependency>
         <groupId>javax.servlet</groupId>

@@ -110,7 +110,7 @@
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>os-core-common</artifactId>
-			<version>0.14.0</version>
+			<version>0.15.0-rc1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.http-client</groupId>
@@ -145,7 +145,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.9.RELEASE</version>
 				<configuration>
-					<mainClass>org.opengroup.osdu.indexerqueue.gcp.cloudrun.IndexerQueCloudRunApplication</mainClass>
+					<mainClass>org.opengroup.osdu.indexerqueue.gcp.cloudrun.IndexerQueueCloudRunApplication</mainClass>
 				</configuration>
 				<executions>
 					<execution>
