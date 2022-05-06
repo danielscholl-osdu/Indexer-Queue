@@ -25,9 +25,9 @@ import org.springframework.retry.annotation.EnableRetry;
 @ConfigurationPropertiesScan(basePackages = "org.opengroup")
 @SpringBootApplication(scanBasePackages = "org.opengroup")
 @EnableRetry
-public class IndexerQueCloudRunApplication {
+public class IndexerQueueCloudRunApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(IndexerQueCloudRunApplication.class, args);
+		SpringApplication.run(IndexerQueueCloudRunApplication.class, args);
 	}
 }
