@@ -58,6 +58,13 @@ public class Subscriber {
 	
 	@Value("${INDEXER_API_KEY}")
 	private String INDEXER_API_KEY;
+	
+	/*
+	 * false : Messages will be indexed from Queue 
+	 * true : Messages will be indexed  from TOPIC
+	 */
+	@Value("${ibm.topic.enable:false}")
+	private String topicFlag;
 
 	private final Gson gson = new Gson();
 	private static final Logger logger = LoggerFactory.getLogger(Subscriber.class);
@@ -73,6 +80,11 @@ public class Subscriber {
 	public void recievedMessage(String msg) throws Exception {
 
 		logger.info("Recieved Message: " + msg);
+		
+		if(topicFlag.equalsIgnoreCase("true")) {
+        	logger.info("Indexing api will not be called or disable flag 'ibm.topic.enable'. Indexing will be happen on messages from Topic");
+        	return;
+        }
 
 		RecordChangedMessages recordMessage;
 
