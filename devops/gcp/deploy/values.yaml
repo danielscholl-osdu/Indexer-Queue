@@ -16,3 +16,4 @@ conf:
   keycloak_secret_name: "indexer-queue-keycloak-secret"
   on_prem_enabled: false
   rabbitmq_secret_name: "rabbitmq-secret"
+  domain: ""
