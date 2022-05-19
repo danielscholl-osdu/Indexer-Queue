@@ -13,8 +13,6 @@ The following software have components provided under the terms of this license:
 ========================================================================
 Apache-1.1
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 
 ========================================================================
@@ -757,6 +755,7 @@ The following software have components provided under the terms of this license:
 - HK2 Spring Bridge (from https://repo1.maven.org/maven2/org/glassfish/hk2/spring-bridge)
 - HK2 config types (from https://repo1.maven.org/maven2/org/glassfish/hk2/config-types)
 - HK2 configuration module (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-config)
+- HK2 module of HK2 itself (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2)
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JSR 311 API (from https://jsr311.dev.java.net, https://jsr311.dev.java.net/)
 - JSR 353 (JSON Processing) Default Provider (from http://jsonp.java.net)
@@ -767,6 +766,7 @@ The following software have components provided under the terms of this license:
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - JavaMail API (from https://repo1.maven.org/maven2/com/sun/mail/javax.mail)
 - OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
+- Run Level Service (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-runlevel)
 - javax.annotation-api (from http://jcp.org/en/jsr/detail?id=250)
 - jersey-client (from https://repo1.maven.org/maven2/com/sun/jersey/jersey-client)
 - jersey-ext-bean-validation (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-bean-validation)
@@ -831,8 +831,6 @@ The following software have components provided under the terms of this license:
 ========================================================================
 EPL-2.0
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - Class Model for Hk2 (from https://repo1.maven.org/maven2/org/glassfish/hk2/class-model)
 - Expression Language 3.0 (from http://el-spec.java.net, http://uel.java.net, https://projects.eclipse.org/projects/ee4j.el)
 - HK2 Implementation Utilities (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-utils)
@@ -911,8 +909,6 @@ The following software have components provided under the terms of this license:
 ========================================================================
 GPL-2.0-or-later
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
 
 ========================================================================
@@ -984,8 +980,6 @@ GPL-3.0-or-later
 ========================================================================
 JSON
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - JSON in Java (from https://github.com/douglascrockford/JSON-java)
 
 ========================================================================
@@ -1009,8 +1003,6 @@ The following software have components provided under the terms of this license:
 ========================================================================
 LGPL-2.1-or-later
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - JTS Topology Suite (from http://sourceforge.net/projects/jts-topo-suite)
 - Javassist (from http://www.javassist.org/)
 - SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
@@ -1030,6 +1022,8 @@ The following software have components provided under the terms of this license:
 ========================================================================
 LGPL-3.0-or-later
 ========================================================================
+The following software have components provided under the terms of this license:
+
 - json-patch (from https://github.com/fge/json-patch)
 - null (from https://github.com/fge/jackson-coreutils)
 
@@ -1127,8 +1121,6 @@ The following software have components provided under the terms of this license:
 ========================================================================
 PHP-3.01
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 
@@ -1161,8 +1153,6 @@ W3C
 ========================================================================
 WTFPL
 ========================================================================
-The following software have components provided under the terms of this license:
-
 - Reflections (from http://code.google.com/p/reflections/, http://github.com/ronmamo/reflections)
 
 ========================================================================
