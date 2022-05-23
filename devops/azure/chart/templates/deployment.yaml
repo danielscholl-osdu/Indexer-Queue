@@ -109,3 +109,5 @@ spec:
               value: "5"
             - name: SPRING_CONFIG_NAME
               value: "common,application"
+            - name: ACCEPT_HTTP  # TEMPORARY UNTIL HTTPS
+              value: "true"
