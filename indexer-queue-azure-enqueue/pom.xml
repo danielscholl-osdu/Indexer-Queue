@@ -38,7 +38,7 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <osdu.corelibazure.version>0.14.0</osdu.corelibazure.version>
+    <osdu.corelibazure.version>0.15.0-rc6</osdu.corelibazure.version>
     <osdu.oscorecommon.version>0.14.0</osdu.oscorecommon.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
