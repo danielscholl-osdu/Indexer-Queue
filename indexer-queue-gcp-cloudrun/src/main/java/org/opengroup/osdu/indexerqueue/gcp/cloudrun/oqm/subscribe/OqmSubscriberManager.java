@@ -173,10 +173,9 @@ public class OqmSubscriberManager {
   private DpsHeaders getHeaders(OqmMessage oqmMessage) {
     DpsHeaders headers = new DpsHeaders();
     headers.getHeaders().put("data-partition-id", oqmMessage.getAttributes().get("data-partition-id"));
-    headers.getHeaders().put("user", oqmMessage.getAttributes().get("user"));
     headers.getHeaders().put("correlation-id", oqmMessage.getAttributes().get("correlation-id"));
     headers.getHeaders().put("account-id", oqmMessage.getAttributes().get("account-id"));
-    headers.getHeaders().put("authorization", tokenProvider.getIdToken());
+    headers.getHeaders().put("authorization", "Bearer " + tokenProvider.getIdToken());
     return headers;
   }
 
