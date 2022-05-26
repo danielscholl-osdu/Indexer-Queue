@@ -38,7 +38,7 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <osdu.corelibazure.version>0.14.0</osdu.corelibazure.version>
+    <osdu.corelibazure.version>0.15.0-rc6</osdu.corelibazure.version>
     <osdu.oscorecommon.version>0.14.0</osdu.oscorecommon.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
@@ -46,7 +46,7 @@
     <resteasy.version>3.12.0.Final</resteasy.version>
     <snakeyaml.version>1.26</snakeyaml.version>
     <resteasy-validator-provider-11.version>3.6.2.Final</resteasy-validator-provider-11.version>
-    <jackson.version>2.11.2</jackson.version>
+    <jackson.version>2.13.3</jackson.version>
   </properties>
 
   <pluginRepositories>
@@ -182,7 +182,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.2.2</version>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -192,6 +192,11 @@
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-xml</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
       <version>${jackson.version}</version>
     </dependency>
     <dependency>
