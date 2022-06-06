@@ -1,0 +1,62 @@
+variables:
+  OSDU_GCP_BUILD_SUBDIR: indexer-queue-gcp
+  OSDU_GCP_INT_TEST_SUBDIR: indexer-queue-gcp # Fix as soon as integration tests are added
+  OSDU_GCP_ENVIRONMENT: osdu-gcp
+  OSDU_GCP_TENANT_NAME: osdu
+  OSDU_GCP_SERVICE: indexer-queue
+  OSDU_GCP_APPLICATION_NAME: indexer-queue
+  OSDU_GCP_VENDOR: gcp-cloudrun
+  OSDU_GCP_HELM_PACKAGE_CHARTS: "devops/gcp/deploy devops/gcp/configmap"
+  OSDU_GCP_HELM_CONFIG_SERVICE: indexer-queue-config
+  OSDU_GCP_HELM_DEPLOYMENT_SERVICE: indexer-queue-deploy
+  OSDU_GCP_HELM_CONFIG_SERVICE_VARS: >
+    --set data.log_level=DEBUG
+    --set data.osdu_entitlements_url=$OSDU_GCP_AUTHORIZE_API
+    --set data.google_cloud_project=$OSDU_GCP_PROJECT
+    --set data.google_cloud_project_region=$OSDU_GCP_CLOUDRUN_REGION
+    --set data.cloud_task_target_host=$OSDU_GCP_CLOUD_TASK_TARGET_HOST
+    --set data.partition_api=$OSDU_GCP_PARTITION_API
+    --set data.google_audiences=$GOOGLE_AUDIENCE
+    --set data.indexer_queue_identifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME
+  OSDU_GCP_HELM_CONFIG_SERVICE_VARS_DEV2: >
+    --set data.log_level=DEBUG
+    --set data.osdu_entitlements_url=$OSDU_GCP_AUTHORIZE_API
+    --set data.google_cloud_project=$OSDU_GCP_PROJECT
+    --set data.google_cloud_project_region=$OSDU_GCP_CLOUDRUN_REGION
+    --set data.cloud_task_target_host=$OSDU_GCP_CLOUD_TASK_TARGET_HOST 
+    --set data.partition_api=$OSDU_GCP_PARTITION_API 
+    --set data.google_audiences=$GOOGLE_AUDIENCE
+    --set data.indexer_queue_identifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME
+  OSDU_GCP_HELM_DEPLOYMENT_SERVICE_VARS: >
+    --set data.image=$CI_REGISTRY_IMAGE/osdu-gcp-$OSDU_GCP_SERVICE:$CI_COMMIT_SHORT_SHA
+    --set data.serviceAccountName=$OSDU_GCP_SERVICE-k8s
+
+osdu-gcp-containerize-gitlab:
+  variables:
+    BUILD_PATH: "$OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/Dockerfile.cloudbuild"
+
+osdu-gcp-containerize-gcr:
+  variables:
+    BUILD_PATH: "$OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/Dockerfile.cloudbuild"
+
+osdu-gcp-test:
+  extends:
+    - .maven
+    - .osdu-gcp-variables
+  stage: integration
+  needs: ["osdu-gcp-deploy-deployment"]
+  allow_failure: true
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
+    - exit 1
+
+osdu-gcp-dev2-test:
+  extends:
+    - .maven
+    - .osdu-gcp-dev2-variables
+  stage: integration
+  needs: ["osdu-gcp-dev2-deploy-deployment"]
+  allow_failure: true
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
+    - exit 1
