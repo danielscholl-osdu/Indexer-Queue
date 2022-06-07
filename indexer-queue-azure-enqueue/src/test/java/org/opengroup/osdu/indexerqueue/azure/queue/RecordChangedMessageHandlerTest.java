@@ -6,18 +6,14 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicStatusLine;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
@@ -43,7 +39,6 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @PowerMockIgnore({"javax.net.ssl.*", "javax.management.*"})
 public class RecordChangedMessageHandlerTest {
     private static final String indexerWorkerUrl = "indexer-worker-url";
-    private static final int currentTry = 1;
     private static final int maxTry = 5;
     private final String ACCOUNT_ID = "test-tenant";
     private final String CORRELATION_ID = "xxxxxx";
@@ -80,30 +75,10 @@ public class RecordChangedMessageHandlerTest {
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
         when(httpClientBuilder.build()).thenThrow(exp);
         try {
-            sut.sendMessagesToIndexer(recordChangedMessages, currentTry);
+            sut.sendMessagesToIndexer(recordChangedMessages);
         }
         catch (Exception e) {
-            verify(azureBootstrapConfig, times(1)).getMaxDeliveryCount();
             assertEquals("httpClientBuilder build failed", e.getMessage());
-        }
-    }
-
-    @Test
-    public void should_BackoffExponentially_whenHttpClientThrows_andCurrentTryLessThanMaxTry() throws Exception{
-        RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
-        when(httpClientBuilder.build()).thenThrow(exp);
-        java.sql.Timestamp before = null;
-        long expectedWaitTime = ((long) Math.pow(2, currentTry) * 10L);
-
-        try {
-            before = new java.sql.Timestamp(new Date().getTime());
-            sut.sendMessagesToIndexer(recordChangedMessages, currentTry);
-        }
-        catch (Exception e) {
-            verify(azureBootstrapConfig, times(1)).getMaxDeliveryCount();
-            java.sql.Timestamp after = new java.sql.Timestamp(new Date().getTime());
-            long actualWaitTime = after.getTime() - before.getTime();
-            assertTrue(actualWaitTime >= expectedWaitTime);
         }
     }
 
@@ -116,9 +91,8 @@ public class RecordChangedMessageHandlerTest {
 
         try {
             before = new java.sql.Timestamp(new Date().getTime());
-            sut.sendMessagesToIndexer(recordChangedMessages, maxTry);
+            sut.sendMessagesToIndexer(recordChangedMessages);
         } catch (Exception e) {
-            verify(azureBootstrapConfig, times(1)).getMaxDeliveryCount();
             java.sql.Timestamp after = new java.sql.Timestamp(new Date().getTime());
             long actualWaitTime = after.getTime() - before.getTime();
             assertTrue(actualWaitTime < backOffWaitTime);
@@ -136,7 +110,7 @@ public class RecordChangedMessageHandlerTest {
         StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),200,"success");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
-        sut.sendMessagesToIndexer(recordChangedMessages, currentTry);
+        sut.sendMessagesToIndexer(recordChangedMessages);
 
         verify(httpClient,times(1)).execute(httpPost);
         verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
@@ -154,7 +128,7 @@ public class RecordChangedMessageHandlerTest {
         when(httpResponse.getStatusLine()).thenReturn(status);
 
         try {
-            sut.sendMessagesToIndexer(recordChangedMessages, currentTry);
+            sut.sendMessagesToIndexer(recordChangedMessages);
         } catch (Exception e) {
             verify(httpClient,times(1)).execute(httpPost);
             verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();

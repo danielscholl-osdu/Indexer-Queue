@@ -106,6 +106,6 @@ spec:
             - name: max_lock_renew_duration_seconds
               value: "600"
             - name: max_delivery_count
-              value: "5"
+              value: "10"
             - name: SPRING_CONFIG_NAME
               value: "common,application"

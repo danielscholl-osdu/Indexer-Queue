@@ -5,12 +5,15 @@ import com.microsoft.azure.servicebus.SubscriptionClient;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
 import org.opengroup.osdu.azure.logging.ICoreLogger;
+import org.opengroup.osdu.azure.servicebus.ITopicClientFactory;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
+import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -30,6 +33,10 @@ public class SubscriptionManager {
     @Autowired
     private SubscriptionClientFactory clientFactory;
     @Autowired
+    private ITopicClientFactory topicClientFactory;
+    @Autowired
+    private RetryUtil retryUtil;
+    @Autowired
     private SbMessageBuilder sbMessageBuilder;
     @Autowired
     private RecordChangedMessageHandler recordChangedMessageHandler;
@@ -39,6 +46,8 @@ public class SubscriptionManager {
     private ITenantFactory tenantFactory;
     @Autowired
     private IMetricService metricService;
+    @Autowired
+    private RetryTemplate retryTemplate;
     private final ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(SubscriptionManager.class.getName());
 
     /***
@@ -85,7 +94,9 @@ public class SubscriptionManager {
             }
             try {
                 SubscriptionClient subscriptionClient = this.clientFactory.getSubscriptionClient(partition);
-                registerMessageHandler(subscriptionClient, executorService);
+                MessagePublisher messagePublisher = new TopicMessagePublisher(this.topicClientFactory, retryTemplate,
+                        partition, azureBootstrapConfig.getServiceBusTopic());
+                registerMessageHandler(subscriptionClient, messagePublisher, executorService);
                 partitions.add(partition);
             }
             catch (Exception e) {
@@ -102,9 +113,13 @@ public class SubscriptionManager {
      * messageWaitDuration  --> duration to wait for receiving the message.
      * maxConcurrentCalls   --> maximum number of concurrent calls to the onMessage handler. (maximum messages that can be handled at any given point.)
      */
-    private void registerMessageHandler(SubscriptionClient subscriptionClient, ExecutorService executorService) {
+    private void registerMessageHandler(SubscriptionClient subscriptionClient, MessagePublisher messageSender, ExecutorService executorService) {
         try {
-            MessageHandler messageHandler = new MessageHandler(subscriptionClient, recordChangedMessageHandler, sbMessageBuilder, metricService, azureBootstrapConfig.getAppName());
+            Integer maxDeliveryCount = Integer.valueOf(azureBootstrapConfig.getMaxDeliveryCount());
+            String appName = azureBootstrapConfig.getAppName();
+            MessageHandler messageHandler = new MessageHandler(subscriptionClient,
+                    messageSender, recordChangedMessageHandler, sbMessageBuilder,
+                    metricService, retryUtil, maxDeliveryCount, appName);
             subscriptionClient.registerMessageHandler(
                     messageHandler,
                     new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),

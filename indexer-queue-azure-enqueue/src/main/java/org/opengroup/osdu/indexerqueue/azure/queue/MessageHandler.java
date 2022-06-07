@@ -17,11 +17,11 @@ import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.SubscriptionClient;
 import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
 import org.opengroup.osdu.azure.logging.ICoreLogger;
-import org.opengroup.osdu.azure.servicebus.AbstractMessageHandler;
 import org.opengroup.osdu.core.common.model.indexer.RecordInfo;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHolder;
+import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 import org.slf4j.MDC;
 
@@ -33,15 +33,22 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /***
  * Defines callback for receiving messages from Azure Service Bus.
  */
-public class MessageHandler extends AbstractMessageHandler {
+public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
 
     private RecordChangedMessageHandler recordChangedMessageHandler;
     private SbMessageBuilder sbMessageBuilder;
     private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(MessageHandler.class.getName());
     private IMetricService metricService;
 
-    MessageHandler(SubscriptionClient client, RecordChangedMessageHandler recordChangedMessageHandler, SbMessageBuilder sbMessageBuilder, IMetricService metricService, String appName) {
-        super(appName, client);
+    MessageHandler(SubscriptionClient client,
+                   MessagePublisher messagePublisher,
+                   RecordChangedMessageHandler recordChangedMessageHandler,
+                   SbMessageBuilder sbMessageBuilder,
+                   IMetricService metricService,
+                   RetryUtil retryUtil,
+                   Integer maxDeliveryCount,
+                   String appName) {
+        super(client, messagePublisher, retryUtil, appName, maxDeliveryCount);
         this.recordChangedMessageHandler = recordChangedMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;
         this.metricService = metricService;
@@ -61,19 +68,13 @@ public class MessageHandler extends AbstractMessageHandler {
             recordChangedMessage.setPublishTime(message.getEnqueuedTimeUtc().toString());
             recordChangedMessage.setMessageId(messageId);
 
-            recordChangedMessageHandler.sendMessagesToIndexer(recordChangedMessage, message.getDeliveryCount());
+            recordChangedMessageHandler.sendMessagesToIndexer(recordChangedMessage);
 
             long stopTime = System.currentTimeMillis();
             this.captureMetrics(recordChangedMessage, enqueueTime, stopTime);
-
-            ThreadScopeContextHolder.getContext().clear();
+        } finally {
             MDC.clear();
-
-        } catch (Exception e) {
             ThreadScopeContextHolder.getContext().clear();
-            MDC.clear();
-
-            throw e;
         }
     }
 
