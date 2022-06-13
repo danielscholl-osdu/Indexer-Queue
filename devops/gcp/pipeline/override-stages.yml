@@ -4,9 +4,7 @@ variables:
   OSDU_GCP_ENVIRONMENT: osdu-gcp
   OSDU_GCP_TENANT_NAME: osdu
   OSDU_GCP_SERVICE: indexer-queue
-  OSDU_GCP_APPLICATION_NAME: indexer-queue
   OSDU_GCP_VENDOR: gcp-cloudrun
-  OSDU_GCP_HELM_PACKAGE_CHARTS: "devops/gcp/deploy devops/gcp/configmap"
   OSDU_GCP_HELM_CONFIG_SERVICE: indexer-queue-config
   OSDU_GCP_HELM_DEPLOYMENT_SERVICE: indexer-queue-deploy
   OSDU_GCP_HELM_CONFIG_SERVICE_VARS: >
