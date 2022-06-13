@@ -4,6 +4,13 @@ Formatted by fossa-with-cache (https://community.opengroup.org/divido/fossa-with
 This software includes the following software and licenses:
 
 ========================================================================
+AML
+========================================================================
+The following software have components provided under the terms of this license:
+
+- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org, https://bitbucket.org/snakeyaml/snakeyaml)
+
+========================================================================
 Android-Sdk
 ========================================================================
 The following software have components provided under the terms of this license:
@@ -13,7 +20,39 @@ The following software have components provided under the terms of this license:
 ========================================================================
 Apache-1.1
 ========================================================================
+The following software have components provided under the terms of this license:
+
+- Apache Geronimo JMS Spec 2.0 (from http://geronimo.apache.org/maven/${siteId}/${version})
+- Apache HttpAsyncClient (from http://hc.apache.org/httpcomponents-asyncclient)
+- Apache HttpClient (from http://hc.apache.org/httpcomponents-client)
+- Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client)
+- Apache HttpCore (from http://hc.apache.org/httpcomponents-core-ga, http://hc.apache.org/httpcomponents-core-ga/, http://hc.apache.org/httpcomponents-core/)
+- Apache HttpCore NIO (from http://hc.apache.org/httpcomponents-core-ga, http://hc.apache.org/httpcomponents-core/)
+- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
+- Apache Log4j JUL Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-jul)
+- Apache Log4j SLF4J Binding (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl)
+- Apache Lucene (module: memory) (from https://lucene.apache.org/)
+- Apache Lucene (module: misc) (from https://lucene.apache.org/)
+- Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/)
+- Apache Lucene (module: suggest) (from https://lucene.apache.org/)
+- Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
+- AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
+- Google Guice - Core Library (from https://repo1.maven.org/maven2/com/google/inject/guice)
+- Google Guice - Extensions - MultiBindings (from https://repo1.maven.org/maven2/com/google/inject/extensions/guice-multibindings)
+- Lucene Grouping (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-grouping)
+- Lucene Highlighter (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-highlighter)
+- Lucene Join (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-join)
+- Lucene Memory (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-backward-codecs, https://repo1.maven.org/maven2/org/apache/lucene/lucene-memory)
+- Lucene Spatial (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial)
+- Lucene Spatial 3D (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial3d)
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
+- Proton-J (from https://repo1.maven.org/maven2/org/apache/qpid/proton-j)
+- QpidJMS Client (from https://repo1.maven.org/maven2/org/apache/qpid/qpid-jms-client)
+- tomcat-embed-websocket (from http://tomcat.apache.org/, https://tomcat.apache.org/)
 
 ========================================================================
 Apache-2.0
@@ -22,6 +61,10 @@ The following software have components provided under the terms of this license:
 
 - AMQP 1.0 JMS Spring Boot AutoConfiguration (from https://repo1.maven.org/maven2/org/amqphub/spring/amqp-10-jms-spring-boot-autoconfigure)
 - AMQP 1.0 JMS Spring Boot Starter (from https://repo1.maven.org/maven2/org/amqphub/spring/amqp-10-jms-spring-boot-starter)
+- ASM Analysis (from http://asm.ow2.io/)
+- ASM Commons (from http://asm.ow2.io/, https://repo1.maven.org/maven2/org/ow2/asm/asm-commons)
+- ASM Tree (from http://asm.ow2.io/, https://repo1.maven.org/maven2/org/ow2/asm/asm-tree)
+- ASM Util (from http://asm.ow2.io/)
 - ASM based accessors helper used by json-smart (from https://urielch.github.io/)
 - AWS Java SDK for AWS Amplify (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for AWS App Mesh (from https://aws.amazon.com/sdkforjava)
@@ -196,6 +239,7 @@ The following software have components provided under the terms of this license:
 - AWS Java SDK for Amazon GuardDuty (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon HealthLake (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon Honeycode (from https://aws.amazon.com/sdkforjava)
+- AWS Java SDK for Amazon Inspector Service (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon Interactive Video (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon Kinesis (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon Kinesis Analytics (from https://aws.amazon.com/sdkforjava)
@@ -250,6 +294,7 @@ The following software have components provided under the terms of this license:
 - AWS Java SDK for Amazon Timestream Write (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon Transcribe (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon Translate (from https://aws.amazon.com/sdkforjava)
+- AWS Java SDK for Amazon WorkDocs (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon WorkLink (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon WorkMail (from https://aws.amazon.com/sdkforjava)
 - AWS Java SDK for Amazon WorkMail Message Flow (from https://aws.amazon.com/sdkforjava)
@@ -282,15 +327,17 @@ The following software have components provided under the terms of this license:
 - AWS SDK for Java - BOM (from https://aws.amazon.com/sdkforjava)
 - AWS SDK for Java - Core (from https://aws.amazon.com/sdkforjava)
 - AWS SDK for Java - Models (from https://aws.amazon.com/sdkforjava)
-- Adapter: RxJava (from https://repo1.maven.org/maven2/com/squareup/retrofit2/adapter-rxjava)
-- Apache Commons BeanUtils (from http://commons.apache.org/proper/commons-beanutils/, https://repo1.maven.org/maven2/commons-beanutils/commons-beanutils)
+- Adapter: RxJava (from https://github.com/square/retrofit, https://repo1.maven.org/maven2/com/squareup/retrofit2/adapter-rxjava)
+- Animal Sniffer Annotations (from https://repo1.maven.org/maven2/org/codehaus/mojo/animal-sniffer-annotations)
+- Apache Commons BeanUtils (from http://commons.apache.org/proper/commons-beanutils/, https://commons.apache.org/proper/commons-beanutils/, https://repo1.maven.org/maven2/commons-beanutils/commons-beanutils)
 - Apache Commons CLI (from https://commons.apache.org/proper/commons-cli/, https://repo1.maven.org/maven2/commons-cli/commons-cli)
 - Apache Commons Codec (from http://commons.apache.org/proper/commons-codec/, https://commons.apache.org/proper/commons-codec/)
-- Apache Commons Collections (from http://commons.apache.org/proper/commons-collections/)
+- Apache Commons Collections (from http://commons.apache.org/proper/commons-collections/, https://commons.apache.org/proper/commons-collections/)
 - Apache Commons IO (from http://commons.apache.org/io/, https://commons.apache.org/proper/commons-io/, https://repo1.maven.org/maven2/commons-io/commons-io)
-- Apache Commons Lang (from http://commons.apache.org/proper/commons-lang/)
+- Apache Commons Lang (from http://commons.apache.org/proper/commons-lang/, https://commons.apache.org/proper/commons-lang/)
 - Apache Commons Logging (from http://commons.apache.org/logging/, http://commons.apache.org/proper/commons-logging/)
 - Apache Geronimo JMS Spec 2.0 (from http://geronimo.apache.org/maven/${siteId}/${version})
+- Apache Groovy (from http://groovy-lang.org, http://groovy.codehaus.org/, https://groovy-lang.org)
 - Apache HTTP transport v2 for the Google HTTP Client Library for Java. (from https://repo1.maven.org/maven2/com/google/http-client/google-http-client-apache-v2)
 - Apache HttpAsyncClient (from http://hc.apache.org/httpcomponents-asyncclient)
 - Apache HttpClient (from http://hc.apache.org/httpcomponents-client)
@@ -302,9 +349,13 @@ The following software have components provided under the terms of this license:
 - Apache Log4j JUL Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-jul)
 - Apache Log4j SLF4J Binding (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl)
 - Apache Log4j to SLF4J Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-to-slf4j)
+- Apache Lucene (module: memory) (from https://lucene.apache.org/)
+- Apache Lucene (module: misc) (from https://lucene.apache.org/)
+- Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/)
+- Apache Lucene (module: suggest) (from https://lucene.apache.org/)
 - Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
 - Apache Maven Shared Utils (from https://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-utils)
-- AssertJ fluent assertions (from https://repo1.maven.org/maven2/org/assertj/assertj-core)
+- AssertJ fluent assertions (from ${project.parent.url}#${project.artifactId}, https://repo1.maven.org/maven2/org/assertj/assertj-core)
 - Asynchronous Http Client (from https://repo1.maven.org/maven2/org/asynchttpclient/async-http-client)
 - Asynchronous Http Client Netty Utils (from https://repo1.maven.org/maven2/org/asynchttpclient/async-http-client-netty-utils)
 - AutoValue Annotations (from https://github.com/google/auto/tree/master/value, https://repo1.maven.org/maven2/com/google/auto/value/auto-value-annotations)
@@ -318,7 +369,9 @@ The following software have components provided under the terms of this license:
 - Byte Buddy Java agent (from https://repo1.maven.org/maven2/net/bytebuddy/byte-buddy-agent)
 - ClassMate (from http://github.com/cowtowncoder/java-classmate)
 - Cloud Key Management Service (KMS) API (from https://repo1.maven.org/maven2/com/google/apis/google-api-services-cloudkms)
+- Cloud Key Management Service (KMS) API v1-rev20220407-1.32.1 (from https://repo1.maven.org/maven2/com/google/apis/google-api-services-cloudkms)
 - Cloud Storage JSON API (from https://repo1.maven.org/maven2/com/google/apis/google-api-services-storage)
+- Cloud Storage JSON API v1-rev20220604-1.32.1 (from https://repo1.maven.org/maven2/com/google/apis/google-api-services-storage)
 - CloudWatch Metrics for AWS Java SDK (from https://aws.amazon.com/sdkforjava)
 - Collections (from https://repo1.maven.org/maven2/commons-collections/commons-collections)
 - Converter: Jackson (from https://github.com/square/retrofit, https://repo1.maven.org/maven2/com/squareup/retrofit2/converter-jackson)
@@ -349,19 +402,28 @@ The following software have components provided under the terms of this license:
 - Guava: Google Core Libraries for Java (from http://code.google.com/p/guava-libraries, https://github.com/google/guava, https://repo1.maven.org/maven2/com/google/guava/guava)
 - HPPC Collections (from https://repo1.maven.org/maven2/com/carrotsearch/hppc)
 - HTTP functionality for the Reactor Netty library (from https://github.com/reactor/reactor-netty)
+- HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
 - Hibernate Validator (from https://repo1.maven.org/maven2/org/hibernate/hibernate-validator, https://repo1.maven.org/maven2/org/hibernate/validator/hibernate-validator)
 - Hibernate Validator Engine - Relocation Artifact (from https://repo1.maven.org/maven2/org/hibernate/hibernate-validator)
+- High Performance Primitive Collections (from https://github.com/carrotsearch/hppc)
+- HikariCP (from https://github.com/brettwooldridge/HikariCP)
+- Hop (from https://github.com/rabbitmq/hop, https://www.rabbitmq.com)
 - IBM COS Java SDK for Amazon S3 (from https://github.com/ibm/ibm-cos-sdk-java)
 - IBM COS Java SDK for COS KMS (from https://github.com/ibm/ibm-cos-sdk-java)
 - IBM COS SDK For Java (from https://github.com/ibm/ibm-cos-sdk-java)
 - IBM COS SDK for Java - Core (from https://github.com/ibm/ibm-cos-sdk-java)
+- Identity and Access Management (IAM) API v2beta-rev20220421-1.32.1 (from https://repo1.maven.org/maven2/com/google/apis/google-api-services-iam)
 - J2ObjC Annotations (from https://github.com/google/j2objc/)
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JBoss Logging 3 (from http://www.jboss.org)
+- JBoss Marshalling API (from https://repo1.maven.org/maven2/org/jboss/marshalling/jboss-marshalling)
+- JBoss Marshalling River (from https://repo1.maven.org/maven2/org/jboss/marshalling/jboss-marshalling-river)
 - JCIP Annotations under Apache License (from http://stephenc.github.com/jcip-annotations)
 - JMES Path Query library (from https://aws.amazon.com/sdkforjava)
+- JOpt Simple (from http://jopt-simple.github.io/jopt-simple, http://pholser.github.io/jopt-simple)
 - JSON Small and Fast Parser (from https://repo1.maven.org/maven2/net/minidev/json-smart, https://urielch.github.io/)
-- JSON Web Token support for the JVM (from https://repo1.maven.org/maven2/io/jsonwebtoken/jjwt)
+- JSON Web Token support for the JVM (from https://github.com/jwtk/jjwt, https://repo1.maven.org/maven2/io/jsonwebtoken/jjwt)
+- JSON in Java (from https://github.com/douglascrockford/JSON-java)
 - JSON library from Android SDK (from http://developer.android.com/sdk)
 - JSONassert (from http://github.com/skyscreamer/yoga, https://github.com/skyscreamer/JSONassert)
 - JSR 311 API (from https://jsr311.dev.java.net, https://jsr311.dev.java.net/)
@@ -384,11 +446,15 @@ The following software have components provided under the terms of this license:
 - Jackson-dataformat-YAML (from http://wiki.fasterxml.com/JacksonExtensionYAML, https://github.com/FasterXML/jackson, https://github.com/FasterXML/jackson-dataformats-text)
 - Jackson-module-parameter-names (from https://repo1.maven.org/maven2/com/fasterxml/jackson/module/jackson-module-parameter-names)
 - Jakarta Bean Validation API (from https://beanvalidation.org)
-- Jakarta Servlet (from http://servlet-spec.java.net, https://projects.eclipse.org/projects/ee4j.servlet)
-- Java Libraries for Amazon Simple WorkFlow (from https://aws.amazon.com/sdkforjava)
+- Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
+- Jakarta Servlet (from http://servlet-spec.java.net, https://javaee.github.io/servlet-spec/, https://projects.eclipse.org/projects/ee4j.servlet)
+- Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
+- Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
+- Java Libraries for Amazon Simple WorkFlow (from https://aws.amazon.com/sdkforjava, https://github.com/aws/aws-swf-flow-library)
 - Java Native Access (from https://github.com/java-native-access/jna, https://github.com/twall/jna, https://repo1.maven.org/maven2/net/java/dev/jna/jna)
 - Java Native Access Platform (from https://github.com/java-native-access/jna)
 - Java UUID Generator (from http://wiki.fasterxml.com/JugHome)
+- JavaBeans Activation Framework (from https://repo1.maven.org/maven2/com/sun/activation/javax.activation)
 - Javassist (from http://www.javassist.org/)
 - JetBrains Java Annotations (from https://github.com/JetBrains/java-annotations)
 - Joda-Time (from http://joda-time.sourceforge.net, http://www.joda.org/joda-time/, https://www.joda.org/joda-time/)
@@ -400,6 +466,7 @@ The following software have components provided under the terms of this license:
 - KeePassJava2 :: Simple (from https://repo1.maven.org/maven2/org/linguafranca/pwdb/KeePassJava2-simple)
 - Kotlin Stdlib (from https://kotlinlang.org/, https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib)
 - Kotlin Stdlib Common (from https://kotlinlang.org/)
+- LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
 - Logback Contrib :: JSON :: Classic (from https://repo1.maven.org/maven2/ch/qos/logback/contrib/logback-json-classic)
 - Logback Contrib :: JSON :: Core (from https://repo1.maven.org/maven2/ch/qos/logback/contrib/logback-json-core)
 - Logback Contrib :: Jackson (from https://repo1.maven.org/maven2/ch/qos/logback/contrib/logback-jackson)
@@ -419,6 +486,7 @@ The following software have components provided under the terms of this license:
 - Lucene Suggest (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-suggest)
 - Maven Incremental Build support utilities (from https://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-incremental)
 - Metrics Core (from https://repo1.maven.org/maven2/io/dropwizard/metrics/metrics-core)
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Web Module (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
@@ -427,8 +495,8 @@ The following software have components provided under the terms of this license:
 - Microsoft Azure SDK for SQL API of Azure Cosmos DB Service (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java, https://github.com/Azure/azure-service-bus-java)
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
-- MongoDB Driver (from http://www.mongodb.org)
-- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org)
+- MongoDB Driver (from http://www.mongodb.org, https://www.mongodb.com/)
+- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
 - Netty Reactive Streams Implementation (from https://repo1.maven.org/maven2/com/typesafe/netty/netty-reactive-streams)
 - Netty/Buffer (from https://repo1.maven.org/maven2/io/netty/netty-buffer)
 - Netty/Codec (from https://repo1.maven.org/maven2/io/netty/netty-codec)
@@ -442,7 +510,7 @@ The following software have components provided under the terms of this license:
 - Netty/Resolver (from https://repo1.maven.org/maven2/io/netty/netty-resolver)
 - Netty/Resolver/DNS (from https://repo1.maven.org/maven2/io/netty/netty-resolver-dns)
 - Netty/Resolver/DNS/Classes/MacOS (from https://repo1.maven.org/maven2/io/netty/netty-resolver-dns-classes-macos)
-- Netty/TomcatNative [BoringSSL - Static] (from https://repo1.maven.org/maven2/io/netty/netty-tcnative-boringssl-static)
+- Netty/TomcatNative [BoringSSL - Static] (from https://github.com/netty/netty-tcnative/netty-tcnative-boringssl-static/, https://repo1.maven.org/maven2/io/netty/netty-tcnative-boringssl-static)
 - Netty/Transport (from https://repo1.maven.org/maven2/io/netty/netty-transport)
 - Netty/Transport/Classes/Epoll (from https://repo1.maven.org/maven2/io/netty/netty-transport-classes-epoll)
 - Netty/Transport/Classes/KQueue (from https://repo1.maven.org/maven2/io/netty/netty-transport-classes-kqueue)
@@ -452,7 +520,7 @@ The following software have components provided under the terms of this license:
 - Nimbus LangTag (from https://bitbucket.org/connect2id/nimbus-language-tags)
 - Non-Blocking Reactive Foundation for the JVM (from https://github.com/reactor/reactor, https://github.com/reactor/reactor-core)
 - OAuth 2.0 SDK with OpenID Connect extensions (from https://bitbucket.org/connect2id/oauth-2.0-sdk-with-openid-connect-extensions)
-- Objenesis (from http://objenesis.org)
+- Objenesis (from http://objenesis.org, https://repo1.maven.org/maven2/org/objenesis/objenesis)
 - OkHttp (from https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp, https://square.github.io/okhttp/)
 - OkHttp Logging Interceptor (from https://github.com/square/okhttp, https://repo1.maven.org/maven2/com/squareup/okhttp3/logging-interceptor, https://square.github.io/okhttp/)
 - OkHttp URLConnection (from https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp-urlconnection, https://square.github.io/okhttp/)
@@ -478,12 +546,15 @@ The following software have components provided under the terms of this license:
 - RESTEasy Validator Provider BV 1.1 (from http://maven.apache.org)
 - RabbitMQ Java Client (from http://www.rabbitmq.com, https://www.rabbitmq.com)
 - Reactive Streams Netty driver (from https://github.com/reactor/reactor-netty)
+- Redisson (from http://redisson.org)
 - Retrofit (from https://github.com/square/retrofit, https://repo1.maven.org/maven2/com/squareup/retrofit2/retrofit)
 - RxJava (from https://github.com/ReactiveX/RxJava)
-- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
+- Simple XML (safe) (from https://github.com/dweiss/simplexml)
+- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org, https://bitbucket.org/snakeyaml/snakeyaml)
 - Spatial4J (from https://projects.eclipse.org/projects/locationtech.spatial4j)
 - Spring AMQP Core (from https://github.com/spring-projects/spring-amqp, https://projects.spring.io/spring-amqp)
 - Spring AOP (from http://www.springframework.org, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-aop)
+- Spring Aspects (from https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework)
 - Spring Beans (from http://www.springframework.org, https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-beans)
 - Spring Boot (from https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot, https://spring.io/projects/spring-boot)
 - Spring Boot AMPQ Starter (from http://projects.spring.io/spring-boot/, https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-amqp, https://spring.io/projects/spring-boot)
@@ -494,6 +565,7 @@ The following software have components provided under the terms of this license:
 - Spring Boot AutoConfigure (from http://projects.spring.io/spring-boot/, https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-autoconfigure, https://spring.io/projects/spring-boot)
 - Spring Boot Configuration Processor (from http://projects.spring.io/spring-boot/, https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-tools/spring-boot-configuration-processor, https://spring.io/projects/spring-boot)
 - Spring Boot Dependencies (from http://projects.spring.io/spring-boot/, https://projects.spring.io/spring-boot/#, https://spring.io/projects/spring-boot)
+- Spring Boot JDBC Starter (from http://projects.spring.io/spring-boot/, https://spring.io/projects/spring-boot)
 - Spring Boot Jersey Starter (from http://projects.spring.io/spring-boot/, https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-jersey, https://spring.io/projects/spring-boot)
 - Spring Boot Json Starter (from https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-json, https://spring.io/projects/spring-boot)
 - Spring Boot Log4j 2 Starter (from http://projects.spring.io/spring-boot/, https://projects.spring.io/spring-boot/#/spring-boot-parent/spring-boot-starters/spring-boot-starter-log4j2, https://spring.io/projects/spring-boot)
@@ -512,12 +584,13 @@ The following software have components provided under the terms of this license:
 - Spring Data Core (from https://repo1.maven.org/maven2/org/springframework/data/spring-data-commons)
 - Spring Data MongoDB - Core (from https://repo1.maven.org/maven2/org/springframework/data/spring-data-mongodb)
 - Spring Expression Language (SpEL) (from https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-expression)
+- Spring JDBC (from https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-jdbc)
 - Spring JMS (from http://www.springframework.org, https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-jms)
 - Spring Messaging (from https://github.com/spring-projects/spring-framework)
 - Spring RabbitMQ Support (from https://github.com/spring-projects/spring-amqp, https://projects.spring.io/spring-amqp)
-- Spring Retry (from http://www.springsource.org)
+- Spring Retry (from http://www.springsource.org, https://www.springsource.org)
 - Spring Security - Core (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-core, https://spring.io/projects/spring-security, https://spring.io/spring-security)
-- Spring Security - Namespace Configuration Module (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-config, https://spring.io/spring-security)
+- Spring Security - Namespace Configuration Module (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-config, https://spring.io/projects/spring-security, https://spring.io/spring-security)
 - Spring Security - Web Application Security Module (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-web, https://spring.io/projects/spring-security, https://spring.io/spring-security)
 - Spring TestContext Framework (from https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework)
 - Spring Transaction (from https://github.com/SpringSource/spring-framework, https://github.com/spring-projects/spring-framework)
@@ -534,6 +607,8 @@ The following software have components provided under the terms of this license:
 - aggs-matrix-stats (from https://github.com/elastic/elasticsearch)
 - compiler (from http://github.com/spullara/mustache.java)
 - datastore-v1-proto-client (from https://repo1.maven.org/maven2/com/google/cloud/datastore/datastore-v1-proto-client)
+- documentdb-bulkexecutor (from http://azure.microsoft.com/en-us/services/documentdb/)
+- elasticsearch (from https://github.com/elastic/elasticsearch, https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch)
 - elasticsearch-cli (from https://github.com/elastic/elasticsearch)
 - elasticsearch-core (from https://github.com/elastic/elasticsearch)
 - elasticsearch-secure-sm (from https://github.com/elastic/elasticsearch)
@@ -555,6 +630,7 @@ The following software have components provided under the terms of this license:
 - jakarta.inject (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/jakarta.inject)
 - java-cloudant (from https://cloudant.com)
 - javatuples (from http://www.javatuples.org)
+- javax.annotation-api (from http://jcp.org/en/jsr/detail?id=250)
 - javax.inject (from http://code.google.com/p/atinject/, https://repo1.maven.org/maven2/org/glassfish/hk2/external/javax.inject)
 - javax.ws.rs-api (from http://jax-rs-spec.java.net, https://github.com/eclipse-ee4j/jaxrs-api)
 - jersey-container-servlet (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet)
@@ -577,6 +653,7 @@ The following software have components provided under the terms of this license:
 - lettuce (from http://github.com/mp911de/lettuce/wiki, https://github.com/lettuce-io/lettuce-core/wiki)
 - micrometer-core (from https://github.com/micrometer-metrics/micrometer)
 - micrometer-registry-azure-monitor (from https://github.com/micrometer-metrics/micrometer)
+- minio (from https://github.com/minio/minio-java)
 - null (from https://github.com/fge/jackson-coreutils)
 - org.apiguardian:apiguardian-api (from https://github.com/apiguardian-team/apiguardian)
 - org.conscrypt:conscrypt-openjdk-uber (from https://conscrypt.org/)
@@ -599,12 +676,13 @@ The following software have components provided under the terms of this license:
 - proto-google-common-protos (from https://github.com/googleapis/api-client-staging, https://github.com/googleapis/googleapis, https://github.com/googleapis/java-iam/proto-google-common-protos)
 - proto-google-iam-v1 (from https://github.com/googleapis/googleapis, https://github.com/googleapis/java-iam/proto-google-iam-v1)
 - rank-eval (from https://github.com/elastic/elasticsearch)
-- resilience4j (from https://github.com/resilience4j/resilience4j, ttps://resilience4j.readme.io)
+- resilience4j (from https://github.com/resilience4j/resilience4j, https://resilience4j.readme.io, ttps://resilience4j.readme.io)
 - rest (from https://github.com/elastic/elasticsearch)
 - rest-high-level (from https://github.com/elastic/elasticsearch)
 - spring-security-crypto (from http://spring.io/spring-security, https://spring.io/projects/spring-security, https://spring.io/spring-security)
 - swagger-annotations (from https://repo1.maven.org/maven2/io/swagger/core/v3/swagger-annotations, https://repo1.maven.org/maven2/io/swagger/swagger-annotations)
 - swagger-jaxrs (from https://repo1.maven.org/maven2/io/swagger/swagger-jaxrs)
+- t-digest (from https://github.com/tdunning/t-digest)
 - tomcat-annotations-api (from http://tomcat.apache.org/, https://tomcat.apache.org/)
 - tomcat-embed-core (from http://tomcat.apache.org/)
 - tomcat-embed-el (from http://tomcat.apache.org/, https://tomcat.apache.org/)
@@ -620,11 +698,26 @@ The following software have components provided under the terms of this license:
 - ASM Commons (from http://asm.ow2.io/, https://repo1.maven.org/maven2/org/ow2/asm/asm-commons)
 - ASM Tree (from http://asm.ow2.io/, https://repo1.maven.org/maven2/org/ow2/asm/asm-tree)
 - ASM Util (from http://asm.ow2.io/)
+- Apache Lucene (module: memory) (from https://lucene.apache.org/)
+- Apache Lucene (module: misc) (from https://lucene.apache.org/)
+- Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/)
+- Apache Lucene (module: suggest) (from https://lucene.apache.org/)
 - GAX (Google Api eXtensions) (from https://github.com/googleapis, https://github.com/googleapis/gax-java)
 - Hamcrest (from http://hamcrest.org/JavaHamcrest/)
-- Hamcrest Core (from http://hamcrest.org/, https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core)
+- Hamcrest Core (from http://hamcrest.org/, http://hamcrest.org/JavaHamcrest/, https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core)
 - HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
+- Jodd BeanUtil (from http://jodd.org)
+- Jodd Core (from http://jodd.org)
 - Lucene Common Analyzers (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-analyzers-common)
+- Lucene Grouping (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-grouping)
+- Lucene Highlighter (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-highlighter)
+- Lucene Join (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-join)
+- Lucene Memory (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-backward-codecs, https://repo1.maven.org/maven2/org/apache/lucene/lucene-memory)
+- Lucene Queries (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queries)
+- Lucene QueryParsers (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queryparser)
+- Lucene Sandbox (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-sandbox)
+- Lucene Spatial (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial)
+- Lucene Spatial 3D (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial3d)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - PostgreSQL JDBC Driver
 - Reflections (from http://code.google.com/p/reflections/, http://github.com/ronmamo/reflections)
@@ -654,18 +747,39 @@ The following software have components provided under the terms of this license:
 - ASM Util (from http://asm.ow2.io/)
 - ASM library repackaged as OSGi bundle (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/asm-all-repackaged)
 - Apache Commons Codec (from http://commons.apache.org/proper/commons-codec/, https://commons.apache.org/proper/commons-codec/)
+- Apache Lucene (module: memory) (from https://lucene.apache.org/)
+- Apache Lucene (module: misc) (from https://lucene.apache.org/)
+- Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/)
+- Apache Lucene (module: suggest) (from https://lucene.apache.org/)
+- Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
 - AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
+- Class Model for Hk2 (from https://repo1.maven.org/maven2/org/glassfish/hk2/class-model)
+- Expression Language 3.0 (from http://el-spec.java.net, http://uel.java.net, https://projects.eclipse.org/projects/ee4j.el)
 - GAX (Google Api eXtensions) (from https://github.com/googleapis, https://github.com/googleapis/gax-java)
 - Google APIs Client Library for Java (from https://repo1.maven.org/maven2/com/google/api-client/google-api-client)
 - Google Auth Library for Java - Credentials (from https://repo1.maven.org/maven2/com/google/auth/google-auth-library-credentials)
 - Google Auth Library for Java - OAuth2 HTTP (from https://repo1.maven.org/maven2/com/google/auth/google-auth-library-oauth2-http)
+- HK2 Implementation Utilities (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-utils)
+- HK2 core module (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-core)
 - Hamcrest (from http://hamcrest.org/JavaHamcrest/)
-- Hamcrest Core (from http://hamcrest.org/, https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core)
+- Hamcrest Core (from http://hamcrest.org/, http://hamcrest.org/JavaHamcrest/, https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core)
 - HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
+- Jackson module: Afterburner (from http://wiki.fasterxml.com/JacksonHome, https://github.com/FasterXML/jackson-modules-base)
 - Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
+- Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Lucene Common Analyzers (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-analyzers-common)
 - Lucene Core (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-core)
+- Lucene Grouping (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-grouping)
+- Lucene Highlighter (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-highlighter)
+- Lucene Join (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-join)
+- Lucene Memory (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-backward-codecs, https://repo1.maven.org/maven2/org/apache/lucene/lucene-memory)
+- Lucene Queries (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queries)
+- Lucene QueryParsers (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queryparser)
+- Lucene Sandbox (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-sandbox)
+- Lucene Spatial (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial)
+- Lucene Spatial 3D (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial3d)
 - Lucene Suggest (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-suggest)
 - Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
@@ -678,17 +792,41 @@ The following software have components provided under the terms of this license:
 - PostgreSQL JDBC Driver
 - Protocol Buffer Java API (from http://code.google.com/p/protobuf, https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java)
 - Protocol Buffers [Util] (from https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java-util)
+- Redisson (from http://redisson.org)
 - Reflections (from http://code.google.com/p/reflections/, http://github.com/ronmamo/reflections)
-- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
+- ServiceLocator Default Implementation (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-locator)
+- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org, https://bitbucket.org/snakeyaml/snakeyaml)
 - Spring Core (from http://www.springframework.org, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-core)
 - ThreeTen backport (from https://github.com/ThreeTen/threetenbp, https://www.threeten.org/threetenbp)
+- aopalliance-repackaged (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/aopalliance-repackaged)
+- jakarta.inject (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/jakarta.inject)
 - jersey-container-servlet (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet)
 - jersey-container-servlet-core (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet-core)
 - jersey-core-client (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-client)
+- jersey-core-common (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-common)
 - jersey-core-server (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-server)
+- jersey-ext-bean-validation (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-bean-validation)
 - jersey-ext-entity-filtering (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-entity-filtering)
 - jersey-inject-hk2 (from https://repo1.maven.org/maven2/org/glassfish/jersey/inject/jersey-hk2)
 - jersey-media-jaxb (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-jaxb)
+- jersey-media-json-jackson (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-json-jackson)
+
+========================================================================
+Beerware
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Java SDK Web Module (from https://github.com/Microsoft/ApplicationInsights-Java)
+- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
+
+========================================================================
+BouncyCastle
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Bouncy Castle Provider (from http://www.bouncycastle.org/java.html, https://www.bouncycastle.org/java.html)
 
 ========================================================================
 CC-BY-2.5
@@ -696,12 +834,16 @@ CC-BY-2.5
 The following software have components provided under the terms of this license:
 
 - "Java Concurrency in Practice" book annotations (from http://jcip.net/)
+- Apache HttpCore (from http://hc.apache.org/httpcomponents-core-ga, http://hc.apache.org/httpcomponents-core-ga/, http://hc.apache.org/httpcomponents-core/)
 - FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
-- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org)
+- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
 
 ========================================================================
 CC-BY-4.0
 ========================================================================
+The following software have components provided under the terms of this license:
+
+- Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Web Module (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
@@ -711,6 +853,24 @@ CC0-1.0
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- Guava: Google Core Libraries for Java (from http://code.google.com/p/guava-libraries, https://github.com/google/guava, https://repo1.maven.org/maven2/com/google/guava/guava)
+- HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
+- Hibernate Validator (from https://repo1.maven.org/maven2/org/hibernate/hibernate-validator, https://repo1.maven.org/maven2/org/hibernate/validator/hibernate-validator)
+- LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
+- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
+- Netty/Common (from https://repo1.maven.org/maven2/io/netty/netty-common)
+- RabbitMQ Java Client (from http://www.rabbitmq.com, https://www.rabbitmq.com)
+- jersey-container-servlet (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet)
+- jersey-container-servlet-core (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet-core)
+- jersey-core-client (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-client)
+- jersey-core-common (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-common)
+- jersey-core-server (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-server)
+- jersey-ext-bean-validation (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-bean-validation)
+- jersey-ext-entity-filtering (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-entity-filtering)
+- jersey-inject-hk2 (from https://repo1.maven.org/maven2/org/glassfish/jersey/inject/jersey-hk2)
+- jersey-media-jaxb (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-jaxb)
+- jersey-media-json-jackson (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-json-jackson)
+- jersey-spring5 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring5)
 - reactive-streams (from http://www.reactive-streams.org/)
 
 ========================================================================
@@ -719,7 +879,9 @@ CDDL-1.0
 The following software have components provided under the terms of this license:
 
 - ASM library repackaged as OSGi bundle (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/asm-all-repackaged)
+- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
 - Class Model for Hk2 (from https://repo1.maven.org/maven2/org/glassfish/hk2/class-model)
+- Expression Language 3.0 API (from http://uel-spec.java.net, http://uel.java.net)
 - HK2 Implementation Utilities (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-utils)
 - HK2 Spring Bridge (from https://repo1.maven.org/maven2/org/glassfish/hk2/spring-bridge)
 - HK2 config types (from https://repo1.maven.org/maven2/org/glassfish/hk2/config-types)
@@ -729,9 +891,15 @@ The following software have components provided under the terms of this license:
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JSR 311 API (from https://jsr311.dev.java.net, https://jsr311.dev.java.net/)
 - Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Servlet (from http://servlet-spec.java.net, https://javaee.github.io/servlet-spec/, https://projects.eclipse.org/projects/ee4j.servlet)
+- Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
+- JavaBeans Activation Framework (from https://repo1.maven.org/maven2/com/sun/activation/javax.activation)
+- JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
+- OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
 - Run Level Service (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-runlevel)
 - ServiceLocator Default Implementation (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-locator)
 - aopalliance-repackaged (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/aopalliance-repackaged)
+- javax.annotation-api (from http://jcp.org/en/jsr/detail?id=250)
 - javax.ws.rs-api (from http://jax-rs-spec.java.net, https://github.com/eclipse-ee4j/jaxrs-api)
 - jersey-client (from https://repo1.maven.org/maven2/com/sun/jersey/jersey-client)
 - jersey-container-servlet (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet)
@@ -750,26 +918,32 @@ CDDL-1.1
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- Class Model for Hk2 (from https://repo1.maven.org/maven2/org/glassfish/hk2/class-model)
 - Common Annotations 1.2 API
 - Expression Language 3.0 API (from http://uel-spec.java.net, http://uel.java.net)
 - HK2 Spring Bridge (from https://repo1.maven.org/maven2/org/glassfish/hk2/spring-bridge)
 - HK2 config types (from https://repo1.maven.org/maven2/org/glassfish/hk2/config-types)
 - HK2 configuration module (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-config)
+- HK2 core module (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-core)
 - HK2 module of HK2 itself (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2)
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JSR 311 API (from https://jsr311.dev.java.net, https://jsr311.dev.java.net/)
 - JSR 353 (JSON Processing) Default Provider (from http://jsonp.java.net)
-- Jakarta Servlet (from http://servlet-spec.java.net, https://projects.eclipse.org/projects/ee4j.servlet)
+- Jakarta Servlet (from http://servlet-spec.java.net, https://javaee.github.io/servlet-spec/, https://projects.eclipse.org/projects/ee4j.servlet)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
-- JavaBeans Activation Framework
+- JavaBeans Activation Framework (from https://repo1.maven.org/maven2/com/sun/activation/javax.activation)
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - JavaMail API (from https://repo1.maven.org/maven2/com/sun/mail/javax.mail)
 - OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
 - Run Level Service (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-runlevel)
+- ServiceLocator Default Implementation (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-locator)
 - javax.annotation-api (from http://jcp.org/en/jsr/detail?id=250)
 - jersey-client (from https://repo1.maven.org/maven2/com/sun/jersey/jersey-client)
+- jersey-core-client (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-client)
+- jersey-core-server (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-server)
 - jersey-ext-bean-validation (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-bean-validation)
+- jersey-inject-hk2 (from https://repo1.maven.org/maven2/org/glassfish/jersey/inject/jersey-hk2)
 - jersey-spring4 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring4)
 - tomcat-embed-core (from http://tomcat.apache.org/)
 
@@ -800,7 +974,10 @@ The following software have components provided under the terms of this license:
 - JUnit Platform Commons (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Platform Engine API (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Vintage Engine (from http://junit.org/junit5/, https://junit.org/junit5/)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
+- Jakarta Bean Validation API (from https://beanvalidation.org)
+- Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Logback Classic Module (from http://logback.qos.ch, https://repo1.maven.org/maven2/ch/qos/logback/logback-classic)
 - Logback Contrib :: JSON :: Classic (from https://repo1.maven.org/maven2/ch/qos/logback/contrib/logback-json-classic)
 - Logback Contrib :: JSON :: Core (from https://repo1.maven.org/maven2/ch/qos/logback/contrib/logback-json-core)
@@ -812,7 +989,7 @@ The following software have components provided under the terms of this license:
 - OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
 - Run Level Service (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-runlevel)
 - ServiceLocator Default Implementation (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-locator)
-- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
+- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org, https://bitbucket.org/snakeyaml/snakeyaml)
 - aopalliance-repackaged (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/aopalliance-repackaged)
 - jakarta.inject (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/jakarta.inject)
 - javax.ws.rs-api (from http://jax-rs-spec.java.net, https://github.com/eclipse-ee4j/jaxrs-api)
@@ -831,6 +1008,9 @@ The following software have components provided under the terms of this license:
 ========================================================================
 EPL-2.0
 ========================================================================
+The following software have components provided under the terms of this license:
+
+- AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
 - Class Model for Hk2 (from https://repo1.maven.org/maven2/org/glassfish/hk2/class-model)
 - Expression Language 3.0 (from http://el-spec.java.net, http://uel.java.net, https://projects.eclipse.org/projects/ee4j.el)
 - HK2 Implementation Utilities (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-utils)
@@ -844,7 +1024,11 @@ EPL-2.0
 - JUnit Platform Commons (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Platform Engine API (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Vintage Engine (from http://junit.org/junit5/, https://junit.org/junit5/)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
+- Jakarta Bean Validation API (from https://beanvalidation.org)
+- Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
+- Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
 - Run Level Service (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-runlevel)
 - ServiceLocator Default Implementation (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-locator)
@@ -870,6 +1054,7 @@ The following software have components provided under the terms of this license:
 
 - ASM library repackaged as OSGi bundle (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/asm-all-repackaged)
 - Class Model for Hk2 (from https://repo1.maven.org/maven2/org/glassfish/hk2/class-model)
+- Expression Language 3.0 (from http://el-spec.java.net, http://uel.java.net, https://projects.eclipse.org/projects/ee4j.el)
 - Expression Language 3.0 API (from http://uel-spec.java.net, http://uel.java.net)
 - HK2 Implementation Utilities (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-utils)
 - HK2 Spring Bridge (from https://repo1.maven.org/maven2/org/glassfish/hk2/spring-bridge)
@@ -879,7 +1064,9 @@ The following software have components provided under the terms of this license:
 - HK2 module of HK2 itself (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2)
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JSR 353 (JSON Processing) Default Provider (from http://jsonp.java.net)
-- Jakarta Servlet (from http://servlet-spec.java.net, https://projects.eclipse.org/projects/ee4j.servlet)
+- Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
+- Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
+- Jakarta Servlet (from http://servlet-spec.java.net, https://javaee.github.io/servlet-spec/, https://projects.eclipse.org/projects/ee4j.servlet)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
 - JavaBeans Activation Framework
@@ -889,6 +1076,7 @@ The following software have components provided under the terms of this license:
 - Run Level Service (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-runlevel)
 - ServiceLocator Default Implementation (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2-locator)
 - aopalliance-repackaged (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/aopalliance-repackaged)
+- jakarta.inject (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/jakarta.inject)
 - javax.annotation-api (from http://jcp.org/en/jsr/detail?id=250)
 - javax.ws.rs-api (from http://jax-rs-spec.java.net, https://github.com/eclipse-ee4j/jaxrs-api)
 - jersey-client (from https://repo1.maven.org/maven2/com/sun/jersey/jersey-client)
@@ -904,12 +1092,15 @@ The following software have components provided under the terms of this license:
 - jersey-media-jaxb (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-jaxb)
 - jersey-media-json-jackson (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-json-jackson)
 - jersey-spring4 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring4)
+- jersey-spring5 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring5)
 - tomcat-embed-core (from http://tomcat.apache.org/)
 
 ========================================================================
 GPL-2.0-or-later
 ========================================================================
-- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
+The following software have components provided under the terms of this license:
+
+- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org, https://bitbucket.org/snakeyaml/snakeyaml)
 
 ========================================================================
 GPL-2.0-with-classpath-exception
@@ -926,11 +1117,14 @@ The following software have components provided under the terms of this license:
 - HK2 module of HK2 itself (from https://repo1.maven.org/maven2/org/glassfish/hk2/hk2)
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JSR 353 (JSON Processing) Default Provider (from http://jsonp.java.net)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
-- Jakarta Servlet (from http://servlet-spec.java.net, https://projects.eclipse.org/projects/ee4j.servlet)
+- Jakarta Bean Validation API (from https://beanvalidation.org)
+- Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
+- Jakarta Servlet (from http://servlet-spec.java.net, https://javaee.github.io/servlet-spec/, https://projects.eclipse.org/projects/ee4j.servlet)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
-- JavaBeans Activation Framework
+- JavaBeans Activation Framework (from https://repo1.maven.org/maven2/com/sun/activation/javax.activation)
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
 - OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
 - RabbitMQ Java Client (from http://www.rabbitmq.com, https://www.rabbitmq.com)
@@ -963,6 +1157,7 @@ The following software have components provided under the terms of this license:
 
 - Expression Language 3.0 (from http://el-spec.java.net, http://uel.java.net, https://projects.eclipse.org/projects/ee4j.el)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
+- Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
 - OSGi resource locator (from https://repo1.maven.org/maven2/org/glassfish/hk2/osgi-resource-locator)
 - Project Lombok (from http://projectlombok.org, https://projectlombok.org)
 - javax.ws.rs-api (from http://jax-rs-spec.java.net, https://github.com/eclipse-ee4j/jaxrs-api)
@@ -978,9 +1173,59 @@ GPL-3.0-or-later
 - null (from https://github.com/fge/jackson-coreutils)
 
 ========================================================================
+ICU
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Apache Lucene (module: memory) (from https://lucene.apache.org/)
+- Apache Lucene (module: misc) (from https://lucene.apache.org/)
+- Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/)
+- Apache Lucene (module: suggest) (from https://lucene.apache.org/)
+- Lucene Grouping (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-grouping)
+- Lucene Highlighter (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-highlighter)
+- Lucene Join (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-join)
+- Lucene Memory (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-backward-codecs, https://repo1.maven.org/maven2/org/apache/lucene/lucene-memory)
+- Lucene Spatial (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial)
+- Lucene Spatial 3D (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial3d)
+
+========================================================================
+IPA
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Lucene Common Analyzers (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-analyzers-common)
+
+========================================================================
+ISC
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Java Native Access Platform (from https://github.com/java-native-access/jna)
+- Lucene Sandbox (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-sandbox)
+- Spring Security - Core (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-core, https://spring.io/projects/spring-security, https://spring.io/spring-security)
+- elasticsearch (from https://github.com/elastic/elasticsearch, https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch)
+- spring-security-crypto (from http://spring.io/spring-security, https://spring.io/projects/spring-security, https://spring.io/spring-security)
+
+========================================================================
+ImageMagick
+========================================================================
+The following software have components provided under the terms of this license:
+
+- aalto-xml (from https://github.com/FasterXML/aalto-xml, https://repo1.maven.org/maven2/com/fasterxml/aalto-xml)
+
+========================================================================
 JSON
 ========================================================================
+The following software have components provided under the terms of this license:
+
 - JSON in Java (from https://github.com/douglascrockford/JSON-java)
+
+========================================================================
+LGPL-2.0-or-later
+========================================================================
+The following software have components provided under the terms of this license:
+
+- JTS Topology Suite (from http://sourceforge.net/projects/jts-topo-suite)
 
 ========================================================================
 LGPL-2.1-only
@@ -1003,9 +1248,12 @@ The following software have components provided under the terms of this license:
 ========================================================================
 LGPL-2.1-or-later
 ========================================================================
+The following software have components provided under the terms of this license:
+
 - JTS Topology Suite (from http://sourceforge.net/projects/jts-topo-suite)
+- Java Native Access (from https://github.com/java-native-access/jna, https://github.com/twall/jna, https://repo1.maven.org/maven2/net/java/dev/jna/jna)
 - Javassist (from http://www.javassist.org/)
-- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org)
+- SnakeYAML (from http://code.google.com/p/snakeyaml/, http://www.snakeyaml.org, https://bitbucket.org/snakeyaml/snakeyaml)
 
 ========================================================================
 LGPL-3.0-only
@@ -1036,6 +1284,15 @@ The following software have components provided under the terms of this license:
 - AWS Java SDK for AWS License Manager (from https://aws.amazon.com/sdkforjava)
 - AWS SDK for Java - Models (from https://aws.amazon.com/sdkforjava)
 - Animal Sniffer Annotations (from https://repo1.maven.org/maven2/org/codehaus/mojo/animal-sniffer-annotations)
+- Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client)
+- Apache Log4j API (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api)
+- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
+- Apache Log4j SLF4J Binding (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl)
+- Apache Log4j to SLF4J Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-to-slf4j)
+- Apache Lucene (module: memory) (from https://lucene.apache.org/)
+- Apache Lucene (module: misc) (from https://lucene.apache.org/)
+- Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/)
+- Apache Lucene (module: suggest) (from https://lucene.apache.org/)
 - Azure AD Spring Security Integration Spring Boot Starter (from https://github.com/Azure/azure-sdk-for-java, https://github.com/Microsoft/azure-spring-boot)
 - Azure Java Client Authentication Library for AutoRest (from https://github.com/Azure/autorest-clientruntime-for-java)
 - Azure Java Client Runtime for ARM (from https://github.com/Azure/autorest-clientruntime-for-java)
@@ -1046,10 +1303,20 @@ The following software have components provided under the terms of this license:
 - Extensions on Apache Proton-J library (from https://github.com/Azure/qpid-proton-j-extensions)
 - JOpt Simple (from http://jopt-simple.github.io/jopt-simple, http://pholser.github.io/jopt-simple)
 - JUL to SLF4J bridge (from http://www.slf4j.org)
+- Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Java Client Runtime for AutoRest (from https://github.com/Azure/autorest-clientruntime-for-java)
 - Java JWT (from http://www.jwt.io, https://github.com/auth0/java-jwt)
+- Lucene Common Analyzers (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-analyzers-common)
 - Lucene Core (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-core)
+- Lucene Grouping (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-grouping)
+- Lucene Highlighter (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-highlighter)
+- Lucene Join (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-join)
+- Lucene Memory (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-backward-codecs, https://repo1.maven.org/maven2/org/apache/lucene/lucene-memory)
+- Lucene Queries (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queries)
+- Lucene QueryParsers (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queryparser)
 - Lucene Sandbox (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-sandbox)
+- Lucene Spatial (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial)
+- Lucene Spatial 3D (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial3d)
 - Microsoft Application Insights Java SDK Core (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Web Module (from https://github.com/Microsoft/ApplicationInsights-Java)
@@ -1063,13 +1330,14 @@ The following software have components provided under the terms of this license:
 - Microsoft Azure SDK for Service Bus (from https://github.com/Azure/azure-sdk-for-java, https://github.com/Azure/azure-service-bus-java)
 - Microsoft Azure SDK for eventgrid (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure client library for Blob Storage (from https://github.com/Azure/azure-sdk-for-java)
+- Microsoft Azure client library for File Storage Data Lake (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure client library for Identity (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure client library for KeyVault Keys (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure client library for KeyVault Secrets (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure common module for Storage (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure internal Avro module for Storage (from https://github.com/Azure/azure-sdk-for-java)
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
-- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org)
+- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
 - Netty/Codec/HTTP (from https://repo1.maven.org/maven2/io/netty/netty-codec-http)
 - Netty/Common (from https://repo1.maven.org/maven2/io/netty/netty-common)
 - Plexus Compiler Api (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-api)
@@ -1077,12 +1345,14 @@ The following software have components provided under the terms of this license:
 - Plexus Javac Component (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-javac)
 - PowerMock (from http://www.powermock.org, https://repo1.maven.org/maven2/org/powermock/powermock-api-mockito)
 - Project Lombok (from http://projectlombok.org, https://projectlombok.org)
+- QpidJMS Client (from https://repo1.maven.org/maven2/org/apache/qpid/qpid-jms-client)
 - SLF4J API Module (from http://www.slf4j.org)
 - SLF4J JDK14 Binding (from http://www.slf4j.org)
 - SLF4J Simple Binding (from http://www.slf4j.org)
 - Spongy Castle (from http://rtyley.github.io/spongycastle/)
 - Spring Data for Azure Cosmos DB SQL API (from https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/cosmos/azure-spring-data-cosmos)
 - Spring Security - Core (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-core, https://spring.io/projects/spring-security, https://spring.io/spring-security)
+- ThreeTen backport (from https://github.com/ThreeTen/threetenbp, https://www.threeten.org/threetenbp)
 - adal4j (from https://github.com/AzureAD/azure-activedirectory-library-for-java)
 - azure-documentdb (from http://azure.microsoft.com/en-us/services/documentdb/, https://azure.microsoft.com/en-us/services/cosmos-db/)
 - documentdb-bulkexecutor (from http://azure.microsoft.com/en-us/services/documentdb/)
@@ -1090,15 +1360,19 @@ The following software have components provided under the terms of this license:
 - jersey-container-servlet (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet)
 - jersey-container-servlet-core (from https://repo1.maven.org/maven2/org/glassfish/jersey/containers/jersey-container-servlet-core)
 - jersey-core-client (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-client)
+- jersey-core-common (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-common)
+- jersey-core-server (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-server)
 - jersey-ext-bean-validation (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-bean-validation)
 - jersey-ext-entity-filtering (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-entity-filtering)
 - jersey-inject-hk2 (from https://repo1.maven.org/maven2/org/glassfish/jersey/inject/jersey-hk2)
 - jersey-media-jaxb (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-jaxb)
+- jersey-media-json-jackson (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-json-jackson)
 - jersey-spring5 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring5)
 - micrometer-core (from https://github.com/micrometer-metrics/micrometer)
 - mockito-junit-jupiter (from https://github.com/mockito/mockito)
 - msal4j (from https://github.com/AzureAD/microsoft-authentication-library-for-java)
 - msal4j-persistence-extension (from https://github.com/AzureAD/microsoft-authentication-extensions-for-java)
+- qpid-proton-j-extensions (from https://github.com/Azure/qpid-proton-j-extensions)
 - spring-security-crypto (from http://spring.io/spring-security, https://spring.io/projects/spring-security, https://spring.io/spring-security)
 
 ========================================================================
@@ -1132,6 +1406,13 @@ Public-Domain
 - jersey-core-server (from https://repo1.maven.org/maven2/org/glassfish/jersey/core/jersey-server)
 
 ========================================================================
+RSA-MD
+========================================================================
+The following software have components provided under the terms of this license:
+
+- AWS Java SDK for Amazon SQS (from https://aws.amazon.com/sdkforjava)
+
+========================================================================
 SunPro
 ========================================================================
 The following software have components provided under the terms of this license:
@@ -1153,7 +1434,28 @@ W3C
 ========================================================================
 WTFPL
 ========================================================================
+The following software have components provided under the terms of this license:
+
 - Reflections (from http://code.google.com/p/reflections/, http://github.com/ronmamo/reflections)
+
+========================================================================
+X11
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Lucene Common Analyzers (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-analyzers-common)
+- Lucene Queries (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queries)
+- Lucene QueryParsers (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-queryparser)
+- Lucene Sandbox (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-sandbox)
+- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
+
+========================================================================
+cc-pd
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Guava: Google Core Libraries for Java (from http://code.google.com/p/guava-libraries, https://github.com/google/guava, https://repo1.maven.org/maven2/com/google/guava/guava)
+- Netty/Codec (from https://repo1.maven.org/maven2/io/netty/netty-codec)
 
 ========================================================================
 public-domain
@@ -1212,3 +1514,10 @@ The following software have components provided under the terms of this license:
 - jersey-media-jaxb (from https://repo1.maven.org/maven2/org/glassfish/jersey/media/jersey-media-jaxb)
 - jersey-spring4 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring4)
 - jersey-spring5 (from https://repo1.maven.org/maven2/org/glassfish/jersey/ext/jersey-spring5)
+
+========================================================================
+xpp
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
