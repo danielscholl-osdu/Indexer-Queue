@@ -24,3 +24,9 @@ osdu-gcp-dev2-test:
   script:
     - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
     - exit 1
+
+osdu-gcp-anthos-test:
+  allow_failure: true
+  script:
+    - echo "This is a stub. The service doesn't support the step."
+    - exit 1
