@@ -61,12 +61,11 @@ public class EnqueueApi {
 				.build();
 
 		HttpStatus response = publisher.sendMessage(cloudTaskRequest, headersInfo.getHeaders());
-		return new ResponseEntity<>(response);
+		return new ResponseEntity<>("", response);
 	}
 
 	private void putAdditionalHeaders() {
 		DpsHeaders headers = this.headersInfo.getHeaders();
-
 		headers.getHeaders().put(DpsHeaders.ACCOUNT_ID, message.getDataPartitionId());
 		headers.put(DpsHeaders.DATA_PARTITION_ID, message.getDataPartitionId());
 		if (message.hasCorrelationId()) {

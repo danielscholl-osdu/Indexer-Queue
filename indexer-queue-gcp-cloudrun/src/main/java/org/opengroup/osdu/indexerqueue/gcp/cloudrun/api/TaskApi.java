@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.opengroup.osdu.core.common.SwaggerDoc;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.CloudTaskRequest;
-import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.common.model.search.SearchServiceRole;
 import org.opengroup.osdu.indexerqueue.gcp.cloudrun.oqm.publish.MessagePublisher;
 import org.springframework.http.HttpStatus;
@@ -45,7 +44,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskApi {
 
   final MessagePublisher publisher;
-  private final RecordChangedMessages message;
   private final DpsHeaders headers;
 
   @PostMapping(value = "/enqueue", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -54,11 +52,10 @@ public class TaskApi {
   public ResponseEntity<String> enqueueTask(
       @NotNull(message = SwaggerDoc.REQUEST_VALIDATION_NOT_NULL_BODY) @Valid @RequestBody CloudTaskRequest request)
       throws IOException {
-
     HttpStatus response = publisher.sendMessage(request, headers);
-
     // Spring MVC will set content-type as JSON only if the response body is present even empty,
     // keep it for indexer service, he can't process text/plain responses
     return new ResponseEntity<>("", response);
   }
+
 }

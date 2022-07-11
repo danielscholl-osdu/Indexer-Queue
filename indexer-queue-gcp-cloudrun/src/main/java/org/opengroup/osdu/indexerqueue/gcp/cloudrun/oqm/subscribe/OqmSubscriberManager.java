@@ -158,8 +158,8 @@ public class OqmSubscriberManager {
       oqmAckReplier.ack();
     }
 
-    HttpStatus response = messagePublisher.sendMessage(request, headers);
-    log.debug("OQM: Send request to Indexer. Response: {}", response);
+    messagePublisher.sendMessage(request, headers);
+    log.debug("OQM: Send request for Indexer processing.");
     // ack message always due to retries in publisher side
     oqmAckReplier.ack();
   }
