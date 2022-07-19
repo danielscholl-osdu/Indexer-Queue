@@ -4,19 +4,19 @@
 
 data:
   # common
-  log_level: "INFO"
-  osdu_entitlements_url: "http://entitlements/api/entitlements/v2"
-  partition_api: "http://partition/api/partition/v1/"
-  spring_profiles_active: "gcp"
+  logLevel: "INFO"
+  entitlementsHost: "http://entitlements"
+  partitionHost: "http://partition"
+  springProfilesActive: "gcp"
   # gcp
-  cloud_task_target_host: ""
-  google_audiences: ""
-  google_cloud_project: ""
-  google_cloud_project_region: ""
-  indexer_queue_identifier: ""
+  cloudTaskTargetHost: ""
+  googleAudiences: ""
+  googleCloudProject: ""
+  googleCloudProjectRegion: ""
+  indexerQueueIdentifier: ""
   # anthos
-  indexer_host: "http://indexer"
+  indexerHost: "http://indexer"
 conf:
-  app_name: "indexer-queue"
+  appName: "indexer-queue"
   configmap: "indexer-queue-config"
-  on_prem_enabled: false
+  onPremEnabled: false

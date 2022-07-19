@@ -3,17 +3,17 @@
 # Declare variables to be passed into your templates.
 
 data:
-  requests_cpu: "0.1"
-  requests_memory: "384M"
-  limits_cpu: "1"
-  limits_memory: "1G"
+  requestsCpu: "0.1"
+  requestsMemory: "384M"
+  limitsCpu: "1"
+  limitsMemory: "1G"
   image: ""
   imagePullPolicy: "IfNotPresent"
   serviceAccountName: "indexer-queue"
 conf:
-  app_name: "indexer-queue"
+  appName: "indexer-queue"
   configmap: "indexer-queue-config"
-  keycloak_secret_name: "indexer-queue-keycloak-secret"
-  on_prem_enabled: false
-  rabbitmq_secret_name: "rabbitmq-secret"
+  keycloakSecretName: "indexer-queue-keycloak-secret"
+  rabbitmqSecretName: "rabbitmq-secret"
+  onPremEnabled: false
   domain: ""
