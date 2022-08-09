@@ -36,7 +36,3 @@ analyze:
     type: mvn
     target: indexer-queue-gcp-cloudrun/pom.xml
     path: .
-  - name: indexer-queue-reference
-    type: mvn
-    target: indexer-queue-reference/pom.xml
-    path: .
