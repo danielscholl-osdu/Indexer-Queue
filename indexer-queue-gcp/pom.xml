@@ -76,7 +76,7 @@
             <dependency>
                 <groupId>org.opengroup.osdu</groupId>
                 <artifactId>os-core-common</artifactId>
-                <version>0.16.0-rc2</version>
+                <version>0.16.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -87,12 +87,12 @@
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
             <artifactId>os-core-common</artifactId>
-            <version>0.16.0-rc2</version>
+            <version>0.16.0</version>
         </dependency>
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
             <artifactId>core-lib-gcp</artifactId>
-            <version>0.16.0-rc1</version>
+            <version>0.16.0</version>
         </dependency>
         <!-- spring boot dependencies -->
         <dependency>
