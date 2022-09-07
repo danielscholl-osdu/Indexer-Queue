@@ -1185,6 +1185,9 @@ The following software have components provided under the terms of this license:
 ========================================================================
 GPL-3.0-or-later
 ========================================================================
+The following software have components provided under the terms of this license:
+
+- aopalliance-repackaged (from https://repo1.maven.org/maven2/org/glassfish/hk2/external/aopalliance-repackaged)
 - json-patch (from https://github.com/fge/json-patch)
 - null (from https://github.com/fge/jackson-coreutils)
 

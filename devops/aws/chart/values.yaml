@@ -1,0 +1,51 @@
+# Service Config
+image: __CONTAINER__
+imagePullPolicy: IfNotPresent
+serviceParameters:
+- objectName: "/osdu/{{ .Values.global.resourcePrefix }}/storage/storage-sqs-url"
+  objectType: "ssmparameter"
+  objectAlias: storage-sqs-url
+- objectName: "/osdu/{{ .Values.global.resourcePrefix }}/indexer-queue/indexer-deadletter-queue-sqs-url"
+  objectType: "ssmparameter"
+  objectAlias: indexer-deadletter-queue-sqs-url
+environmentVariables:
+  - name: AWS_INDEXER_INDEX_API
+    value: http://os-indexer:8080
+  - name: AWS_REGION
+    value: "{{ .Values.global.region }}"
+  - name: ENVIRONMENT
+    value: "{{ .Values.global.resourcePrefix }}"
+  - name: JAVA_OPTS
+    value: "-Xms538M -Xmx900M"
+  - name: SSM_ENABLED
+    value: "True"
+  - name: ENTITLEMENTS_BASE_URL
+    value: "http://os-entitlements:8080"
+  - name: PARAMETER_MOUNT_PATH
+    value: "/mnt/params"
+podAnnotations: {}
+
+# Resource Config
+replicaCount: 1
+resources:
+  limits:
+    memory: 900M
+  requests:
+    cpu: 500m
+    memory: 900M
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Security Config
+serviceAccountRole: arn:aws:iam::{{ .Values.global.accountID }}:role/{{ .Values.global.resourcePrefix }}-{{ include "common.name" . }}
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000

@@ -1,0 +1,4 @@
+{{- template "common.deployment" (list . "os-indexer-queue.deployment") -}}
+{{- define "os-indexer-queue.deployment" -}}
+## Define overrides for the service deployment resource here
+{{- end -}}
