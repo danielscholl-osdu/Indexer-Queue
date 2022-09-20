@@ -43,9 +43,12 @@ phases:
       - echo $JAVA_HOME #WHY
       - mkdir -p /root/.m2
       - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
-      - wget https://github.com/mikefarah/yq/releases/download/v4.27.2/yq_linux_amd64 -q -O /usr/bin/yq && chmod +x /usr/bin/yq
       - export AWS_ACCOUNT_ID=`aws sts get-caller-identity | grep Account | cut -d':' -f 2 | cut -d'"' -f 2`
       - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_OSDU_DEV_MAVEN_DOMAIN --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text`
+      # Install git secrets
+      - git clone https://github.com/awslabs/git-secrets.git
+      - cd git-secrets && make install && cd ..
+      - git secrets --install && git secrets --register-aws
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
@@ -65,10 +68,14 @@ phases:
       - export VERSION=${pom_version%-*}
       - printenv
 
+      - GIT_SECRETS_SCAN_RESULT=$(git secrets --scan 2> ${OUTPUT_DIR}/git_secrets.out.txt && echo OK || echo FAILED)
+      - if [ "$GIT_SECRETS_SCAN_RESULT" = "FAILED" ]; then echo "Secrets detected!" && exit 1; fi
+
       - echo "Building primary service assemblies..."
       - mvn -ntp -B test install sonar:sonar -pl .,indexer-queue-aws -Ddeployment.environment=prod -Dsonar.login=${SONAR_USERNAME} -Dsonar.password=${SONAR_PASSWORD} -Dsonar.branch.name=${BRANCH_NAME} 
 
-      - yq -i '.version = strenv(VERSION)' devops/aws/chart/Chart.yaml
+      - sed -i "s|__CHART_VERSION__|$VERSION|"  devops/aws/chart/Chart.yaml
+      - sed -i "s|__CONTAINER__|$ECR_IMAGE|"  devops/aws/chart/values.yaml
       - echo "--Copying Helm Charts to ${OUTPUT_DIR:-dist}--"
       - rsync -r devops/aws/* "${OUTPUT_DIR:-dist}"
 

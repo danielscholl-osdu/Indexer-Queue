@@ -41,7 +41,7 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Security Config
-serviceAccountRole: arn:aws:iam::{{ .Values.global.accountID }}:role/{{ .Values.global.resourcePrefix }}-{{ include "common.name" . }}
+serviceAccountRole: arn:aws:iam::{{ .Values.global.accountID }}:role/osdu-{{ .Values.global.resourcePrefix }}-{{ .Values.global.region }}-{{ include "common.name" . }}
 securityContext: {}
   # capabilities:
   #   drop:

@@ -14,5 +14,7 @@
 
 package org.opengroup.osdu.indexerqueue.aws.api;
 
+/* TODO
 public class IndexProcessorTest {
 }
+*/
