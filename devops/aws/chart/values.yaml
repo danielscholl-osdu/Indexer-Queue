@@ -1,6 +1,6 @@
 # Service Config
 image: __CONTAINER__
-imagePullPolicy: IfNotPresent
+imagePullPolicy: Always
 serviceParameters:
 - objectName: "/osdu/{{ .Values.global.resourcePrefix }}/storage/storage-sqs-url"
   objectType: "ssmparameter"
@@ -23,7 +23,8 @@ environmentVariables:
     value: "http://os-entitlements:8080"
   - name: PARAMETER_MOUNT_PATH
     value: "/mnt/params"
-podAnnotations: {}
+podAnnotations: 
+  seccomp.security.alpha.kubernetes.io/pod: "runtime/default"
 
 # Resource Config
 replicaCount: 1
@@ -42,10 +43,11 @@ autoscaling:
 
 # Security Config
 serviceAccountRole: arn:aws:iam::{{ .Values.global.accountID }}:role/osdu-{{ .Values.global.resourcePrefix }}-{{ .Values.global.region }}-{{ include "common.name" . }}
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext: 
+  runAsUser: 10001
+  runAsNonRoot: true
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
