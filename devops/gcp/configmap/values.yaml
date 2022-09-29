@@ -4,7 +4,7 @@
 
 data:
   # common
-  logLevel: "INFO"
+  logLevel: "ERROR"
   entitlementsHost: "http://entitlements"
   partitionHost: "http://partition"
   springProfilesActive: "gcp"
