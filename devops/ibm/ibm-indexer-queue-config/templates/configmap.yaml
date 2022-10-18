@@ -12,7 +12,7 @@ data:
   server.port: "{{ .Values.data.serverPort }}"
 
 #Authorization  
-  INDEXER_API_KEY: "{{.Values.data.indexerAPIKey"}}""
+  INDEXER_API_KEY: "{{.Values.data.indexerAPIKey}}"
   DEPLOYMENT_ENVIRONMENT: "{{ .Values.data.deployEnv }}"
 
 #tenant-validation
