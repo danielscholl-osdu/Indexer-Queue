@@ -10,10 +10,18 @@ data:
   logging.level.org.springframework.web: "{{ .Values.data.loggingLevelSpring }}"
   JAVA_APP_JAR: "{{ .Values.data.javaAppJar }}"
   server.port: "{{ .Values.data.serverPort }}"
+  ibm.health-check-uri: "/ah"
+  ibm.env.prefix: "{{ .Values.data.envPrefix }}"
+  
+#queue
+  RETRY_COUNT: "{{ .Values.data.retryCount }}"
 
 #Authorization  
   INDEXER_API_KEY: "{{.Values.data.indexerAPIKey}}"
   DEPLOYMENT_ENVIRONMENT: "{{ .Values.data.deployEnv }}"
+  
+#Indexer
+  INDEXER_URL: "http://{{ .Release.Name }}-ibm-indexer-deploy:8080"
 
 #tenant-validation
   PARTITION_API: "http://{{ .Release.Name }}-ibm-partition-deploy:8080/api/partition/v1"

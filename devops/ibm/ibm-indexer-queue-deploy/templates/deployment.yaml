@@ -19,6 +19,7 @@ spec:
       {{- end }}
       labels:
         {{- include "ibm-indexer-queue-deploy.selectorLabels" . | nindent 8 }}
+        sidecar.istio.io/inject: "{{ .Values.sidecarIstioInjected }}"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -36,12 +37,12 @@ spec:
           env:
             - name: amqphub.amqp10jms.username
               valueFrom:
-                secretzKeyRef:
+                secretKeyRef:
                   key: AMQ_USER
                   name: ex-aao-credentials-secret
             - name: amqphub.amqp10jms.password
               valueFrom:
-                secretzKeyRef:
+                secretKeyRef:
                   key: AMQ_PASSWORD
                   name: ex-aao-credentials-secret
           envFrom:
