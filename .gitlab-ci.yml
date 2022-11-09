@@ -15,6 +15,7 @@ variables:
   AZURE_SERVICE: indexer-queue
   AZURE_BUILD_SUBDIR: indexer-queue-azure-enqueue
   AZURE_TEST_SUBDIR: testing/indexer-queue-azure-enqueue
+  AZURE_SKIP_SWAGGER_TEST: "true"
 
   GCP_BUILD_SUBDIR: indexer-queue-gcp
   GCP_INT_TEST_SUBDIR: indexer-queue-gcp # Fix as soon as integration tests are added
@@ -50,6 +51,7 @@ include:
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/azure.yml"
 
+
   - project: "osdu/platform/ci-cd-pipelines"
     file: "publishing/pages.yml"
 
@@ -57,3 +59,4 @@ include:
     file: "cloud-providers/osdu-gcp-global.yml"
 
   - local: "devops/gcp/pipeline/override-stages.yml"
+

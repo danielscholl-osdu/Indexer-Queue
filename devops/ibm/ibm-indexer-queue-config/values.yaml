@@ -7,6 +7,10 @@ data:
   logPrefix: indexer-queue
   loggingLevelOsdu: info
   loggingLevelSpring: info
+  envPrefix: ibm-iks
+
+# queue
+  retryCount: 2
  
 #authorization
   deployEnv: CLOUD
