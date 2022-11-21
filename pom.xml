@@ -30,7 +30,7 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <log4j.version>2.17.1</log4j.version>
         <json-smart.version>2.4.7</json-smart.version>
-        <jackson-databind.version>2.13.2.2</jackson-databind.version>
+        <jackson-databind.version>2.13.4</jackson-databind.version>
     </properties>
 
     <licenses>
@@ -106,6 +106,10 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
             </exclusion>
+            <exclusion>
+                      <groupId>org.yaml</groupId>
+                      <artifactId>snakeyaml</artifactId>
+             </exclusion>
         </exclusions>
     </dependency>
 
@@ -128,12 +132,18 @@
     <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
-        <version>3.6.2.Final</version>
+        <version>3.15.3.Final</version>
     </dependency>
     <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-validator-provider-11</artifactId>
-        <version>3.6.2.Final</version>
+        <version>3.6.3.Final</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernat</groupId>
+          <artifactId>hibernate-validator</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
         <groupId>org.jboss.resteasy</groupId>
@@ -158,6 +168,12 @@
         <groupId>org.elasticsearch</groupId>
         <artifactId>elasticsearch</artifactId>
         <version>6.6.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.yaml</groupId>
+          <artifactId>snakeyaml</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
         <groupId>org.elasticsearch.client</groupId>
