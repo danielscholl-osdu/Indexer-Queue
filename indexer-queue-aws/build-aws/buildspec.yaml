@@ -46,6 +46,9 @@ phases:
       - export AWS_ACCOUNT_ID=`aws sts get-caller-identity | grep Account | cut -d':' -f 2 | cut -d'"' -f 2`
       - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_OSDU_DEV_MAVEN_DOMAIN --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text`
       # Install git secrets
+       #TODO temporarily adding hotfix, due to https://github.com/awslabs/git-secrets/issues/220
+      - export SAY_LOCATION=`ln -s "$(which echo)" say`
+      - export PATH="$PATH:$SAY_LOCATION"
       - git clone https://github.com/awslabs/git-secrets.git
       - cd git-secrets && make install && cd ..
       - git secrets --install && git secrets --register-aws
