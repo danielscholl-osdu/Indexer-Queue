@@ -26,35 +26,35 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 public class RetryConfig {
 
-    @Value("${retry.elongationPoint}")
-    private int elongationPoint;
-    @Value("${retry.multiplier}")
-    private int standardMultiplier;
-    @Value("${retry.maxRetryDuration}")
-    private int maxRetryDuration;
+  @Value("${retry.elongationPoint}")
+  private int elongationPoint;
+  @Value("${retry.multiplier}")
+  private int standardMultiplier;
+  @Value("${retry.maxRetryDuration}")
+  private int maxRetryDuration;
 
-    @Bean
-    public RetryTemplate retryTemplate() {
-        RetryTemplate retryTemplate = new RetryTemplate();
+  @Bean
+  public RetryTemplate retryTemplate() {
+    RetryTemplate retryTemplate = new RetryTemplate();
 
-        ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
-        exponentialBackOffPolicy.setInitialInterval(1000L);
-        exponentialBackOffPolicy.setMultiplier(2);
-        retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
+    ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
+    exponentialBackOffPolicy.setInitialInterval(1000L);
+    exponentialBackOffPolicy.setMultiplier(2);
+    retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
 
-        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-        retryPolicy.setMaxAttempts(6);
-        retryTemplate.setRetryPolicy(retryPolicy);
+    SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+    retryPolicy.setMaxAttempts(6);
+    retryTemplate.setRetryPolicy(retryPolicy);
 
-        return retryTemplate;
-    }
+    return retryTemplate;
+  }
 
-    @Bean
-    public RetryUtil exponentialRetryUtil(){
-        return ExponentialRetryUtil.builder()
-                .elongationPoint(elongationPoint)
-                .multiplier(standardMultiplier)
-                .maxRetryDuration(maxRetryDuration)
-                .build();
-    }
+  @Bean
+  public RetryUtil exponentialRetryUtil(){
+    return ExponentialRetryUtil.builder()
+      .elongationPoint(elongationPoint)
+      .multiplier(standardMultiplier)
+      .maxRetryDuration(maxRetryDuration)
+      .build();
+  }
 }
