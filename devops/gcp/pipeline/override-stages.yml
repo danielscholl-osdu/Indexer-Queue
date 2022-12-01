@@ -1,0 +1,32 @@
+variables:
+  OSDU_GCP_SERVICE: indexer-queue
+  OSDU_GCP_VENDOR: gcp-cloudrun
+  BUILD_PATH: "$OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/Dockerfile.cloudbuild"
+
+osdu-gcp-test:
+  extends:
+    - .maven
+    - .osdu-gcp-variables
+  stage: integration
+  needs: ["osdu-gcp-deploy-deployment"]
+  allow_failure: true
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
+    - exit 1
+
+osdu-gcp-dev2-test:
+  extends:
+    - .maven
+    - .osdu-gcp-dev2-variables
+  stage: integration
+  needs: ["osdu-gcp-dev2-deploy-deployment"]
+  allow_failure: true
+  script:
+    - echo "This is a stub. Integration tests are not implemented for the Indexer-Queue service."
+    - exit 1
+
+osdu-gcp-anthos-test:
+  allow_failure: true
+  script:
+    - echo "This is a stub. The service doesn't support the step."
+    - exit 1

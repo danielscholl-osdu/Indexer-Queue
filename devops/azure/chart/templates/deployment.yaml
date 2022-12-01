@@ -45,6 +45,16 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+          livenessProbe:
+              httpGet:
+                path: /actuator/health
+                port: 8081
+              initialDelaySeconds: 250
+              periodSeconds: 10
           resources:
             requests:
               cpu: "1000m"
@@ -96,4 +106,6 @@ spec:
             - name: max_lock_renew_duration_seconds
               value: "600"
             - name: max_delivery_count
-              value: "5"
+              value: "10"
+            - name: SPRING_CONFIG_NAME
+              value: "common,application"

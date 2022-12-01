@@ -158,8 +158,8 @@ public class OqmSubscriberManager {
       oqmAckReplier.ack();
     }
 
-    HttpStatus response = messagePublisher.sendMessage(request, headers);
-    log.debug("OQM: Send request to Indexer. Response: {}", response);
+    messagePublisher.sendMessage(request, headers);
+    log.debug("OQM: Send request for Indexer processing.");
     // ack message always due to retries in publisher side
     oqmAckReplier.ack();
   }
@@ -173,10 +173,9 @@ public class OqmSubscriberManager {
   private DpsHeaders getHeaders(OqmMessage oqmMessage) {
     DpsHeaders headers = new DpsHeaders();
     headers.getHeaders().put("data-partition-id", oqmMessage.getAttributes().get("data-partition-id"));
-    headers.getHeaders().put("user", oqmMessage.getAttributes().get("user"));
     headers.getHeaders().put("correlation-id", oqmMessage.getAttributes().get("correlation-id"));
     headers.getHeaders().put("account-id", oqmMessage.getAttributes().get("account-id"));
-    headers.getHeaders().put("authorization", tokenProvider.getIdToken());
+    headers.getHeaders().put("authorization", "Bearer " + tokenProvider.getIdToken());
     return headers;
   }
 

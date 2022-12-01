@@ -31,6 +31,7 @@ public class SubscriptionManagerTest {
     private static final String maxLockRenewDuration = "60";
     private static final String maxConcurrentCalls = "1";
     private static final String nThreads = "2";
+    private static final String maxDeliveryCount = "5";
     private static final String errorMessage = "some-error";
 
     @InjectMocks
@@ -71,6 +72,7 @@ public class SubscriptionManagerTest {
 
         doNothing().when(subscriptionClient).registerMessageHandler(any(), any(), any());
         when(clientFactory.getSubscriptionClient(dataPartition)).thenReturn(subscriptionClient);
+        when(azureBootstrapConfig.getMaxDeliveryCount()).thenReturn(maxDeliveryCount);
 
         sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
@@ -83,6 +85,7 @@ public class SubscriptionManagerTest {
 
         doThrow(new InterruptedException(errorMessage)).when(subscriptionClient).registerMessageHandler(any(), any(), any());
         when(clientFactory.getSubscriptionClient(dataPartition)).thenReturn(subscriptionClient);
+        when(azureBootstrapConfig.getMaxDeliveryCount()).thenReturn(maxDeliveryCount);
 
         sut.fetchPartitionsAndSubscribe(executorService, partitions);
 

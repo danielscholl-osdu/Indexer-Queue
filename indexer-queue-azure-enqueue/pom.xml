@@ -20,14 +20,14 @@
   <parent>
     <artifactId>indexer-queue</artifactId>
     <groupId>org.opengroup.osdu.indexerqueue</groupId>
-    <version>0.15.0-SNAPSHOT</version>
+    <version>0.18.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.opengroup.osdu.indexerqueue</groupId>
   <artifactId>EnqueueFunction</artifactId>
-  <version>0.15.0-SNAPSHOT</version>
+  <version>0.18.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -38,16 +38,16 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <osdu.corelibazure.version>0.14.0</osdu.corelibazure.version>
-    <osdu.oscorecommon.version>0.14.0</osdu.oscorecommon.version>
-    <jackson.version>2.11.2</jackson.version>
+    <osdu.corelibazure.version>0.18.0-rc5</osdu.corelibazure.version>
+    <osdu.oscorecommon.version>0.16.0</osdu.oscorecommon.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
     <common-codec.version>1.14</common-codec.version>
     <resteasy.version>3.12.0.Final</resteasy.version>
     <snakeyaml.version>1.26</snakeyaml.version>
-    <resteasy-validator-provider-11.version>3.6.2.Final</resteasy-validator-provider-11.version>
-    <jackson.version>2.11.2</jackson.version>
+    <resteasy-validator-provider-11.version>3.6.3.Final</resteasy-validator-provider-11.version>
+    <jackson.version>2.13.3</jackson.version>
+    <spring-webmvc.version>5.3.22</spring-webmvc.version>
   </properties>
 
   <pluginRepositories>
@@ -140,9 +140,19 @@
     </dependency>
 
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${spring-webmvc.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.retry</groupId>
+      <artifactId>spring-retry</artifactId>
     </dependency>
 
     <dependency>
@@ -196,6 +206,11 @@
       <version>${jackson.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
@@ -216,7 +231,11 @@
       <artifactId>powermock-module-junit4</artifactId>
       <version>2.0.2</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework.retry</groupId>
+      <artifactId>spring-retry</artifactId>
+      <version>1.3.1</version>
+    </dependency>
   </dependencies>
 
   <build>

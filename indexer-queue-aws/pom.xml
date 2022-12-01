@@ -19,7 +19,7 @@
   <parent>
     <artifactId>indexer-queue</artifactId>
     <groupId>org.opengroup.osdu.indexerqueue</groupId>
-    <version>0.15.0-SNAPSHOT</version>
+    <version>0.18.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -28,7 +28,7 @@
   <artifactId>indexer-queue-aws</artifactId>
   <description>Indexer Queue Service on AWS</description>
   <packaging>jar</packaging>
-  <version>0.15.0-SNAPSHOT</version>
+  <version>0.18.0-SNAPSHOT</version>
 
   <name>indexer-queue-aws</name>
 
@@ -36,6 +36,9 @@
     <aws.version>1.11.1018</aws.version>
     <deployment.environment>dev</deployment.environment>
     <deployment.repositorybucket>osdu-local-maven-repository</deployment.repositorybucket>
+    <jackson-databind.version>2.13.2.2</jackson-databind.version>
+    <jackson.version>2.13.2</jackson.version>
+    <spring-webmvc.version>5.3.22</spring-webmvc.version>
   </properties>
 
     <dependencies>
@@ -43,7 +46,7 @@
       <dependency>
         <groupId>org.opengroup.osdu.core.aws</groupId>
         <artifactId>os-core-lib-aws</artifactId>
-        <version>0.14.0</version>
+        <version>0.16.1</version>
       </dependency>
 
       <!-- AWS managed packages -->
@@ -118,8 +121,23 @@
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.11.2</version>
+        <version>${jackson-databind.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.0.16</version>
       </dependency>
 
       <!-- Testing packages -->
@@ -141,6 +159,11 @@
         <version>2.0.2</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring-webmvc.version}</version>
+      </dependency>
 
     </dependencies>
 

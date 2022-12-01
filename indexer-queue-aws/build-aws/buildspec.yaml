@@ -45,6 +45,10 @@ phases:
       - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
       - export AWS_ACCOUNT_ID=`aws sts get-caller-identity | grep Account | cut -d':' -f 2 | cut -d'"' -f 2`
       - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_OSDU_DEV_MAVEN_DOMAIN --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text`
+      # Install git secrets
+      - git clone https://github.com/awslabs/git-secrets.git
+      - cd git-secrets && make install && cd ..
+      - git secrets --install && git secrets --register-aws
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
@@ -60,13 +64,23 @@ phases:
       - mkdir -p ${OUTPUT_DIR}/bin
       # - mkdir -p ${OUTPUT_DIR}/testing && mkdir -p ${OUTPUT_DIR}/testing/bin
       - echo "Placeholder" >> ${OUTPUT_DIR}/build-info.json # touched so that the output directory has some content incase the build fails so that testing reports are uploaded
+      - pom_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+      - export VERSION=${pom_version%-*}
       - printenv
+
+      - GIT_SECRETS_SCAN_RESULT=$(git secrets --scan 2> ${OUTPUT_DIR}/git_secrets.out.txt && echo OK || echo FAILED)
+      - if [ "$GIT_SECRETS_SCAN_RESULT" = "FAILED" ]; then echo "Secrets detected!" && exit 1; fi
 
       - echo "Building primary service assemblies..."
       - mvn -ntp -B test install sonar:sonar -pl .,indexer-queue-aws -Ddeployment.environment=prod -Dsonar.login=${SONAR_USERNAME} -Dsonar.password=${SONAR_PASSWORD} -Dsonar.branch.name=${BRANCH_NAME} 
 
-#      - echo "Copying assemblies to dist..."
-#      - cp ./indexer-queue-aws/target/indexer-queue*.jar ${OUTPUT_DIR}/bin # copy aws jars
+      - sed -i "s|__CHART_VERSION__|$VERSION|"  devops/aws/chart/Chart.yaml
+      - sed -i "s|__CONTAINER__|$ECR_IMAGE|"  devops/aws/chart/values.yaml
+      - echo "--Copying Helm Charts to ${OUTPUT_DIR:-dist}--"
+      - rsync -r devops/aws/* "${OUTPUT_DIR:-dist}"
+
+      - echo "--Copying Helm Charts to ${OUTPUT_DIR:-dist}--"
+      - rsync -r devops/aws/* "${OUTPUT_DIR:-dist}"
 
       - echo "Logging into Docker Hub..."
       - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}

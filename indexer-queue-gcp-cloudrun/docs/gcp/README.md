@@ -1,12 +1,15 @@
 # Service Configuration for GCP
 
 ## Table of Contents <a name="TOC"></a>
-* [Environment variables](#Environment-variables)
-* [Common properties for all environments](#Common-properties-for-all-environments)
-* [For Mappers to activate drivers](#For-Mappers-to-activate-drivers)
-* [For Google Cloud only](#For-Google-Cloud-only)
-* [Pubsub configuration](#Pubsub-configuration)
-* [Google cloud service account configuration](#Google-cloud-service-account-configuration)
+
+* [Service Configuration for GCP](#service-configuration-for-gcp)
+  * [Table of Contents <a name="TOC"></a>](#table-of-contents-)
+  * [Environment variables](#environment-variables)
+    * [Must have](#must-have)
+    * [Defined in default application property file but possible to override](#defined-in-default-application-property-file-but-possible-to-override)
+    * [For Google Cloud only](#for-google-cloud-only)
+  * [Pubsub configuration](#pubsub-configuration)
+  * [Google cloud service account configuration](#google-cloud-service-account-configuration)
 
 ## Environment variables
 

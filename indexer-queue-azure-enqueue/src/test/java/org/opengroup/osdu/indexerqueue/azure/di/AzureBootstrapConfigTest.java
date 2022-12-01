@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,38 +16,82 @@ class AzureBootstrapConfigTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AzureBootstrapConfig.class);
 
-    @Value("${azure.keyvault.url}")
-    private String keyVaultURL;
+//    @Value("${azure.keyvault.url}")
+//    private String keyVaultURL;
+//
+//    @Value("${azure.app.resource.id}")
+//    private String appResourceId;
+//
+//    @Value("${executor-n-threads}")
+//    private String nThreads;
+//
+//    @Value("${max-concurrent-calls}")
+//    private String maxConcurrentCalls;
+//
+//    @Value("${max-lock-renew-duration-seconds}")
+//    private String maxLockRenewDurationInSeconds;
+//
+//    @Value("${max-delivery-count}")
+//    private String maxDeliveryCount;
+//
+//    @Value("${azure.servicebus.topic-name}")
+//    private String serviceBusTopic;
+//
+//    @Value("${azure.servicebus.topic-subscription}")
+//    private String serviceBusTopicSubscription;
+//
+//    @Value("${indexer.worker.url}")
+//    private String indexerWorkerURL;
+//
+//    @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
+//    private Integer sleepDurationForMainThreadInSeconds;
+//
+//    @Value("${spring.application.name}")
+//    private String appName;
 
-    @Value("${azure.app.resource.id}")
-    private String appResourceId;
+  @Mock
+  @Value("keyVaultURLVal")
+  private String keyVaultURL;
 
-    @Value("${executor-n-threads}")
-    private String nThreads;
+  @Mock
+  @Value("appResourceIdVal")
+  private String appResourceId;
 
-    @Value("${max-concurrent-calls}")
-    private String maxConcurrentCalls;
+  @Mock
+  @Value("nThreads")
+  private String nThreads;
 
-    @Value("${max-lock-renew-duration-seconds}")
-    private String maxLockRenewDurationInSeconds;
+  @Mock
+  @Value("maxConcurrentCalls")
+  private String maxConcurrentCalls;
 
-    @Value("${max-delivery-count}")
-    private String maxDeliveryCount;
+  @Mock
+  @Value("max-lock-renew-duration-seconds")
+  private String maxLockRenewDurationInSeconds;
 
-    @Value("${azure.servicebus.topic-name}")
-    private String serviceBusTopic;
+  @Mock
+  @Value("max-delivery-count")
+  private String maxDeliveryCount;
 
-    @Value("${azure.servicebus.topic-subscription}")
-    private String serviceBusTopicSubscription;
+  @Mock
+  @Value("azure.servicebus.topic-name")
+  private String serviceBusTopic;
 
-    @Value("${indexer.worker.url}")
-    private String indexerWorkerURL;
+  @Mock
+  @Value("azure.servicebus.topic-subscription")
+  private String serviceBusTopicSubscription;
 
-    @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
-    private Integer sleepDurationForMainThreadInSeconds;
+  @Mock
+  @Value("indexer.worker.url")
+  private String indexerWorkerURL;
 
-    @Value("${spring.application.name}")
-    private String appName;
+  @Mock
+  @Value("100")
+  private Integer sleepDurationForMainThreadInSeconds;
+
+  @Mock
+  @Value("IndexerQueue")
+  private String appName;
 
     @InjectMocks
     AzureBootstrapConfig sut = new AzureBootstrapConfig();

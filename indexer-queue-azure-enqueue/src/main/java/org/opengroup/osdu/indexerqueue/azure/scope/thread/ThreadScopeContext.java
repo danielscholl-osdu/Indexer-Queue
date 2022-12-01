@@ -43,7 +43,9 @@ public class ThreadScopeContext {
         Bean bean = beans.get(name);
         if (null != bean) {
             beans.remove(name);
-            bean.destructionCallback.run();
+            if (null != bean.destructionCallback) {
+              bean.destructionCallback.run();
+            }
             return bean.object;
         }
         return null;
@@ -57,7 +59,7 @@ public class ThreadScopeContext {
      */
     public void registerDestructionCallback(String name, Runnable callback) {
         Bean bean = beans.computeIfAbsent(name,k->new Bean());
-        bean.destructionCallback = callback;
+        bean.setDestructionCallback(callback);
     }
 
     /** Clear all beans and call the destruction callback. */
@@ -70,8 +72,8 @@ public class ThreadScopeContext {
         beans.clear();
     }
 
-    /** Private class storing bean name and destructor callback. */
-    static class Bean {
+    /** Protected class storing bean name and destructor callback. */
+    protected class Bean {
 
         private Object object;
         private Runnable destructionCallback;
