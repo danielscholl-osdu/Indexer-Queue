@@ -13,11 +13,10 @@ import java.util.Map;
 @Primary
 @Scope(value = "ThreadScope", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ThreadDpsHeaders extends DpsHeaders {
-    public void setThreadContext(String dataPartitionId, String correlationId, String accountId) {
+    public void setThreadContext(String dataPartitionId, String correlationId) {
         Map<String, String> headers = new HashMap<>();
         headers.put(DpsHeaders.DATA_PARTITION_ID, dataPartitionId);
         headers.put(DpsHeaders.CORRELATION_ID, correlationId);
-        headers.put(DpsHeaders.ACCOUNT_ID, accountId);
         this.addFromMap(headers);
     }
 }

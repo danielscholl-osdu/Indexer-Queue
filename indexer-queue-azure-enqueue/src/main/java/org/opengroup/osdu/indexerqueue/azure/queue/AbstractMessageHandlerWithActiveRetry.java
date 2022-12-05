@@ -16,10 +16,16 @@ package org.opengroup.osdu.indexerqueue.azure.queue;
 
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.SubscriptionClient;
-import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
-import org.opengroup.osdu.azure.logging.ICoreLogger;
 import org.opengroup.osdu.azure.servicebus.AbstractMessageHandler;
+import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
+import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHolder;
+import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
+import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -34,7 +40,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMessageHandler {
 
-    private static final ICoreLogger LOGGER = CoreLoggerFactory.getInstance().getLogger(AbstractMessageHandlerWithActiveRetry.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMessageHandlerWithActiveRetry.class.getName());
     private static final String PROPERTY_RETRY = "RETRY";
     private static final String RETRY_LOG_MESSAGE_TEMPLATE = "Exception occurred while sending message %s to indexer service: %s - %s.";
     private final String workerName;
@@ -42,6 +48,9 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
     private final MessagePublisher messagePublisher;
     private final Integer maxDeliveryCount;
     private final RetryUtil retryUtil;
+    private final ThreadDpsHeaders dpsHeaders;
+    private final MdcContextMap mdcContextMap;
+    private final MessageAttributesExtractor messageAttributesExtractor;
 
     /***
      * Constructor.
@@ -53,6 +62,9 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
     public AbstractMessageHandlerWithActiveRetry(final SubscriptionClient client,
                                                  final MessagePublisher publisher,
                                                  final RetryUtil retryUtil,
+                                                 final ThreadDpsHeaders dpsHeaders,
+                                                 final MdcContextMap mdcContextMap,
+                                                 final MessageAttributesExtractor messageAttributesExtractor,
                                                  final String workerServiceName,
                                                  final Integer maximumDeliveryCount) {
         super(workerServiceName, client);
@@ -61,6 +73,9 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
         this.workerName = workerServiceName;
         this.maxDeliveryCount = maximumDeliveryCount;
         this.retryUtil = retryUtil;
+        this.dpsHeaders = dpsHeaders;
+        this.mdcContextMap = mdcContextMap;
+        this.messageAttributesExtractor = messageAttributesExtractor;
     }
 
     /***
@@ -73,10 +88,9 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
         long startTime = System.currentTimeMillis();
         long enqueueTime = message.getEnqueuedTimeUtc().toEpochMilli();
         String messageId = message.getMessageId();
-
-        logWorkerStart(messageId, this.workerName, "Received message from service bus");
-
-        try {
+      try {
+            setupLoggerContext(message);
+            logWorkerStart(messageId, this.workerName, "Received message from service bus");
             processMessage(message);
             long stopTime = System.currentTimeMillis();
             logWorkerEnd(messageId, this.workerName, String.format("Successfully processed message. End to end time from enqueue : %d", stopTime - enqueueTime), stopTime - startTime, true);
@@ -109,6 +123,8 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
                     return ackMessageWithRetry(() -> receiveClient.completeAsync(message.getLockToken()), message, utcEnqueueTime);
                 }
             }
+        } finally {
+            cleanUpLoggerContext();
         }
     }
 
@@ -140,5 +156,18 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
                 receiveClient.deadLetterAsync(message.getLockToken());
             }
         }
+    }
+
+    private void setupLoggerContext(IMessage message) {
+        RecordChangedAttributes recordChangedAttributes = messageAttributesExtractor.extractAttributesFromMessageBody(message);
+        String correlationId = recordChangedAttributes.getCorrelationId();
+        String dataPartitionId = recordChangedAttributes.getDataPartitionId();
+        MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));
+        dpsHeaders.setThreadContext(dataPartitionId, correlationId);
+    }
+
+    private void cleanUpLoggerContext() {
+        ThreadScopeContextHolder.getContext().clear();
+        MDC.clear();
     }
 }

@@ -17,11 +17,16 @@ package org.opengroup.osdu.indexerqueue.azure.queue;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.MessageBody;
 import com.microsoft.azure.servicebus.SubscriptionClient;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
+import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
+import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 
 import java.time.Instant;
@@ -62,6 +67,12 @@ public class AbstractMessageHandlerWithActiveRetryTest {
 
     @Mock
     private MessageBody messageBody;
+    @Mock
+    private ThreadDpsHeaders dpsHeaders;
+    @Mock
+    private MdcContextMap mdcContextMap;
+    @Mock
+    private MessageAttributesExtractor messageAttributesExtractor;
 
     private AbstractMessageHandlerWithActiveRetry messageHandler;
 
@@ -69,13 +80,15 @@ public class AbstractMessageHandlerWithActiveRetryTest {
     public void setup() {
         messageProperties = new HashMap<>();
         messageHandler = new AbstractMessageHandlerWithActiveRetry(receiveClient,
-                messagePublisher, retryUtil, WORKER_NAME, MAX_DELIVERY_COUNT) {
+                messagePublisher, retryUtil, dpsHeaders, mdcContextMap,
+                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT) {
             @Override
             public void processMessage(IMessage message) {
                 testMessageProcessor.doTheProcessing(message);
             }
         };
         when(message.getEnqueuedTimeUtc()).thenReturn(INSTANT);
+        when(messageAttributesExtractor.extractAttributesFromMessageBody(any())).thenReturn(new RecordChangedAttributes());
     }
 
     @Test
