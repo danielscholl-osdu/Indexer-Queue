@@ -3,10 +3,8 @@ package org.opengroup.osdu.indexerqueue.azure.config;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

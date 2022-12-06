@@ -35,7 +35,6 @@ class ThreadScopeTest {
 
     @Test
     void should_returnObject_whenGetIsCalled_whenBeanNotPresent() {
-
         assertNotNull(sut.get(name, new ObjectFactory<Object>() {
             @Override
             public Object getObject() throws BeansException {
@@ -61,7 +60,6 @@ class ThreadScopeTest {
     });
 
     assertEquals(expectedObject, responseObject);
-
   }
 
   @Test

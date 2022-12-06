@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.azure.servicebus.ISubscriptionClientFactory;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doThrow;

@@ -9,56 +9,55 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class AzureBootstrapConfigTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AzureBootstrapConfig.class);
 
-  @Mock
-  @Value("keyVaultURLVal")
-  private String keyVaultURL;
+    @Mock
+    @Value("keyVaultURLVal")
+    private String keyVaultURL;
 
-  @Mock
-  @Value("appResourceIdVal")
-  private String appResourceId;
+    @Mock
+    @Value("appResourceIdVal")
+    private String appResourceId;
 
-  @Mock
-  @Value("nThreads")
-  private String nThreads;
+    @Mock
+    @Value("nThreads")
+    private String nThreads;
 
-  @Mock
-  @Value("maxConcurrentCalls")
-  private String maxConcurrentCalls;
+    @Mock
+    @Value("maxConcurrentCalls")
+    private String maxConcurrentCalls;
 
-  @Mock
-  @Value("max-lock-renew-duration-seconds")
-  private String maxLockRenewDurationInSeconds;
+    @Mock
+    @Value("max-lock-renew-duration-seconds")
+    private String maxLockRenewDurationInSeconds;
 
-  @Mock
-  @Value("max-delivery-count")
-  private String maxDeliveryCount;
+    @Mock
+    @Value("max-delivery-count")
+    private String maxDeliveryCount;
 
-  @Mock
-  @Value("azure.servicebus.topic-name")
-  private String serviceBusTopic;
+    @Mock
+    @Value("azure.servicebus.topic-name")
+    private String serviceBusTopic;
 
-  @Mock
-  @Value("azure.servicebus.topic-subscription")
-  private String serviceBusTopicSubscription;
+    @Mock
+    @Value("azure.servicebus.topic-subscription")
+    private String serviceBusTopicSubscription;
 
-  @Mock
-  @Value("indexer.worker.url")
-  private String indexerWorkerURL;
+    @Mock
+    @Value("indexer.worker.url")
+    private String indexerWorkerURL;
 
-  @Mock
-  @Value("100")
-  private Integer sleepDurationForMainThreadInSeconds;
+    @Mock
+    @Value("100")
+    private Integer sleepDurationForMainThreadInSeconds;
 
-  @Mock
-  @Value("IndexerQueue")
-  private String appName;
+    @Mock
+    @Value("IndexerQueue")
+    private String appName;
 
     @InjectMocks
     AzureBootstrapConfig sut = new AzureBootstrapConfig();
