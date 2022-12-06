@@ -11,9 +11,7 @@ import org.mockito.stubbing.Answer;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
-
 import java.util.concurrent.atomic.AtomicReference;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -71,7 +69,9 @@ class ThreadScopeTest {
     try (MockedStatic<ThreadScopeContextHolder> mockedHolder = mockStatic(ThreadScopeContextHolder.class)) {
       mockedHolder.when(() -> ThreadScopeContextHolder.getContext()).thenReturn(threadScopeContext);
       when(threadScopeContext.remove(name)).thenReturn(null);
+
       sut.remove(name);
+
       verify(threadScopeContext, times(1)).remove(name);
     }
   }
@@ -81,7 +81,9 @@ class ThreadScopeTest {
     try (MockedStatic<ThreadScopeContextHolder> mockedHolder = mockStatic(ThreadScopeContextHolder.class)) {
       mockedHolder.when(() -> ThreadScopeContextHolder.getContext()).thenReturn(threadScopeContext);
       doNothing().when(threadScopeContext).registerDestructionCallback(name, runnable);
+
       sut.registerDestructionCallback(name, runnable);
+
       verify(threadScopeContext, times(1)).registerDestructionCallback(name, runnable);
     }
   }
@@ -100,12 +102,13 @@ class ThreadScopeTest {
     void should_invoke_clearContextMethodOfThreadScopeContextHolder_when_destroyCalled() {
       try (MockedStatic<ThreadScopeContextHolder> mockedHolder = mockStatic(ThreadScopeContextHolder.class)) {
         mockedHolder.when(() -> ThreadScopeContextHolder.clearContext()).thenCallRealMethod();
+
         sut.destroy();
+
         mockedHolder.verify(
           () -> ThreadScopeContextHolder.clearContext(),
           times(1)
         );
       }
     }
-
 }

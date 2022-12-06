@@ -16,39 +16,6 @@ class AzureBootstrapConfigTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AzureBootstrapConfig.class);
 
-//    @Value("${azure.keyvault.url}")
-//    private String keyVaultURL;
-//
-//    @Value("${azure.app.resource.id}")
-//    private String appResourceId;
-//
-//    @Value("${executor-n-threads}")
-//    private String nThreads;
-//
-//    @Value("${max-concurrent-calls}")
-//    private String maxConcurrentCalls;
-//
-//    @Value("${max-lock-renew-duration-seconds}")
-//    private String maxLockRenewDurationInSeconds;
-//
-//    @Value("${max-delivery-count}")
-//    private String maxDeliveryCount;
-//
-//    @Value("${azure.servicebus.topic-name}")
-//    private String serviceBusTopic;
-//
-//    @Value("${azure.servicebus.topic-subscription}")
-//    private String serviceBusTopicSubscription;
-//
-//    @Value("${indexer.worker.url}")
-//    private String indexerWorkerURL;
-//
-//    @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
-//    private Integer sleepDurationForMainThreadInSeconds;
-//
-//    @Value("${spring.application.name}")
-//    private String appName;
-
   @Mock
   @Value("keyVaultURLVal")
   private String keyVaultURL;

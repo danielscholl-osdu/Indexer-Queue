@@ -79,6 +79,7 @@ public class RecordChangedMessageHandlerTest {
     public void close() {
       httpMock.close();
     }
+
     @Test
     public void shouldThrow_whenHttpClientThrows() throws Exception{
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");

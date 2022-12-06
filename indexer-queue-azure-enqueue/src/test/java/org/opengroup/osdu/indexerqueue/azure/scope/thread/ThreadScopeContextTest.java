@@ -39,6 +39,7 @@ class ThreadScopeContextTest {
     void should_returnSameObjectAddedInSetBean_whenGetBeanCalled() {
         sut.setBean(name, object);
         Object response = sut.getBean(name);
+
         assertEquals(object, response);
     }
 
@@ -51,6 +52,7 @@ class ThreadScopeContextTest {
   void should_returnBeanObjectAndDeleteBean_whenRemoveCalledOnBean() {
       sut.setBean(name, object);
       Object response = sut.remove(name);
+
       assertEquals(object, response);
       assertNull(sut.getBean(name));
   }
@@ -60,6 +62,7 @@ class ThreadScopeContextTest {
       doNothing().when(runnable).run();
       sut.registerDestructionCallback(name, runnable);
       sut.remove(name);
+
       verify(runnable,times(1)).run();
     }
 
@@ -67,6 +70,7 @@ class ThreadScopeContextTest {
     void should_clearBean_whenClearCalled() {
         sut.setBean(name, object);
         sut.clear();
+
         assertNull(sut.getBean(name));
     }
 
@@ -76,6 +80,7 @@ class ThreadScopeContextTest {
       sut.setBean(name, object);
       sut.registerDestructionCallback(name,runnable);
       sut.clear();
+
       verify(runnable,times(1)).run();
     }
 }
