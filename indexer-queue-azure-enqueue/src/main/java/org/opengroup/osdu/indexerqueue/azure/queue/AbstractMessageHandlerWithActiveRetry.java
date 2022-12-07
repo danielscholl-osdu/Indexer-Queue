@@ -22,6 +22,7 @@ import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHold
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,11 +98,15 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
             if (message.getProperties().get(PROPERTY_RETRY) != null) {
                 Integer retryValue = (Integer) message.getProperties().get(PROPERTY_RETRY);
                 String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
-                LOGGER.info("Successfully sent message {} after {} retries", messageBody, retryValue);
+                LOGGER.debug("Successfully sent message {} after {} retries", messageBody, retryValue);
             }
             return this.receiveClient.completeAsync(message.getLockToken());
 
-        } catch (Exception e) {
+        }catch (ValidStorageRecordNotFoundException e){
+          String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
+          LOGGER.debug(e.getMessage() + ". No retry on message: {}",messageBody);
+          return this.receiveClient.completeAsync(message.getLockToken());
+        }catch (Exception e) {
             String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
             if (message.getProperties().get(PROPERTY_RETRY) == null) {
                 int retryDuration = retryUtil.generateNextRetryTerm(1);

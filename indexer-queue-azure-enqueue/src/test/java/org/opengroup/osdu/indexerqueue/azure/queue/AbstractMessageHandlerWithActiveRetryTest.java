@@ -27,6 +27,7 @@ import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 
 import java.time.Instant;
@@ -36,6 +37,7 @@ import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -165,6 +167,22 @@ public class AbstractMessageHandlerWithActiveRetryTest {
         verify(receiveClient, times(1)).deadLetterAsync(UUID);
         verify(messagePublisher, only()).sendMessageToTopic(eq(message), any());
     }
+
+  @Test
+  public void should_completeMessage_andNoRetry_ifValidStorageRecordNotFoundExceptionIsThrown(){
+    when(message.getLockToken()).thenReturn(UUID);
+    when(messageBody.getBinaryData()).thenReturn(singletonList(TEST_MESSAGE_BODY.getBytes(UTF_8)));
+    when(message.getMessageBody()).thenReturn(messageBody);
+    doThrow(new ValidStorageRecordNotFoundException("test error message")).when(testMessageProcessor).doTheProcessing(message);
+
+    messageHandler.onMessageAsync(message);
+
+    assertNull(messageProperties.get(PROPERTY_RETRY));
+
+    verify(receiveClient, only()).completeAsync(UUID);
+    verifyNoInteractions(messagePublisher);
+
+  }
 
     private void setupMessagesStubsForFailureCases() {
         when(messageBody.getBinaryData()).thenReturn(singletonList(TEST_MESSAGE_BODY.getBytes(UTF_8)));
