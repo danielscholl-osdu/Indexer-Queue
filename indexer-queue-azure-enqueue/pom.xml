@@ -44,7 +44,7 @@
     <hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
     <common-codec.version>1.14</common-codec.version>
     <resteasy.version>3.12.0.Final</resteasy.version>
-    <snakeyaml.version>1.26</snakeyaml.version>
+    <snakeyaml.version>1.33</snakeyaml.version>
     <resteasy-validator-provider-11.version>3.6.3.Final</resteasy-validator-provider-11.version>
     <jackson.version>2.13.3</jackson.version>
     <spring-webmvc.version>5.3.22</spring-webmvc.version>
