@@ -20,9 +20,6 @@ class ThreadScopeContextTest {
     Object object;
 
     @Mock
-    ThreadScopeContext.Bean bean;
-
-    @Mock
     Runnable runnable;
 
     @InjectMocks

@@ -59,7 +59,7 @@ public class ThreadScopeContext {
      */
     public void registerDestructionCallback(String name, Runnable callback) {
         Bean bean = beans.computeIfAbsent(name,k->new Bean());
-        bean.setDestructionCallback(callback);
+        bean.destructionCallback = callback;
     }
 
     /** Clear all beans and call the destruction callback. */
@@ -72,8 +72,8 @@ public class ThreadScopeContext {
         beans.clear();
     }
 
-    /** Protected class storing bean name and destructor callback. */
-    protected class Bean {
+    /** Private class storing bean name and destructor callback. */
+    private class Bean {
 
         private Object object;
         private Runnable destructionCallback;

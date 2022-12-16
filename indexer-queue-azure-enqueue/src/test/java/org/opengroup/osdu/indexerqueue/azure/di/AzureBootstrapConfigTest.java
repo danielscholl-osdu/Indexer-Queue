@@ -63,62 +63,62 @@ class AzureBootstrapConfigTest {
     AzureBootstrapConfig sut = new AzureBootstrapConfig();
 
     @Test
-    void should_getKeyVaultURL() {
+    void shouldReturnSetValue_when_getKeyVaultURL_isCalled() {
         assertEquals(keyVaultURL, sut.keyVaultURL());
     }
 
     @Test
-    void should_getMdcContextMap() {
+    void shouldReturnNotNullValue_when_getMdcContextMap_isCalled() {
         assertNotNull(sut.mdcContextMap());
     }
 
     @Test
-    void should_getAppResourceId() {
+    void shouldReturnSetValue_when_getAppResourceId_isCalled() {
         assertEquals(sut.getAppResourceId(), appResourceId);
     }
 
     @Test
-    void should_getNThreads() {
+    void shouldReturnSetValue_when_getNThreads_isCalled() {
         assertEquals(sut.getNThreads(), nThreads);
     }
 
     @Test
-    void should_getMaxConcurrentCalls() {
+    void shouldReturnSetValue_when_getMaxConcurrentCalls_isCalled() {
         assertEquals(sut.getMaxConcurrentCalls(), maxConcurrentCalls);
     }
 
     @Test
-    void should_getMaxLockRenewDurationInSeconds() {
+    void shouldReturnSetValue_when_getMaxLockRenewDurationInSeconds_isCalled() {
         assertEquals(sut.getMaxLockRenewDurationInSeconds(), maxLockRenewDurationInSeconds);
     }
 
     @Test
-    void should_getMaxDeliveryCount() {
+    void shouldReturnSetValue_when_getMaxDeliveryCount_isCalled() {
         assertEquals(sut.getMaxDeliveryCount(), maxDeliveryCount);
     }
 
     @Test
-    void should_getServiceBusTopic() {
+    void shouldReturnSetValue_when_getServiceBusTopic_isCalled() {
         assertEquals(sut.getServiceBusTopic(), serviceBusTopic);
     }
 
     @Test
-    void should_getServiceBusTopicSubscription() {
+    void shouldReturnSetValue_when_getServiceBusTopicSubscription_isCalled() {
         assertEquals(sut.getServiceBusTopicSubscription(), serviceBusTopicSubscription);
     }
 
     @Test
-    void should_getIndexerWorkerURL() {
+    void shouldReturnSetValue_when_getIndexerWorkerURL_isCalled() {
         assertEquals(sut.getIndexerWorkerURL(), indexerWorkerURL);
     }
 
     @Test
-    void should_getSleepDurationForMainThreadInSeconds() {
+    void shouldReturnSetValue_when_getSleepDurationForMainThreadInSeconds_isCalled() {
         assertEquals(sut.getSleepDurationForMainThreadInSeconds(), sleepDurationForMainThreadInSeconds);
     }
 
     @Test
-    void should_getAppName() {
+    void shouldReturnSetValue_when_getAppName_isCalled() {
         assertEquals(sut.getAppName(), appName);
     }
 }
