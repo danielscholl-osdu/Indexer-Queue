@@ -176,7 +176,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.1.9.RELEASE</version>
+				<version>2.7.6</version>
 				<configuration>
 					<mainClass>org.opengroup.osdu.indexerqueue.gcp.cloudrun.IndexerQueueCloudRunApplication</mainClass>
 				</configuration>
