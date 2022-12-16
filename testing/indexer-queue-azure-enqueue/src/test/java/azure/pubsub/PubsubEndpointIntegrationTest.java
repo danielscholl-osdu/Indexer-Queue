@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 public class PubsubEndpointIntegrationTest {
     // Generate unique record id using timestamp
     protected static final String RECORD_ID = TenantUtils.getTenantName() + ":inttest:" + System.currentTimeMillis();
-    protected static final String KIND = TenantUtils.getTenantName() + ":ds:inttest:1.0."
+    protected static final String KIND = TenantUtils.getTenantName() + ":wks:inttest:1.0."
             + System.currentTimeMillis();
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
 
