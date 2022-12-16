@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(MockitoJUnitRunner.class)
 public class MessageHandlerTest {
 
     private static final String RECORD_INFO_PAYLOAD = "[{\"id\":\"testId\", \"kind\":\"testKind\", \"op\": \"testOp\"}]";
