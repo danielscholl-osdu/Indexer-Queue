@@ -102,11 +102,11 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
             }
             return this.receiveClient.completeAsync(message.getLockToken());
 
-        }catch (ValidStorageRecordNotFoundException e){
+        } catch (ValidStorageRecordNotFoundException e) {
           String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
           LOGGER.debug(e.getMessage() + ". No retry on message: {}",messageBody);
           return this.receiveClient.completeAsync(message.getLockToken());
-        }catch (Exception e) {
+        } catch (Exception e) {
             String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
             if (message.getProperties().get(PROPERTY_RETRY) == null) {
                 int retryDuration = retryUtil.generateNextRetryTerm(1);
