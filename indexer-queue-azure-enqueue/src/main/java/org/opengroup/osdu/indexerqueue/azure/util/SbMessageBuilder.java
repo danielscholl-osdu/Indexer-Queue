@@ -4,8 +4,6 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
-import org.opengroup.osdu.azure.logging.ICoreLogger;
 import org.opengroup.osdu.core.common.Constants;
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /***
  * A class to extract RecordChangedMessages from the serviceBusMessage. Extract properties like data-partition-id, correlation-id, account-id and set the thread context.
@@ -75,11 +72,10 @@ public class SbMessageBuilder {
 
         // Set the context for this thread.
         // messageId is the correlation-id for the remaining workflow.
-        threadDpsHeaders.setThreadContext(dataPartitionId,messageId,accountId);
+        threadDpsHeaders.setThreadContext(dataPartitionId,messageId);
         MDC.setContextMap(mdcContextMap.getContextMap(messageId, dataPartitionId));
 
         // Populate attributes map for the recordChangedMessage.
-        attributesMap.put(DpsHeaders.ACCOUNT_ID, accountId);
         attributesMap.put(DpsHeaders.DATA_PARTITION_ID, dataPartitionId);
         attributesMap.put(DpsHeaders.CORRELATION_ID, messageId);
 

@@ -15,14 +15,17 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.SubscriptionClient;
-import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
-import org.opengroup.osdu.azure.logging.ICoreLogger;
 import org.opengroup.osdu.core.common.model.indexer.RecordInfo;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
+import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHolder;
+import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
+import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.lang.reflect.Type;
@@ -37,7 +40,7 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
 
     private RecordChangedMessageHandler recordChangedMessageHandler;
     private SbMessageBuilder sbMessageBuilder;
-    private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(MessageHandler.class.getName());
+    private Logger logger = LoggerFactory.getLogger(MessageHandler.class.getName());
     private IMetricService metricService;
 
     MessageHandler(SubscriptionClient client,
@@ -46,9 +49,12 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
                    SbMessageBuilder sbMessageBuilder,
                    IMetricService metricService,
                    RetryUtil retryUtil,
+                   ThreadDpsHeaders dpsHeaders,
+                   MdcContextMap mdcContextMap,
+                   MessageAttributesExtractor messageAttributesExtractor,
                    Integer maxDeliveryCount,
                    String appName) {
-        super(client, messagePublisher, retryUtil, appName, maxDeliveryCount);
+        super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount);
         this.recordChangedMessageHandler = recordChangedMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;
         this.metricService = metricService;
@@ -86,7 +92,7 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
                 this.metricService.sendIndexLatencyMetric(stopTime - enqueueTime);
             }
         } catch (Exception e) {
-            Logger.error("Error recording metrics", e);
+            logger.error("Error recording metrics", e);
         }
     }
 }

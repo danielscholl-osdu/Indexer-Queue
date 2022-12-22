@@ -35,7 +35,7 @@ public class ExponentialRetryUtil implements RetryUtil {
     public int generateNextRetryTerm(int currentRetry) {
         int result;
         if (currentRetry > elongationPoint) {
-            result = multiplier * currentRetry * 20;
+            result = multiplier * currentRetry * 17;
             for(int i = 1; i < currentRetry - elongationPoint; i++) {
                 result = multiplier * result;
             }

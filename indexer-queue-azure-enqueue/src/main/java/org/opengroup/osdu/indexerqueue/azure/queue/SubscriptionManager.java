@@ -3,15 +3,18 @@ package org.opengroup.osdu.indexerqueue.azure.queue;
 import com.microsoft.azure.servicebus.MessageHandlerOptions;
 import com.microsoft.azure.servicebus.SubscriptionClient;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
-import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
-import org.opengroup.osdu.azure.logging.ICoreLogger;
 import org.opengroup.osdu.azure.servicebus.ITopicClientFactory;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
+import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
+import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
+import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -48,7 +51,14 @@ public class SubscriptionManager {
     private IMetricService metricService;
     @Autowired
     private RetryTemplate retryTemplate;
-    private final ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(SubscriptionManager.class.getName());
+
+    @Autowired
+    private ThreadDpsHeaders dpsHeaders;
+    @Autowired
+    private MdcContextMap mdcContextMap;
+    @Autowired
+    private MessageAttributesExtractor messageAttributesExtractor;
+    private final Logger logger = LoggerFactory.getLogger(SubscriptionManager.class.getName());
 
     /***
      * Create subscription clients for service buses of different partitions to register them with message handling options.
@@ -66,15 +76,15 @@ public class SubscriptionManager {
                 fetchPartitionsAndSubscribe(executorService, partitions);
             }
             catch (Exception e) {
-                Logger.error("Exception encountered while fetching partition information", e);
+                logger.error("Exception encountered while fetching partition information", e);
             }
 
             try {
-                Logger.info("Sleeping the main thread...");
+                logger.info("Sleeping the main thread...");
                 Thread.sleep(sleepMainThreadDuration * 1000);
             }
             catch (Exception e) {
-                Logger.error("Exception encountered while sleeping the main thread", e);
+                logger.error("Exception encountered while sleeping the main thread", e);
                 break;
             }
         }
@@ -85,7 +95,7 @@ public class SubscriptionManager {
         List<String> tenantList = tenantFactory.listTenantInfo().stream().map(TenantInfo::getDataPartitionId)
                 .collect(Collectors.toList());
 
-        Logger.info("Total number of partitions " + tenantList.size());
+        logger.info("Total number of partitions " + tenantList.size());
 
         for (String partition : tenantList) {
 
@@ -100,7 +110,7 @@ public class SubscriptionManager {
                 partitions.add(partition);
             }
             catch (Exception e) {
-                Logger.error("Error while creating or registering subscription client", e);
+                logger.error("Error while creating or registering subscription client", e);
             }
         }
     }
@@ -119,7 +129,7 @@ public class SubscriptionManager {
             String appName = azureBootstrapConfig.getAppName();
             MessageHandler messageHandler = new MessageHandler(subscriptionClient,
                     messageSender, recordChangedMessageHandler, sbMessageBuilder,
-                    metricService, retryUtil, maxDeliveryCount, appName);
+                    metricService, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, maxDeliveryCount, appName);
             subscriptionClient.registerMessageHandler(
                     messageHandler,
                     new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),
@@ -130,7 +140,7 @@ public class SubscriptionManager {
                     executorService);
 
         } catch (InterruptedException | ServiceBusException e) {
-            Logger.debug("Error registering message handler for subscription named - {}\n error - {}", subscriptionClient.getSubscriptionName() ,e);
+            logger.debug("Error registering message handler for subscription named - {}\n error - {}", subscriptionClient.getSubscriptionName() ,e);
         }
     }
 }

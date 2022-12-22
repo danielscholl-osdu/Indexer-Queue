@@ -19,10 +19,9 @@ class ThreadDpsHeadersTest {
 
     @Test
     void should_setThreadContext() {
-        sut.setThreadContext(dataPartitionId, correlationId, accountId);
+        sut.setThreadContext(dataPartitionId, correlationId);
 
         assertEquals(dataPartitionId, sut.getPartitionId());
         assertEquals(correlationId, sut.getCorrelationId());
-        assertEquals(accountId, sut.getAccountId());
     }
 }
