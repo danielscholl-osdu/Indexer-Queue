@@ -10,38 +10,38 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicStatusLine;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.opengroup.osdu.core.common.cache.VmCache;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({RecordChangedMessageHandler.class})
-@PowerMockIgnore({"javax.net.ssl.*", "javax.management.*"})
+@ExtendWith(MockitoExtension.class)
 public class RecordChangedMessageHandlerTest {
     private static final String indexerWorkerUrl = "indexer-worker-url";
     private static final int maxTry = 5;
     private final String ACCOUNT_ID = "test-tenant";
     private final String CORRELATION_ID = "xxxxxx";
+    private static MockedConstruction<HttpPost> httpMock;
 
     @Mock
     private AzureBootstrapConfig azureBootstrapConfig;
@@ -49,8 +49,6 @@ public class RecordChangedMessageHandlerTest {
     private Gson gson;
     @Mock
     private RecordChangedMessages recordChangedMessages;
-    @Mock
-    private HttpPost httpPost;
     @Mock
     private CloseableHttpResponse httpResponse;
     @Mock
@@ -60,14 +58,24 @@ public class RecordChangedMessageHandlerTest {
     @InjectMocks
     private RecordChangedMessageHandler sut;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Map<String, String> headers = new HashMap<>();
         headers.put(DpsHeaders.ACCOUNT_ID, ACCOUNT_ID);
         headers.put(DpsHeaders.CORRELATION_ID, CORRELATION_ID);
         recordChangedMessages = RecordChangedMessages.builder()
                 .attributes(headers).build();
-        when(azureBootstrapConfig.getMaxDeliveryCount()).thenReturn("5");
+
+        httpMock = mockConstruction(
+          HttpPost.class,(mock, context) -> {
+            doNothing().when(mock).setEntity(any(HttpEntity.class));
+            doNothing().when(mock).setHeader(any());
+        });
+    }
+
+    @AfterEach
+    public void close() {
+      httpMock.close();
     }
 
     @Test
@@ -103,26 +111,21 @@ public class RecordChangedMessageHandlerTest {
     public void shouldInvoke_httpPostMethod_whenHttpResponseCodeIsSuccess() throws Exception {
         when(httpClientBuilder.build()).thenReturn(httpClient);
         when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
-        whenNew(HttpPost.class).withArguments(indexerWorkerUrl).thenReturn(httpPost);
-        doNothing().when(httpPost).setEntity(any(HttpEntity.class));
-        doNothing().when(httpPost).setHeader(any());
         when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
         StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),200,"success");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
         sut.sendMessagesToIndexer(recordChangedMessages);
 
-        verify(httpClient,times(1)).execute(httpPost);
+        assertEquals(httpMock.constructed().size(),1);
+        verify(httpClient,times(1)).execute(any());
         verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
     }
 
     @Test
-    public void shouldThrow_whenHttpPostMethod_ReturnsErrorReponseCode() throws Exception {
+    public void shouldThrow_whenHttpPostMethod_ReturnsErrorResponseCode() throws Exception {
         when(httpClientBuilder.build()).thenReturn(httpClient);
         when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
-        whenNew(HttpPost.class).withArguments(indexerWorkerUrl).thenReturn(httpPost);
-        doNothing().when(httpPost).setEntity(any(HttpEntity.class));
-        doNothing().when(httpPost).setHeader(any());
         when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
         StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),400,"error");
         when(httpResponse.getStatusLine()).thenReturn(status);
@@ -130,10 +133,9 @@ public class RecordChangedMessageHandlerTest {
         try {
             sut.sendMessagesToIndexer(recordChangedMessages);
         } catch (Exception e) {
-            verify(httpClient,times(1)).execute(httpPost);
+            assertEquals(httpMock.constructed().size(),1);
+            verify(httpClient,times(1)).execute(any());
             verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
         }
-
     }
-
 }

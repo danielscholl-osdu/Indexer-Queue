@@ -43,7 +43,9 @@ public class ThreadScopeContext {
         Bean bean = beans.get(name);
         if (null != bean) {
             beans.remove(name);
-            bean.destructionCallback.run();
+            if (null != bean.destructionCallback) {
+              bean.destructionCallback.run();
+            }
             return bean.object;
         }
         return null;

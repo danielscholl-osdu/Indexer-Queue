@@ -18,12 +18,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import org.opengroup.osdu.azure.logging.CoreLoggerFactory;
-import org.opengroup.osdu.azure.logging.ICoreLogger;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerRetryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class RecordChangedMessageHandler implements IRecordChangedMessageHandler
 
   private final Gson gson = new Gson();
   private HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-  private ICoreLogger Logger = CoreLoggerFactory.getInstance().getLogger(RecordChangedMessageHandler.class.getName());
+  private Logger logger = LoggerFactory.getLogger(RecordChangedMessageHandler.class.getName());
 
   /***
    * Create an Http Request to index-worker endpoint of indexer service and deliver RecordChangedMessage.
@@ -55,7 +55,7 @@ public class RecordChangedMessageHandler implements IRecordChangedMessageHandler
   public void sendMessagesToIndexer(RecordChangedMessages recordChangedMessage) {
 
     try (CloseableHttpClient indexWorkerClient = httpClientBuilder.build()) {
-      Logger.debug("Sending recordChangedMessages to indexer service {}: ", this.gson.toJson(recordChangedMessage));
+      logger.debug("Sending recordChangedMessages to indexer service {}: ", this.gson.toJson(recordChangedMessage));
       HttpPost indexWorkerRequest = new HttpPost(azureBootstrapConfig.getIndexerWorkerURL());
       indexWorkerRequest.setEntity(new StringEntity(this.gson.toJson(recordChangedMessage)));
       indexWorkerRequest.setHeader(DpsHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
