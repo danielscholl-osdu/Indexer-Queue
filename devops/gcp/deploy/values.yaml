@@ -10,6 +10,7 @@ data:
   image: ""
   imagePullPolicy: "IfNotPresent"
   serviceAccountName: "indexer-queue"
+
 conf:
   appName: "indexer-queue"
   configmap: "indexer-queue-config"
@@ -17,3 +18,11 @@ conf:
   rabbitmqSecretName: "rabbitmq-secret"
   onPremEnabled: false
   domain: ""
+
+istio:
+  proxyCPU: "50m"
+  proxyCPULimit: "500m"
+  proxyMemory: "64Mi"
+  proxyMemoryLimit: "512Mi"
+  bootstrapProxyCPU: "10m"
+  bootstrapProxyCPULimit: "100m"
