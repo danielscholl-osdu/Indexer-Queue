@@ -19,6 +19,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
+import org.opengroup.osdu.core.common.model.http.RequestStatus;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
@@ -69,7 +70,7 @@ public class RecordChangedMessageHandler implements IRecordChangedMessageHandler
 
       CloseableHttpResponse response = indexWorkerClient.execute(indexWorkerRequest);
 
-      if (response.getStatusLine().getStatusCode() == 295) {
+      if (response.getStatusLine().getStatusCode() == RequestStatus.NO_RETRY) {
         throw new IndexerNoRetryException(format("Failed to send message %s to Indexer. No retry response", recordChangedMessage.getData()));
       }
       if (response.getStatusLine().getStatusCode() == 404) {

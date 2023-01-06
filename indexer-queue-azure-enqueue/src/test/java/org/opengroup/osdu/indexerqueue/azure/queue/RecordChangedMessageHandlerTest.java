@@ -21,8 +21,10 @@ import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.cache.VmCache;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
+import org.opengroup.osdu.core.common.model.http.RequestStatus;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -30,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -137,5 +140,16 @@ public class RecordChangedMessageHandlerTest {
             verify(httpClient,times(1)).execute(any());
             verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
         }
+    }
+
+    @Test
+    public void shouldThrow_whenHttpPostMethod_ReturnsNoRetryResponseCode() throws Exception {
+        when(httpClientBuilder.build()).thenReturn(httpClient);
+        when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
+        when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
+        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1), RequestStatus.NO_RETRY,"error");
+        when(httpResponse.getStatusLine()).thenReturn(status);
+
+        assertThrows(IndexerNoRetryException.class, () -> sut.sendMessagesToIndexer(recordChangedMessages));
     }
 }
