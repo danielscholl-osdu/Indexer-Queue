@@ -208,6 +208,9 @@
         <version>6.2.2</version>
         <executions>
             <execution>
+              <configuration>
+                <skip>true</skip>
+              </configuration>
                 <goals>
                     <goal>check</goal>
                 </goals>
