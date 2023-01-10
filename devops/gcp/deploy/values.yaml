@@ -3,6 +3,18 @@
 # Declare variables to be passed into your templates.
 
 data:
+  # Configmap
+  logLevel: "ERROR"
+  entitlementsHost: "http://entitlements"
+  partitionHost: "http://partition"
+  springProfilesActive: "gcp"
+  cloudTaskTargetHost: ""
+  googleAudiences: ""
+  googleCloudProject: ""
+  googleCloudProjectRegion: ""
+  indexerQueueIdentifier: ""
+  indexerHost: "http://indexer"
+  # Deployment
   requestsCpu: "0.1"
   requestsMemory: "384M"
   limitsCpu: "1"
