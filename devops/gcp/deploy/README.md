@@ -27,28 +27,55 @@ Packages are only needed for installation from a local computer.
 Before installing deploy Helm chart you need to install [configmap Helm chart](../configmap).
 First you need to set variables in **values.yaml** file using any code editor. Some of the values are prefilled, but you need to specify some values as well. You can find more information about them below.
 
-### Common variables
+### Configmap variables
 
 | Name | Description | Type | Default |Required |
 |------|-------------|------|---------|---------|
-**requestsCpu** | amount of requested CPU | string | 0.1 | yes
-**requestsMemory** | amount of requested memory| string | 384M | yes
-**limitsCpu** | CPU limit | string | 1 | yes
-**limitsMemory** | memory limit | string | 1G | yes
-**image** | service image | string | - | yes
-**imagePullPolicy** | when to pull image | string | IfNotPresent | yes
-**serviceAccountName** | name of your service account | string | indexer-queue | yes
+**data.logLevel** | logging level | string | INFO | yes
+**data.entitlementsHost** | entitlements service host | string | "http://entitlements" | yes
+**data.partitionHost** | partition service host | string | "http://partition" | yes
+**data.springProfilesActive** | active spring profile | string | gcp | yes
+**data.cloudTaskTargetHost** | your target host | string | - | yes
+**data.googleAudiences** | your GCP [client ID](https://console.cloud.google.com/apis/credentials) | string | - | yes
+**data.googleCloudProject** | your GCP project ID | string | - | yes
+**data.googleCloudProjectRegion** | your GCP project region | string | - | yes
+**data.indexerQueueIdentifier** | config for cloud tasks queue | string | - | yes
+**data.indexerHost** | indexer service host | string | "http://indexer" | yes
+
+### Deployment variables
+
+| Name | Description | Type | Default |Required |
+|------|-------------|------|---------|---------|
+**data.requestsCpu** | amount of requested CPU | string | 0.1 | yes
+**data.requestsMemory** | amount of requested memory| string | 384M | yes
+**data.limitsCpu** | CPU limit | string | 1 | yes
+**data.limitsMemory** | memory limit | string | 1G | yes
+**data.image** | service image | string | - | yes
+**data.imagePullPolicy** | when to pull image | string | IfNotPresent | yes
+**data.serviceAccountName** | name of your service account | string | indexer-queue | yes
 
 ### Config variables
 
 | Name | Description | Type | Default |Required |
 |------|-------------|------|---------|---------|
-**appName** | name of the app | string | indexer-queue | yes
-**configmap** | configmap to be used | string | indexer-queue-config | yes
-**keycloakSecretName** | secret for keycloak | string | indexer-queue-keycloak-secret | yes
-**rabbitmqSecretName** | secret for rabbitmq | string | rabbitmq-secret | yes
-**onPremEnabled** | whether on-prem is enabled | boolean | false | yes
-**domain** | your domain | string | - | yes
+**conf.appName** | name of the app | string | indexer-queue | yes
+**conf.configmap** | configmap to be used | string | indexer-queue-config | yes
+**conf.keycloakSecretName** | secret for keycloak | string | indexer-queue-keycloak-secret | yes
+**conf.rabbitmqSecretName** | secret for rabbitmq | string | rabbitmq-secret | yes
+**conf.onPremEnabled** | whether on-prem is enabled | boolean | false | yes
+**conf.domain** | your domain | string | - | yes
+
+
+### ISTIO variables
+
+| Name | Description | Type | Default |Required |
+|------|-------------|------|---------|---------|
+**istio.proxyCPU** | CPU request for Envoy sidecars | string | 50m | yes
+**istio.proxyCPULimit** | CPU limit for Envoy sidecars | string | 500m | yes
+**istio.proxyMemory** | memory request for Envoy sidecars | string | 64Mi | yes
+**istio.proxyMemoryLimit** | memory limit for Envoy sidecars | string | 512Mi | yes
+**istio.bootstrapProxyCPU** | CPU request for Envoy sidecars | string | 10m | yes
+**istio.bootstrapProxyCPULimit** | CPU limit for Envoy sidecars | string | 100m | yes
 
 ### Install the helm chart
 
