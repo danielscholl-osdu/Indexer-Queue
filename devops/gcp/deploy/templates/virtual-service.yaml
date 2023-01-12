@@ -22,4 +22,4 @@ spec:
         - destination:
             port:
               number: 80
-            host: "{{ .Values.conf.appName }}.{{ .Release.Namespace }}.svc.cluster.local"
+            host: {{ printf "%s.%s.svc.cluster.local" .Values.conf.appName .Release.Namespace | quote }}

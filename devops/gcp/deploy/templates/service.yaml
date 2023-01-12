@@ -5,8 +5,8 @@ metadata:
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
   {{- end }}
-  name: "{{ .Values.conf.appName }}"
-  namespace: "{{ .Release.Namespace }}"
+  name: {{ .Values.conf.appName | quote }}
+  namespace: {{ .Release.Namespace | quote }}
 spec:
   ports:
     - protocol: TCP
@@ -14,4 +14,4 @@ spec:
       targetPort: 8080
       name: http
   selector:
-    app: "{{ .Values.conf.appName }}"
+    app: {{ .Values.conf.appName | quote }}
