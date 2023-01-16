@@ -24,6 +24,7 @@ import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerRetryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -67,7 +68,10 @@ public class RecordChangedMessageHandler implements IRecordChangedMessageHandler
 
       CloseableHttpResponse response = indexWorkerClient.execute(indexWorkerRequest);
 
-      if (response.getStatusLine().getStatusCode() != 200 && response.getStatusLine().getStatusCode() != 201) {
+      if(response.getStatusLine().getStatusCode() == 404){
+        throw new ValidStorageRecordNotFoundException(format("Indexer unable to proceed, valid storage record not found. Response status: %d", response.getStatusLine().getStatusCode()));
+      }
+      else if (response.getStatusLine().getStatusCode() > 299) {
         throw new IndexerRetryException(format("Failed to send message %s to Indexer. Response status: %d", recordChangedMessage.getData(), response.getStatusLine().getStatusCode()));
       }
     } catch (IOException e) {
