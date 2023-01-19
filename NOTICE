@@ -347,7 +347,7 @@ The following software have components provided under the terms of this license:
 - Apache Lucene (module: suggest) (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-suggest)
 - Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
 - Apache Maven Shared Utils (from https://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-utils)
-- AssertJ fluent assertions (from ${project.parent.url}#${project.artifactId}, https://repo1.maven.org/maven2/org/assertj/assertj-core)
+- AssertJ Core (from ${project.organization.url}#${project.artifactId})
 - Asynchronous Http Client (from https://repo1.maven.org/maven2/org/asynchttpclient/async-http-client)
 - Asynchronous Http Client Netty Utils (from https://repo1.maven.org/maven2/org/asynchttpclient/async-http-client-netty-utils)
 - AutoValue Annotations (from https://github.com/google/auto/tree/master/value, https://repo1.maven.org/maven2/com/google/auto/value/auto-value-annotations)
@@ -582,11 +582,11 @@ The following software have components provided under the terms of this license:
 - compiler (from http://github.com/spullara/mustache.java)
 - datastore-v1-proto-client (from https://repo1.maven.org/maven2/com/google/cloud/datastore/datastore-v1-proto-client)
 - documentdb-bulkexecutor (from http://azure.microsoft.com/en-us/services/documentdb/)
-- elasticsearch (from https://github.com/elastic/elasticsearch, https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch)
-- elasticsearch-cli (from https://github.com/elastic/elasticsearch)
-- elasticsearch-core (from https://github.com/elastic/elasticsearch)
-- elasticsearch-secure-sm (from https://github.com/elastic/elasticsearch)
-- elasticsearch-x-content (from https://github.com/elastic/elasticsearch)
+- elasticsearch (from https://github.com/elastic/elasticsearch, https://github.com/elastic/elasticsearch.git, https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch)
+- elasticsearch-cli (from https://github.com/elastic/elasticsearch, https://github.com/elastic/elasticsearch.git)
+- elasticsearch-core (from https://github.com/elastic/elasticsearch, https://github.com/elastic/elasticsearch.git)
+- elasticsearch-secure-sm (from https://github.com/elastic/elasticsearch, https://github.com/elastic/elasticsearch.git)
+- elasticsearch-x-content (from https://github.com/elastic/elasticsearch, https://github.com/elastic/elasticsearch.git)
 - error-prone annotations (from https://repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations)
 - io.grpc:grpc-alts (from https://github.com/grpc/grpc-java)
 - io.grpc:grpc-api (from https://github.com/grpc/grpc-java)
@@ -630,11 +630,11 @@ The following software have components provided under the terms of this license:
 - proto-google-cloud-tasks-v2 (from https://github.com/googleapis/java-tasks/proto-google-cloud-tasks-v2, https://repo1.maven.org/maven2/com/google/api/grpc/proto-google-cloud-tasks-v2)
 - proto-google-cloud-tasks-v2beta2 (from https://github.com/googleapis/java-tasks/proto-google-cloud-tasks-v2beta2, https://repo1.maven.org/maven2/com/google/api/grpc/proto-google-cloud-tasks-v2beta2)
 - proto-google-cloud-tasks-v2beta3 (from https://github.com/googleapis/java-tasks/proto-google-cloud-tasks-v2beta3, https://repo1.maven.org/maven2/com/google/api/grpc/proto-google-cloud-tasks-v2beta3)
-- proto-google-common-protos (from https://github.com/googleapis/api-client-staging, https://github.com/googleapis/googleapis, https://github.com/googleapis/java-iam/proto-google-common-protos)
-- proto-google-iam-v1 (from https://github.com/googleapis/googleapis, https://github.com/googleapis/java-iam/proto-google-iam-v1)
+- proto-google-common-protos (from https://github.com/googleapis/api-client-staging, https://github.com/googleapis/gapic-generator-java, https://github.com/googleapis/googleapis, https://github.com/googleapis/java-iam/proto-google-common-protos)
+- proto-google-iam-v1 (from https://github.com/googleapis/gapic-generator-java, https://github.com/googleapis/googleapis, https://github.com/googleapis/java-iam/proto-google-iam-v1)
 - rank-eval (from https://github.com/elastic/elasticsearch.git)
 - resilience4j (from https://github.com/resilience4j/resilience4j, https://resilience4j.readme.io, ttps://resilience4j.readme.io)
-- rest (from https://github.com/elastic/elasticsearch)
+- rest (from https://github.com/elastic/elasticsearch.git)
 - rest-high-level (from https://github.com/elastic/elasticsearch)
 - spring-security-crypto (from http://spring.io/spring-security, https://spring.io/projects/spring-security, https://spring.io/spring-security)
 - swagger-annotations (from https://repo1.maven.org/maven2/io/swagger/core/v3/swagger-annotations, https://repo1.maven.org/maven2/io/swagger/swagger-annotations)
@@ -652,7 +652,7 @@ BSD-2-Clause
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- API Common (from https://github.com/googleapis, https://github.com/googleapis/api-common-java)
+- API Common (from https://github.com/googleapis, https://github.com/googleapis/api-common-java, https://repo1.maven.org/maven2/com/google/api/api-common)
 - Apache Lucene (module: memory) (from https://lucene.apache.org/)
 - Apache Lucene (module: misc) (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-misc)
 - Apache Lucene (module: spatial-extras) (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-spatial-extras)
@@ -686,7 +686,7 @@ BSD-3-Clause
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- API Common (from https://github.com/googleapis, https://github.com/googleapis/api-common-java)
+- API Common (from https://github.com/googleapis, https://github.com/googleapis/api-common-java, https://repo1.maven.org/maven2/com/google/api/api-common)
 - ASM Analysis (from http://asm.ow2.io/)
 - ASM Commons (from http://asm.ow2.io/, https://repo1.maven.org/maven2/org/ow2/asm/asm-commons)
 - ASM Core (from http://asm.ow2.io/, http://asm.ow2.org/)
@@ -715,7 +715,7 @@ The following software have components provided under the terms of this license:
 - JBoss Jakarta Annotations API (from https://github.com/jboss/jboss-jakarta-annotations-api_spec)
 - Jackson module: Afterburner (from http://wiki.fasterxml.com/JacksonHome, https://github.com/FasterXML/jackson-modules-base)
 - Jakarta Activation (from https://repo1.maven.org/maven2/com/sun/activation/jakarta.activation)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
 - Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
@@ -823,7 +823,7 @@ The following software have components provided under the terms of this license:
 - Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
 - Expression Language 3.0 API (from http://uel-spec.java.net, http://uel.java.net)
 - JSR 311 API (from https://jsr311.dev.java.net, https://jsr311.dev.java.net/)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Java Architecture for XML Binding (from http://jaxb.java.net/, https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api)
 - JavaBeans Activation Framework (from https://repo1.maven.org/maven2/com/sun/activation/javax.activation)
 - JavaBeans(TM) Activation Framework (from http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
@@ -872,7 +872,7 @@ The following software have components provided under the terms of this license:
 - JUnit Platform Commons (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Platform Engine API (from http://junit.org/junit5/, https://junit.org/junit5/)
 - Jakarta Activation (from https://repo1.maven.org/maven2/com/sun/activation/jakarta.activation)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
 - Jakarta Bean Validation API (from https://beanvalidation.org)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
@@ -910,7 +910,7 @@ The following software have components provided under the terms of this license:
 - JUnit Platform Commons (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Platform Engine API (from http://junit.org/junit5/, https://junit.org/junit5/)
 - Jakarta Activation (from https://repo1.maven.org/maven2/com/sun/activation/jakarta.activation)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
 - Jakarta Bean Validation API (from https://beanvalidation.org)
 - Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
@@ -985,7 +985,7 @@ The following software have components provided under the terms of this license:
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JBoss Jakarta Annotations API (from https://github.com/jboss/jboss-jakarta-annotations-api_spec)
 - Jakarta Activation (from https://repo1.maven.org/maven2/com/sun/activation/jakarta.activation)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
 - Jakarta Bean Validation API (from https://beanvalidation.org)
 - Jakarta RESTful WS API (from https://github.com/eclipse-ee4j/jaxrs-api)
@@ -1061,7 +1061,7 @@ The following software have components provided under the terms of this license:
 - Java Native Access Platform (from https://github.com/java-native-access/jna)
 - Lucene Sandbox (from https://lucene.apache.org/, https://repo1.maven.org/maven2/org/apache/lucene/lucene-sandbox)
 - Spring Security - Core (from http://spring.io/spring-security, https://repo1.maven.org/maven2/org/springframework/security/spring-security-core, https://spring.io/projects/spring-security, https://spring.io/spring-security)
-- elasticsearch (from https://github.com/elastic/elasticsearch, https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch)
+- elasticsearch (from https://github.com/elastic/elasticsearch, https://github.com/elastic/elasticsearch.git, https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch)
 - spring-security-crypto (from http://spring.io/spring-security, https://spring.io/projects/spring-security, https://spring.io/spring-security)
 
 ========================================================================
@@ -1295,7 +1295,7 @@ unknown
 The following software have components provided under the terms of this license:
 
 - Jakarta Activation (from https://repo1.maven.org/maven2/com/sun/activation/jakarta.activation)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - System Rules (from http://stefanbirkner.github.com/system-rules/, http://stefanbirkner.github.io/system-rules/)
 
 ========================================================================

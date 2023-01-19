@@ -2,6 +2,9 @@ variables:
   OSDU_GCP_SERVICE: indexer-queue
   OSDU_GCP_VENDOR: gcp-cloudrun
   BUILD_PATH: "$OSDU_GCP_SERVICE-$OSDU_GCP_VENDOR/cloudbuild/Dockerfile.cloudbuild"
+  GC_HELM_SETS: >- 
+    --set data.cloudTaskTargetHost=$OSDU_GCP_CLOUD_TASK_TARGET_HOST 
+    --set data.indexerQueueIdentifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME
   # FIXME remove when all services are migrated to a single helm
   OSDU_GCP_ENABLE_HELM_CONFIG: "false"
 
