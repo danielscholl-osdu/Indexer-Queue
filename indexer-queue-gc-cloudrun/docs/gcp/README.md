@@ -1,8 +1,8 @@
-# Service Configuration for GCP
+# Service Configuration for Google Cloud
 
 ## Table of Contents <a name="TOC"></a>
 
-* [Service Configuration for GCP](#service-configuration-for-gcp)
+* [Service Configuration for Google Cloud](#service-configuration-for-gc)
   * [Table of Contents <a name="TOC"></a>](#table-of-contents-)
   * [Environment variables](#environment-variables)
     * [Must have](#must-have)
@@ -17,10 +17,10 @@
 
 | name | value | description | sensitive? | source |
 | ---  | ---   | ---         | ---        | ---    |
-| `GOOGLE_AUDIENCES` | ex `*****.apps.googleusercontent.com` | Client ID for getting access to cloud resources | yes | https://console.cloud.google.com/apis/credentials |
+| `GOOGLE_AUDIENCES` | ex `*****.apps.googleusercontent.com` | Client ID for getting access to cloud resources | yes | <https://console.cloud.google.com/apis/credentials> |
 | `GOOGLE_CLOUD_PROJECT_REGION` | ex `us-central1` | Service deployment region | no | output of infrastructure deployment |
 | `GOOGLE_CLOUD_PROJECT` | ex `opendes` | Google Cloud Project Id| no | output of infrastructure deployment |
-| `SPRING_PROFILES_ACTIVE` | ex `gcp` | Spring profile that activate default configuration for GCP environment | false | - |
+| `SPRING_PROFILES_ACTIVE` | ex `gcp` | Spring profile that activate default configuration for Google Cloud environment | false | - |
 
 ### Defined in default application property file but possible to override
 
@@ -40,12 +40,12 @@
 
 ### For Google Cloud only
 
-These variables define service behavior, and are used to switch between `anthos` or `gcp` environments, their overriding
+These variables define service behavior, and are used to switch between `Reference` or `Google Cloud` environments, their overriding
 and usage in mixed mode was not tested. Usage of spring profiles is preferred.
 
 | name                         | value                                 | description                                                        | sensitive? | source                                            |
 |------------------------------|---------------------------------------|--------------------------------------------------------------------|------------|---------------------------------------------------|
-| `GOOGLE_APPLICATION_CREDENTIALS` | ex `/path/to/directory/service-key.json` | Service account credentials, you only need this if running locally | yes | https://console.cloud.google.com/iam-admin/serviceaccounts |
+| `GOOGLE_APPLICATION_CREDENTIALS` | ex `/path/to/directory/service-key.json` | Service account credentials, you only need this if running locally | yes | <https://console.cloud.google.com/iam-admin/serviceaccounts> |
 
 ## Pubsub configuration
 
@@ -55,17 +55,18 @@ At Pubsub should be created topic with name:
 
 It can be overridden by:
 
-- through the Spring Boot property `records_changed_topic_name`
-- environment variable `RECORDS_CHANGED_TOPIC_NAME`
+* through the Spring Boot property `records_changed_topic_name`
+* environment variable `RECORDS_CHANGED_TOPIC_NAME`
 
-2.  **name:** `records`
+2. **name:** `records`
 
 It can be overridden by:
 
-- through the Spring Boot property `records_topic_name`
-- environment variable `RECORDS_TOPIC_NAME`
+* through the Spring Boot property `records_topic_name`
+* environment variable `RECORDS_TOPIC_NAME`
 
 ## Google cloud service account configuration
+
 TBD
 
 | Required roles |

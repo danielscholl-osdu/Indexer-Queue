@@ -8,31 +8,31 @@ cli:
   project: Indexer Queue
 analyze:
   modules:
-  - name: indexer-queue
-    type: mvn
-    target: pom.xml
-    path: .
-  - name: indexer-queue-gcp
-    type: mvn
-    target: indexer-queue-gcp/pom.xml
-    path: .
-  - name: indexer-queue-aws
-    type: mvn
-    target: indexer-queue-aws/pom.xml
-    path: .
-  - name: indexer-queue-ibm
-    type: mvn
-    target: indexer-queue-ibm/pom.xml
-    path: .
-  - name: EnqueueFunction
-    type: mvn
-    target: indexer-queue-azure-enqueue/pom.xml
-    path: .
-  - name: RequeueFunction
-    type: mvn
-    target: indexer-queue-azure-requeue/pom.xml
-    path: .
-  - name: indexer-queue-gcp-cloudrun
-    type: mvn
-    target: indexer-queue-gcp-cloudrun/pom.xml
-    path: .
+    - name: indexer-queue
+      type: mvn
+      target: pom.xml
+      path: .
+    - name: indexer-queue-gcp
+      type: mvn
+      target: indexer-queue-gcp/pom.xml
+      path: .
+    - name: indexer-queue-aws
+      type: mvn
+      target: indexer-queue-aws/pom.xml
+      path: .
+    - name: indexer-queue-ibm
+      type: mvn
+      target: indexer-queue-ibm/pom.xml
+      path: .
+    - name: EnqueueFunction
+      type: mvn
+      target: indexer-queue-azure-enqueue/pom.xml
+      path: .
+    - name: RequeueFunction
+      type: mvn
+      target: indexer-queue-azure-requeue/pom.xml
+      path: .
+    - name: indexer-queue-gc-cloudrun
+      type: mvn
+      target: indexer-queue-gc-cloudrun/pom.xml
+      path: .
