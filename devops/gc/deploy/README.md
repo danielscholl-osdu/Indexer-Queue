@@ -36,9 +36,9 @@ First you need to set variables in **values.yaml** file using any code editor. S
 **data.partitionHost** | partition service host | string | "http://partition" | yes
 **data.springProfilesActive** | active spring profile | string | gcp | yes
 **data.cloudTaskTargetHost** | your target host | string | - | yes
-**data.googleAudiences** | your GCP [client ID](https://console.cloud.google.com/apis/credentials) | string | - | yes
-**data.googleCloudProject** | your GCP project ID | string | - | yes
-**data.googleCloudProjectRegion** | your GCP project region | string | - | yes
+**data.googleAudiences** | your Google Cloud [client ID](https://console.cloud.google.com/apis/credentials) | string | - | yes
+**data.googleCloudProject** | your Google Cloud project ID | string | - | yes
+**data.googleCloudProjectRegion** | your Google Cloud project region | string | - | yes
 **data.indexerQueueIdentifier** | config for cloud tasks queue | string | - | yes
 **data.indexerHost** | indexer service host | string | "http://indexer" | yes
 
@@ -65,7 +65,6 @@ First you need to set variables in **values.yaml** file using any code editor. S
 **conf.onPremEnabled** | whether on-prem is enabled | boolean | false | yes
 **conf.domain** | your domain | string | - | yes
 
-
 ### ISTIO variables
 
 | Name | Description | Type | Default |Required |
@@ -82,7 +81,7 @@ First you need to set variables in **values.yaml** file using any code editor. S
 Run this command from within this directory:
 
 ```console
-helm install gcp-indexer-queue-deploy .
+helm install gc-indexer-queue-deploy .
 ```
 
 ## Uninstalling the Chart
@@ -90,7 +89,7 @@ helm install gcp-indexer-queue-deploy .
 To uninstall the helm deployment:
 
 ```console
-helm uninstall gcp-indexer-queue-deploy
+helm uninstall gc-indexer-queue-deploy
 ```
 
 [Move-to-Top](#deploy-helm-chart)

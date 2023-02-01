@@ -102,7 +102,7 @@ public class ReEnqueueApplication {
             }
 
 //           TODO: Verify authorization token sent by Index Worker
-//            Similar to indexer-queue-boot-gcp/.../middleware/AuthorizationRequestFilter.java
+//            Similar to indexer-queue-boot-gc/.../middleware/AuthorizationRequestFilter.java
 
         } catch (Exception e) {
             throw new AppException(HttpStatus.SC_FORBIDDEN, "Access denied", "The user or service is not authorized to perform this action", e);

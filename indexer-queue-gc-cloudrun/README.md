@@ -1,20 +1,20 @@
-# Indexer-queue-gcp
+# Indexer-queue-gc
 
-indexer-queue-gcp-cloudrun is a service that is woken up in response to messages emitted by os-storage onto Service Bus.
+indexer-queue-gc-cloudrun is a service that is woken up in response to messages emitted by os-storage onto Service Bus.
 It is responsible for calling the os-indexer to trigger re-indexing events.
 
 ## Table of Contents <a name="TOC"></a>
-* [Getting started](#Getting-started)
-* [Mappers](#Mappers)
-* [Settings and Configuration](#Settings-and-Configuration)
-* [Run service](#Run-service)
-* [Testing](#Testing)
-* [Deployment](#Deployment)
-* [Entitlements groups](#Entitlements-groups)
-* [Licence](#Licence)
+
+* [Getting started](#getting-started)
+* [Mappers](#mappers)
+* [Settings and Configuration](#settings-and-configuration)
+* [Run service](#run-service)
+* [Testing](#testing)
+* [Deployment](#deployment)
+* [Entitlements groups](#entitlements-groups)
+* [Licence](#licence)
 
 ## Getting Started
-
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing
 purposes. See deployment for notes on how to deploy the project on a live system.
@@ -25,29 +25,33 @@ This is a universal solution created using EPAM OSM, OBM and OQM mappers technol
 implementations of KV stores, Blob stores and message brokers.
 
 For more information about mappers:
-- [OQM Readme](https://community.opengroup.org/osdu/platform/system/lib/cloud/gcp/oqm/-/blob/master/README.md)
+
+* [OQM Readme](https://community.opengroup.org/osdu/platform/system/lib/cloud/gcp/oqm/-/blob/master/README.md)
 
 ### Limitations of the current version
 
 In the current version, the mappers are equipped with several drivers to the stores and the message broker:
 
-- OQM (mapper to message brokers): Google PubSub; RabbitMQ
+* OQM (mapper to message brokers): Google PubSub; RabbitMQ
 
 ## Settings and Configuration
 
 ### Prerequisites
 
 1. Mandatory
-    - [Maven 3.6.0+](https://maven.apache.org/download.cgi)
-    - [AdoptOpenJDK8](https://adoptopenjdk.net/)
-    - [Lombok 1.16 or later](https://projectlombok.org/setup/maven)
+    * [Maven 3.6.0+](https://maven.apache.org/download.cgi)
+    * [AdoptOpenJDK8](https://adoptopenjdk.net/)
+    * [Lombok 1.16 or later](https://projectlombok.org/setup/maven)
 2. For Google Cloud only
-    - [GCloud SDK with java (latest version)](https://cloud.google.com/sdk/docs/install)
+    * [GCloud SDK with java (latest version)](https://cloud.google.com/sdk/docs/install)
 
-### Anthos Service Configuration:
-[Anthos service configuration ](docs/anthos/README.md)
-### GCP Service Configuration:
-[Gcp service configuration ](docs/gcp/README.md)
+### Anthos Service Configuration
+
+[Anthos service configuration](docs/anthos/README.md)
+
+##***REMOVED*** Service Configuration
+
+[Google Cloud service configuration](docs/gc/README.md)
 
 ## Run service
 
@@ -128,30 +132,30 @@ After configuring your environment as specified above, you can follow these step
 These steps should be invoked from the *repository root.*
 
 ```bash
-cd indexer-queue-gcp-cloudrun/ && mvn spring-boot:run
+cd indexer-queue-gc-cloudrun/ && mvn spring-boot:run
 ```
 
 ## Deployment
 
-* Google Documentation: https://cloud.google.com/cloud-build/docs/deploying-builds/deploy-cloud-run
+* Google Documentation: <https://cloud.google.com/cloud-build/docs/deploying-builds/deploy-cloud-run>
 
 ## Entitlements groups
 
-For authentication indexer-queue-gcp-cloudrun rely on entitlements service, 
+For authentication indexer-queue-gc-cloudrun rely on entitlements service,
 that mean Pubsub push subscription must be configured to use service account
 
 **Entitlements configuration for pubsub account**
 
-| Service account used in subscription | 
-| ---  | 
+| Service account used in subscription |
+| ---  |
 | users<br/>service.entitlements.user<br/>service.search.admin|
 
 Push endpoint must be service endpoint:
 
 Push endpoint
-https://indexer-queue-jvmvia5dea-uc.a.run.app/api/indexer-queue/v1/_ah/push-handlers/enqueue
+<https://indexer-queue-jvmvia5dea-uc.a.run.app/api/indexer-queue/v1/_ah/push-handlers/enqueue>
 
-* Google Documentation: https://cloud.google.com/pubsub/docs/push#authentication_and_authorization
+* Google Documentation: <https://cloud.google.com/pubsub/docs/push#authentication_and_authorization>
 
 ## Licence
 

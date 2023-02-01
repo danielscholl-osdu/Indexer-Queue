@@ -24,7 +24,7 @@ trigger:
       - /docs
       - /indexer-queue-aws
       - /indexer-queue-gcp
-      - /indexer-queue-gcp-cloudrun
+      - /indexer-queue-gc-cloudrun
       - /indexer-queue-ibm
       - /indexer-queue-reference
 
@@ -38,8 +38,8 @@ resources:
       name: infra-azure-provisioning
 
 variables:
-  - group: 'Azure - OSDU'
-  - group: 'Azure - OSDU Secrets'
+  - group: "Azure - OSDU"
+  - group: "Azure - OSDU Secrets"
 
   - name: serviceName
     value: "indexer-queue"
@@ -47,28 +47,28 @@ variables:
     value: "devops/azure/chart"
   - name: valuesFile
     value: "devops/azure/chart/helm-config.yaml"
-  - name: 'MANIFEST_REPO'
+  - name: "MANIFEST_REPO"
     value: $[ resources.repositories['FluxRepo'].name ]
   - name: SKIP_TESTS
-    value: 'false'
-  - name: 'MAVEN_CACHE_FOLDER'
+    value: "false"
+  - name: "MAVEN_CACHE_FOLDER"
     value: $(Pipeline.Workspace)/.m2/repository
 
 stages:
   - template: /devops/build-stage.yml@TemplateRepo
     parameters:
-      mavenGoal: 'package'
+      mavenGoal: "package"
       mavenPublishJUnitResults: true
-      mavenOptions: '-P indexer-queue-azure-enqueue --settings .mvn/community-maven.settings.xml -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+      mavenOptions: "-P indexer-queue-azure-enqueue --settings .mvn/community-maven.settings.xml -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)"
       copyFileContents: |
         pom.xml
         indexer-queue-azure-enqueue/maven/settings.xml
         indexer-queue-azure-enqueue/pom.xml
         indexer-queue-azure-enqueue/target/*-spring-boot.jar
-      copyFileContentsToFlatten: ''
-      mavenSettingsFile: './maven/settings.xml'
+      copyFileContentsToFlatten: ""
+      mavenSettingsFile: "./maven/settings.xml"
       # Integration tests exist only for azure provider currently.
-      testingRootFolder: 'testing/indexer-queue-azure-enqueue'
+      testingRootFolder: "testing/indexer-queue-azure-enqueue"
       serviceBase: ${{ variables.serviceName }}
       chartPath: ${{ variables.chartPath }}
   - template: /devops/deploy-stages.yml@TemplateRepo
@@ -79,5 +79,5 @@ stages:
       skipDeploy: ${{ variables.SKIP_DEPLOY }}
       skipTest: ${{ variables.SKIP_TESTS }}
       providers:
-        -  name: Azure
-           environments: ['dev']
+        - name: Azure
+          environments: ["dev"]
