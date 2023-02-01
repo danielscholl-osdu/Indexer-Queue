@@ -5,6 +5,7 @@ variables:
   GC_HELM_SETS: >- 
     --set data.cloudTaskTargetHost=$OSDU_GCP_CLOUD_TASK_TARGET_HOST 
     --set data.indexerQueueIdentifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME
+    --set data.googleAudiences=$GOOGLE_AUDIENCE
   # FIXME remove when all services are migrated to a single helm
   OSDU_GCP_ENABLE_HELM_CONFIG: "false"
 
