@@ -60,6 +60,10 @@ public class SbMessageBuilder {
         message.getAsJsonObject().addProperty(Constants.DATA, dataValue);
 
         Map<String, String> attributesMap = new HashMap<>();
+        JsonElement attributes = message.getAsJsonObject().get("attributes");
+        if(attributes != null && !Strings.isNullOrEmpty(attributes.toString())) {
+          attributesMap = gson.fromJson(attributes.toString(), attributesMap.getClass());
+        }
 
         if (message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID) == null
                 || message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID) == null) {
