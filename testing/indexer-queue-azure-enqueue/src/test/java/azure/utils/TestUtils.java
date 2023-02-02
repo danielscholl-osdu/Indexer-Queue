@@ -10,9 +10,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -76,8 +78,29 @@ public class TestUtils {
 
         WebResource.Builder builder = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON);
         headers.forEach(builder::header);
-
-        return builder.method(httpMethod, ClientResponse.class, requestBody);
+        int retryCount = 2;
+        try{
+            ClientResponse response = builder.method(httpMethod, ClientResponse.class, requestBody);
+            while (retryCount > 0) {
+                if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
+                  System.out.println("got resoponse : " + response.getStatusInfo());
+                  Thread.sleep(5000);
+                  System.out.println("Retrying.. ");
+                  response = builder.method(httpMethod, ClientResponse.class, requestBody);
+                } else
+                  break;
+                retryCount--;
+            }
+            System.out.println("sending response from TestUtils send method");
+            return response;
+        } catch (Exception e) {
+            if (e.getCause() instanceof SocketTimeoutException) {
+              System.out.println("Retrying in case of socket timeout exception");
+              return builder.method(httpMethod, ClientResponse.class, requestBody);
+            }
+            e.printStackTrace();
+            throw new AssertionError("Error: Send request error", e);
+        }
     }
 
     public static ClientResponse send(String url, String path, String httpMethod, Map<String, String> headers,
@@ -89,8 +112,29 @@ public class TestUtils {
         WebResource webResource = client.resource(url + path);
         WebResource.Builder builder = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON);
         headers.forEach(builder::header);
-
-        return builder.method(httpMethod, ClientResponse.class, requestBody);
+        int retryCount = 2;
+        try{
+            ClientResponse response = builder.method(httpMethod, ClientResponse.class, requestBody);
+            while (retryCount > 0) {
+                if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
+                  System.out.println("got resoponse : " + response.getStatusInfo());
+                  Thread.sleep(5000);
+                  System.out.println("Retrying.. ");
+                  response = builder.method(httpMethod, ClientResponse.class, requestBody);
+                } else
+                  break;
+                retryCount--;
+            }
+            System.out.println("sending response from TestUtils send method");
+            return response;
+        } catch (Exception e) {
+            if (e.getCause() instanceof SocketTimeoutException) {
+              System.out.println("Retrying in case of socket timeout exception");
+              return builder.method(httpMethod, ClientResponse.class, requestBody);
+            }
+            e.printStackTrace();
+            throw new AssertionError("Error: Send request error", e);
+        }
     }
 
     private static void log(String method, String url, Map<String, String> headers, String body) {
