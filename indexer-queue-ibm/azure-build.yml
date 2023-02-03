@@ -6,7 +6,7 @@
 trigger:
   branches:
     include:
-    - master
+      - master
   paths:
     exclude:
       - README.md
@@ -17,17 +17,17 @@ pool:
   demands: maven
 
 steps:
-- task: Maven@3
-  displayName: 'build, test, code coverage'
-  inputs:
-    mavenPomFile: 'indexer-queue-gcp/pom.xml'
-    options: '--settings indexer-queue-ibm/configuration/settings.xml -DVSTS_FEED_TOKEN=$(VSTS_FEED_TOKEN)'
-    testResultsFiles: '**/*/TEST-*.xml'
-    codeCoverageToolOption: JaCoCo
-    goals: 'clean install -U'
+  - task: Maven@3
+    displayName: "build, test, code coverage"
+    inputs:
+      mavenPomFile: "indexer-queue-gc/pom.xml"
+      options: "--settings indexer-queue-ibm/configuration/settings.xml -DVSTS_FEED_TOKEN=$(VSTS_FEED_TOKEN)"
+      testResultsFiles: "**/*/TEST-*.xml"
+      codeCoverageToolOption: JaCoCo
+      goals: "clean install -U"
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
-  inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
-  condition: succeededOrFailed()
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Artifact: drop"
+    inputs:
+      PathtoPublish: "$(build.artifactstagingdirectory)"
+    condition: succeededOrFailed()
