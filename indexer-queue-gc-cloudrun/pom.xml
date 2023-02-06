@@ -34,7 +34,7 @@
 
 	<groupId>org.opengroup.osdu.indexerqueue.cloudrun</groupId>
 	<artifactId>indexer-queue-gc-cloudrun</artifactId>
-	<version>0.19.0-SNAPSHOT</version>
+	<version>0.20.0-SNAPSHOT</version>
 	<name>indexer-queue-gc-cloudrun</name>
 	<description>Indexer Queue Google Cloud CloudRun</description>
 	<packaging>jar</packaging>
