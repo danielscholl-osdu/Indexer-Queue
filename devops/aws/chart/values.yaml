@@ -23,8 +23,6 @@ environmentVariables:
     value: "http://os-entitlements:8080"
   - name: PARAMETER_MOUNT_PATH
     value: "/mnt/params"
-podAnnotations: 
-  seccomp.security.alpha.kubernetes.io/pod: "runtime/default"
 
 # Resource Config
 replicaCount: 1
@@ -51,3 +49,7 @@ securityContext:
   capabilities:
     drop:
     - ALL
+podSecurityContext: 
+  fsGroup: 1337
+  seccompProfile:
+    type: RuntimeDefault
