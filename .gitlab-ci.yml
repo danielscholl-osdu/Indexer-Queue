@@ -53,8 +53,3 @@ include:
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "publishing/pages.yml"
-
-  - project: "osdu/platform/ci-cd-pipelines"
-    file: "cloud-providers/gc-global.yml"
-
-  - local: "devops/gc/pipeline/override-stages.yml"
