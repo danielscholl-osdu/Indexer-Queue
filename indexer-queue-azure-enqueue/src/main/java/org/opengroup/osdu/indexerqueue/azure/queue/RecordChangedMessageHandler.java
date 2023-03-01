@@ -19,8 +19,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
+import org.opengroup.osdu.core.common.model.http.RequestStatus;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerRetryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,10 +70,13 @@ public class RecordChangedMessageHandler implements IRecordChangedMessageHandler
 
       CloseableHttpResponse response = indexWorkerClient.execute(indexWorkerRequest);
 
-      if(response.getStatusLine().getStatusCode() == 404){
+      if (response.getStatusLine().getStatusCode() == RequestStatus.NO_RETRY) {
+        throw new IndexerNoRetryException(format("Failed to send message %s to Indexer. No retry response", recordChangedMessage.getData()));
+      }
+      if (response.getStatusLine().getStatusCode() == 404) {
         throw new ValidStorageRecordNotFoundException(format("Indexer unable to proceed, valid storage record not found. Response status: %d", response.getStatusLine().getStatusCode()));
       }
-      else if (response.getStatusLine().getStatusCode() > 299) {
+      if (response.getStatusLine().getStatusCode() > 299) {
         throw new IndexerRetryException(format("Failed to send message %s to Indexer. Response status: %d", recordChangedMessage.getData(), response.getStatusLine().getStatusCode()));
       }
     } catch (IOException e) {

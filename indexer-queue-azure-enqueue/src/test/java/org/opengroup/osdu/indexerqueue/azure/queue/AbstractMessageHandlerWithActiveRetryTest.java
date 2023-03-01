@@ -28,6 +28,7 @@ import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 
 import java.time.Instant;
@@ -147,6 +148,19 @@ public class AbstractMessageHandlerWithActiveRetryTest {
         messageHandler.onMessageAsync(message);
 
         assertEquals(6, messageProperties.get(PROPERTY_RETRY));
+
+        verify(receiveClient, only()).deadLetterAsync(UUID);
+        verifyNoInteractions(messagePublisher);
+    }
+
+    @Test
+    public void should_deadLetterMessage_ifNoRetryExceptionIsThrown() {
+        when(messageBody.getBinaryData()).thenReturn(singletonList(TEST_MESSAGE_BODY.getBytes(UTF_8)));
+        when(message.getMessageBody()).thenReturn(messageBody);
+        when(message.getLockToken()).thenReturn(UUID);
+        doThrow(new IndexerNoRetryException("test msg")).when(testMessageProcessor).doTheProcessing(message);
+
+        messageHandler.onMessageAsync(message);
 
         verify(receiveClient, only()).deadLetterAsync(UUID);
         verifyNoInteractions(messagePublisher);
