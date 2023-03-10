@@ -88,8 +88,8 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
         try {
             Type listType = new TypeToken<List<RecordInfo>>() {}.getType();
             List<RecordInfo> recordInfos = new Gson().fromJson(recordChangedMessage.getData(), listType);
-            for(RecordInfo record: recordInfos) {
-                this.metricService.sendIndexLatencyMetric(stopTime - enqueueTime);
+            for (RecordInfo record : recordInfos) {
+                this.metricService.sendIndexLatencyMetric(stopTime - enqueueTime, recordChangedMessage.getDataPartitionId(), recordChangedMessage.getCorrelationId());
             }
         } catch (Exception e) {
             logger.error("Error recording metrics", e);
