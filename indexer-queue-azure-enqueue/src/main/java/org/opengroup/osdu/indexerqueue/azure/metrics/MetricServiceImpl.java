@@ -19,6 +19,8 @@ import com.microsoft.applicationinsights.telemetry.MetricTelemetry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 public class MetricServiceImpl implements IMetricService {
 
@@ -33,14 +35,18 @@ public class MetricServiceImpl implements IMetricService {
     }
 
     @Override
-    public void sendIndexLatencyMetric(double value) {
-        this.sendMetric(LATENCY_METRIC_NAME, value);
+    public void sendIndexLatencyMetric(double value, String dataPartitionId, String correlationId) {
+        this.sendMetric(LATENCY_METRIC_NAME, value, dataPartitionId, correlationId);
     }
 
-    private void sendMetric(String name, double value) {
+    private void sendMetric(String name, double value, String dataPartitionId, String correlationId) {
+        Date date = new Date(System.currentTimeMillis());
         MetricTelemetry metric = new MetricTelemetry();
         metric.setName(name);
         metric.setValue(value);
+        metric.setTimestamp(date);
+        metric.getProperties().putIfAbsent("correlation-id", correlationId);
+        metric.getProperties().putIfAbsent("data-partition-id", dataPartitionId);
         telemetryClient.trackMetric(metric);
         telemetryClient.flush();
     }
