@@ -23,6 +23,7 @@ import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,11 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
             }
             return this.receiveClient.completeAsync(message.getLockToken());
 
+        } catch (IndexerNoRetryException e) {
+            String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
+            LOGGER.warn(String.format("No retry exception occurred while sending message %s to indexer service: %s",
+                messageBody, e.getMessage()));
+            return receiveClient.deadLetterAsync(message.getLockToken());
         } catch (ValidStorageRecordNotFoundException e) {
           String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
           LOGGER.debug(e.getMessage() + ". Record not found. No retry on message: {}", messageBody);

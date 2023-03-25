@@ -12,10 +12,6 @@ analyze:
       type: mvn
       target: pom.xml
       path: .
-    - name: indexer-queue-gcp
-      type: mvn
-      target: indexer-queue-gcp/pom.xml
-      path: .
     - name: indexer-queue-aws
       type: mvn
       target: indexer-queue-aws/pom.xml
@@ -31,8 +27,4 @@ analyze:
     - name: RequeueFunction
       type: mvn
       target: indexer-queue-azure-requeue/pom.xml
-      path: .
-    - name: indexer-queue-gc-cloudrun
-      type: mvn
-      target: indexer-queue-gc-cloudrun/pom.xml
       path: .

@@ -15,8 +15,8 @@ data:
   indexerQueueIdentifier: ""
   indexerHost: "http://indexer"
   # Deployment
-  requestsCpu: "0.1"
-  requestsMemory: "384M"
+  requestsCpu: "30m"
+  requestsMemory: "650Mi"
   limitsCpu: "1"
   limitsMemory: "1G"
   image: ""
@@ -32,9 +32,7 @@ conf:
   domain: ""
 
 istio:
-  proxyCPU: "50m"
+  proxyCPU: "20m"
   proxyCPULimit: "500m"
-  proxyMemory: "64Mi"
+  proxyMemory: "200Mi"
   proxyMemoryLimit: "512Mi"
-  bootstrapProxyCPU: "10m"
-  bootstrapProxyCPULimit: "100m"
