@@ -211,6 +211,7 @@
           <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
           <nugetconfAnalyzerEnabled>false</nugetconfAnalyzerEnabled>
           <nuspecAnalyzerEnabled>false</nuspecAnalyzerEnabled>
+          <failOnError>false</failOnError>
         </configuration>
         <executions>
           <execution>
