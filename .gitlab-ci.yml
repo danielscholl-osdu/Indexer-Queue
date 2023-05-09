@@ -29,36 +29,27 @@ variables:
 include:
   - project: "osdu/platform/ci-cd-pipelines"
     file: "standard-setup.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "build/maven.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "scanners/fossa-maven.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "scanners/gitlab-ultimate.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/aws-global.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/aws-maven.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/ibm-deploy-only.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "cloud-providers/azure.yml"
-    ref: m18-pipeline-update-mm
 
   - project: "osdu/platform/ci-cd-pipelines"
     file: "publishing/pages.yml"
-    ref: m18-pipeline-update-mm
