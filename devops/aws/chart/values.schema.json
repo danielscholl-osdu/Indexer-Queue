@@ -1,11 +1,9 @@
 {
-    "$schema": "osdu-aws-services-no-ingress-helm",
+    "$schema": "osdu-aws-services-private",
     "type": "object",
     "default": {},
     "required": [
         "image",
-        "imagePullPolicy",
-        "replicaCount",
         "serviceAccountRole"
     ],
     "properties": {
