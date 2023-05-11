@@ -22,6 +22,8 @@ import java.util.Map;
  */
 @Component
 public class SbMessageBuilder {
+    // It should be moved to core common later
+    private final String ANCESTRY_KINDS = "ancestry_kinds";
 
     @Autowired
     private ThreadDpsHeaders threadDpsHeaders;
@@ -60,6 +62,9 @@ public class SbMessageBuilder {
         message.getAsJsonObject().addProperty(Constants.DATA, dataValue);
 
         Map<String, String> attributesMap = new HashMap<>();
+        if(message.getAsJsonObject().get(ANCESTRY_KINDS) != null) {
+          attributesMap.put(ANCESTRY_KINDS, message.getAsJsonObject().get(ANCESTRY_KINDS).getAsString());
+        }
 
         if (message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID) == null
                 || message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID) == null) {
