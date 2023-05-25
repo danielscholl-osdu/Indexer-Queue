@@ -96,7 +96,7 @@
         </dependency>
         <dependency>
             <groupId>org.opengroup.osdu</groupId>
-            <artifactId>core-lib-gcp</artifactId>
+            <artifactId>core-lib-gc</artifactId>
             <version>0.16.0</version>
         </dependency>
         <!-- spring boot dependencies -->

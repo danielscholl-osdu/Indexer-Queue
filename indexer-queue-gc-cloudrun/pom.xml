@@ -117,7 +117,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
-			<artifactId>core-lib-gcp</artifactId>
+			<artifactId>core-lib-gc</artifactId>
 			<version>0.17.0-rc5</version>
 		</dependency>
 		<dependency>
