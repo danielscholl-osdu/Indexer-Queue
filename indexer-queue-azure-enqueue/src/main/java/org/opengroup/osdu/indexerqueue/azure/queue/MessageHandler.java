@@ -38,14 +38,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
 
-    private RecordChangedMessageHandler recordChangedMessageHandler;
+    private IndexUpdateMessageHandler indexUpdateMessageHandler;
     private SbMessageBuilder sbMessageBuilder;
     private Logger logger = LoggerFactory.getLogger(MessageHandler.class.getName());
     private IMetricService metricService;
 
     MessageHandler(SubscriptionClient client,
                    MessagePublisher messagePublisher,
-                   RecordChangedMessageHandler recordChangedMessageHandler,
+                   IndexUpdateMessageHandler indexUpdateMessageHandler,
                    SbMessageBuilder sbMessageBuilder,
                    IMetricService metricService,
                    RetryUtil retryUtil,
@@ -55,7 +55,7 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
                    Integer maxDeliveryCount,
                    String appName) {
         super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount);
-        this.recordChangedMessageHandler = recordChangedMessageHandler;
+        this.indexUpdateMessageHandler = indexUpdateMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;
         this.metricService = metricService;
     }
@@ -74,7 +74,7 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
             recordChangedMessage.setPublishTime(message.getEnqueuedTimeUtc().toString());
             recordChangedMessage.setMessageId(messageId);
 
-            recordChangedMessageHandler.sendMessagesToIndexer(recordChangedMessage);
+            indexUpdateMessageHandler.sendMessagesToIndexer(recordChangedMessage);
 
             long stopTime = System.currentTimeMillis();
             this.captureMetrics(recordChangedMessage, enqueueTime, stopTime);

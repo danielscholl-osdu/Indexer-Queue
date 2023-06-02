@@ -4,14 +4,11 @@ import com.microsoft.azure.servicebus.Message;
 import com.microsoft.azure.servicebus.MessageBody;
 import com.microsoft.azure.servicebus.SubscriptionClient;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
@@ -39,7 +36,7 @@ public class MessageHandlerTest {
     @Mock
     private SubscriptionClient subscriptionClient;
     @Mock
-    private RecordChangedMessageHandler recordChangedMessageHandler;
+    private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock
     private SbMessageBuilder sbMessageBuilder;
     @Mock
@@ -72,7 +69,7 @@ public class MessageHandlerTest {
         sut.processMessage(message);
 
         // Verify
-        verify(recordChangedMessageHandler, times(1)).sendMessagesToIndexer(recordChangedMessages);
+        verify(indexUpdateMessageHandler, times(1)).sendMessagesToIndexer(recordChangedMessages);
         verify(message, times(1)).getMessageId();
         verify(message, times(1)).getMessageBody();
         verify(message, times(2)).getEnqueuedTimeUtc();
@@ -82,7 +79,7 @@ public class MessageHandlerTest {
     public void shouldThrow_whenSendMessagesToIndexerThrows() throws Exception{
         //Setup
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
-        doThrow(exp).when(recordChangedMessageHandler).sendMessagesToIndexer(recordChangedMessages);
+        doThrow(exp).when(indexUpdateMessageHandler).sendMessagesToIndexer(recordChangedMessages);
 
         // Execute
         try {

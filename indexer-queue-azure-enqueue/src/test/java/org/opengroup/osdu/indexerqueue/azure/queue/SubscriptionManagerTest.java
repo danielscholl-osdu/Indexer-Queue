@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
@@ -39,7 +40,7 @@ public class SubscriptionManagerTest {
     @Mock
     private SbMessageBuilder sbMessageBuilder;
     @Mock
-    private RecordChangedMessageHandler recordChangedMessageHandler;
+    private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock
     private AzureBootstrapConfig azureBootstrapConfig;
     @Mock
@@ -71,25 +72,25 @@ public class SubscriptionManagerTest {
     public void shouldSuccessfullyRegisterMessageHandler() throws ServiceBusException, InterruptedException {
 
         doNothing().when(subscriptionClient).registerMessageHandler(any(), any(), any());
-        when(clientFactory.getSubscriptionClient(dataPartition)).thenReturn(subscriptionClient);
+        when(clientFactory.getSubscriptionClient(eq(dataPartition), any(), any())).thenReturn(subscriptionClient);
         when(azureBootstrapConfig.getMaxDeliveryCount()).thenReturn(maxDeliveryCount);
 
         sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
-        verify(azureBootstrapConfig, times(1)).getMaxConcurrentCalls();
-        verify(azureBootstrapConfig, times(1)).getMaxLockRenewDurationInSeconds();
+        verify(azureBootstrapConfig, times(2)).getMaxConcurrentCalls();
+        verify(azureBootstrapConfig, times(2)).getMaxLockRenewDurationInSeconds();
     }
 
     @Test
     public void shouldCatchExceptionIfErrorWhileRegisteringMessageHandler() throws ServiceBusException, InterruptedException {
 
         doThrow(new InterruptedException(errorMessage)).when(subscriptionClient).registerMessageHandler(any(), any(), any());
-        when(clientFactory.getSubscriptionClient(dataPartition)).thenReturn(subscriptionClient);
+        when(clientFactory.getSubscriptionClient(eq(dataPartition), any(), any())).thenReturn(subscriptionClient);
         when(azureBootstrapConfig.getMaxDeliveryCount()).thenReturn(maxDeliveryCount);
 
         sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
-        verify(azureBootstrapConfig, times(1)).getMaxConcurrentCalls();
-        verify(azureBootstrapConfig, times(1)).getMaxLockRenewDurationInSeconds();
+        verify(azureBootstrapConfig, times(2)).getMaxConcurrentCalls();
+        verify(azureBootstrapConfig, times(2)).getMaxLockRenewDurationInSeconds();
     }
 }
