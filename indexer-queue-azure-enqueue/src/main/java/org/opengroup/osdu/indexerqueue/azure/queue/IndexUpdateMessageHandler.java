@@ -40,14 +40,14 @@ import static java.lang.String.format;
  * A class to send recordChangedMessages to indexer-service.
  */
 @Component
-public class RecordChangedMessageHandler implements IRecordChangedMessageHandler {
+public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
 
   @Autowired
   private AzureBootstrapConfig azureBootstrapConfig;
 
   private final Gson gson = new Gson();
   private HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-  private Logger logger = LoggerFactory.getLogger(RecordChangedMessageHandler.class.getName());
+  private Logger logger = LoggerFactory.getLogger(IndexUpdateMessageHandler.class.getName());
 
   /***
    * Create an Http Request to index-worker endpoint of indexer service and deliver RecordChangedMessage.

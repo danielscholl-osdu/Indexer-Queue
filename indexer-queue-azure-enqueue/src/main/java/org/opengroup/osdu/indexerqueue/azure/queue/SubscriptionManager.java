@@ -42,7 +42,7 @@ public class SubscriptionManager {
     @Autowired
     private SbMessageBuilder sbMessageBuilder;
     @Autowired
-    private RecordChangedMessageHandler recordChangedMessageHandler;
+    private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Autowired
     private AzureBootstrapConfig azureBootstrapConfig;
     @Autowired
@@ -97,16 +97,17 @@ public class SubscriptionManager {
 
         logger.info("Total number of partitions " + tenantList.size());
 
+        // Please note that for MessagePublisher, publish topic for retry should use reindex topic instead of record change topic
+        // to avoid creating duplicate/repeated record change event
+        String publishTopicName = azureBootstrapConfig.getReindexTopic();
         for (String partition : tenantList) {
 
             if(partitions.contains(partition)) {
                 continue;
             }
             try {
-                SubscriptionClient subscriptionClient = this.clientFactory.getSubscriptionClient(partition);
-                MessagePublisher messagePublisher = new TopicMessagePublisher(this.topicClientFactory, retryTemplate,
-                        partition, azureBootstrapConfig.getServiceBusTopic());
-                registerMessageHandler(subscriptionClient, messagePublisher, executorService);
+                subscribe(executorService, partition, azureBootstrapConfig.getServiceBusTopic(), azureBootstrapConfig.getServiceBusTopicSubscription(), publishTopicName);
+                subscribe(executorService, partition, azureBootstrapConfig.getReindexTopic(), azureBootstrapConfig.getReindexTopicSubscription(), publishTopicName);
                 partitions.add(partition);
             }
             catch (Exception e) {
@@ -115,6 +116,12 @@ public class SubscriptionManager {
         }
     }
 
+    private void subscribe(ExecutorService executorService, String partition, String topicName, String subscriptionName, String publishTopicName) {
+        SubscriptionClient subscriptionClient = this.clientFactory.getSubscriptionClient(partition, topicName, subscriptionName);
+        MessagePublisher messagePublisher = new TopicMessagePublisher(this.topicClientFactory, retryTemplate,
+          partition, publishTopicName);
+        registerMessageHandler(subscriptionClient, messagePublisher, executorService);
+    }
 
     /*
      * For the given subscriptionClient, register message handler with message handling options as mentioned below.
@@ -128,7 +135,7 @@ public class SubscriptionManager {
             Integer maxDeliveryCount = Integer.valueOf(azureBootstrapConfig.getMaxDeliveryCount());
             String appName = azureBootstrapConfig.getAppName();
             MessageHandler messageHandler = new MessageHandler(subscriptionClient,
-                    messageSender, recordChangedMessageHandler, sbMessageBuilder,
+                    messageSender, indexUpdateMessageHandler, sbMessageBuilder,
                     metricService, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, maxDeliveryCount, appName);
             subscriptionClient.registerMessageHandler(
                     messageHandler,

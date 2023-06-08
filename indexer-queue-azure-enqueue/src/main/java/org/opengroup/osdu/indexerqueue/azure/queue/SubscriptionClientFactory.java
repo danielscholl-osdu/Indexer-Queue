@@ -13,16 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubscriptionClientFactory {
 
-    @Autowired
-    private AzureBootstrapConfig azureBootstrapConfig;
-
     @Autowired private ISubscriptionClientFactory subscriptionClientFactory;
 
-    public SubscriptionClient getSubscriptionClient(String dataPartition) {
-        String sbTopic = azureBootstrapConfig.getServiceBusTopic();
-        String sbSubscription = azureBootstrapConfig.getServiceBusTopicSubscription();
+    public SubscriptionClient getSubscriptionClient(String dataPartition, String topicName, String subscriptionName) {
         try {
-            return subscriptionClientFactory.getClient(dataPartition, sbTopic, sbSubscription);
+            return subscriptionClientFactory.getClient(dataPartition, topicName, subscriptionName);
         } catch (ServiceBusException | InterruptedException e) {
             throw new AppException(500, "Server Error", "Unexpected error creating Subscription Client", e);
         }

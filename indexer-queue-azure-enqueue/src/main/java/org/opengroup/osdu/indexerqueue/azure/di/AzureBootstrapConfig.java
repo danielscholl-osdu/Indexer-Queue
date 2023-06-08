@@ -40,6 +40,12 @@ public class AzureBootstrapConfig {
     @Value("${azure.servicebus.topic-subscription}")
     private String serviceBusTopicSubscription;
 
+    @Value("${azure.reindex.topic-name}")
+    private String reindexTopic;
+
+    @Value("${azure.reindex.topic-subscription}")
+    private String reindexTopicSubscription;
+
     @Value("${indexer.worker.url}")
     private String indexerWorkerURL;
 

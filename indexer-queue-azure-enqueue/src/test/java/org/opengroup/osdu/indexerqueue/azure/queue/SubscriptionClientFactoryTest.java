@@ -35,24 +35,20 @@ public class SubscriptionClientFactoryTest {
 
     @Test
     public void subscriptionClientShouldNotBeNull() throws ServiceBusException, InterruptedException {
-        when(azureBootstrapConfig.getServiceBusTopic()).thenReturn(sbTopic);
-        when(azureBootstrapConfig.getServiceBusTopicSubscription()).thenReturn(sbSubscription);
         when(subscriptionClientFactory.getClient(dataPartition, sbTopic, sbSubscription))
                 .thenReturn(subscriptionClient);
 
-        SubscriptionClient result = sut.getSubscriptionClient(dataPartition);
+        SubscriptionClient result = sut.getSubscriptionClient(dataPartition, sbTopic, sbSubscription);
         assertNotNull(result);
         assertEquals(subscriptionClient, result);
     }
 
     @Test
     public void shouldThrow_when_subscriptionClientFactory_ThrowsInterruptedException() throws ServiceBusException, InterruptedException {
-        when(azureBootstrapConfig.getServiceBusTopic()).thenReturn(sbTopic);
-        when(azureBootstrapConfig.getServiceBusTopicSubscription()).thenReturn(sbSubscription);
         doThrow(new InterruptedException()).when(subscriptionClientFactory).getClient(dataPartition, sbTopic, sbSubscription);
 
         try {
-            SubscriptionClient result = sut.getSubscriptionClient(dataPartition);
+            SubscriptionClient result = sut.getSubscriptionClient(dataPartition, sbTopic, sbSubscription);
         } catch (Exception e) {
             assertEquals(e.getClass(), AppException.class);
             assertEquals(e.getMessage(), "Unexpected error creating Subscription Client");
@@ -61,12 +57,10 @@ public class SubscriptionClientFactoryTest {
 
     @Test
     public void shouldThrow_when_subscriptionClientFactory_ThrowsServiceBusException() throws ServiceBusException, InterruptedException {
-        when(azureBootstrapConfig.getServiceBusTopic()).thenReturn(sbTopic);
-        when(azureBootstrapConfig.getServiceBusTopicSubscription()).thenReturn(sbSubscription);
         doThrow(new ServiceBusException(true)).when(subscriptionClientFactory).getClient(dataPartition, sbTopic, sbSubscription);
 
         try {
-            SubscriptionClient result = sut.getSubscriptionClient(dataPartition);
+            SubscriptionClient result = sut.getSubscriptionClient(dataPartition, sbTopic, sbSubscription);
         } catch (Exception e) {
             assertEquals(e.getClass(), AppException.class);
             assertEquals(e.getMessage(), "Unexpected error creating Subscription Client");
