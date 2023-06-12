@@ -44,6 +44,8 @@ az keyvault secret show --vault-name $KEY_VAULT_NAME --name $KEY_VAULT_SECRET_NA
 | ---  | ---   | ---         | ---        | ---    |
 | `azure_servicebus_topic_name` | `recordstopic` | Service Bus topic to listen on | no | output of infrastructure deployment |
 | `azure_servicebus_topic_subscription` | `recordstopicsubscription` | Service Bus subscription to listen from | no | output of infrastructure deployment |
+| `azure_reindex_topic_name` | `reindextopic` | Re-index topic to listen on | no | output of infrastructure deployment |
+| `azure_reindex_topic_subscription` | `reindextopicsubscription` | Re-index subscription to listen from | no | output of infrastructure deployment |
 | `indexer_worker_url` | ex `https://indexer.azurewebsites.net/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer endpoint | no | output of infrastructure deployment |
 | `azure_application_insights_instrumentation_key` | `********` | Instrumentation key of the associated application insights resource | yes | output of infrastructure deployment |
 | `AZURE_TENANT_ID` | `*******` | AD tenant to authenticate users from | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-tenant-id` |
