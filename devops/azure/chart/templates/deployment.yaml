@@ -80,6 +80,10 @@ spec:
               value: {{ .Values.azure.servicebusTopic }}
             - name: azure_servicebus_topic_subscription
               value: {{ .Values.azure.servicebusSubscription }}
+            - name: azure_reindex_topic_name
+              value: { { .Values.azure.reindexTopic } }
+            - name: azure_reindex_topic_subscription
+              value: { { .Values.azure.reindexSubscription } }
             - name: KEYVAULT_URI
               valueFrom:
                  configMapKeyRef:
