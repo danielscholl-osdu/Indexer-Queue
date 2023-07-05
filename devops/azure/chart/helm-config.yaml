@@ -8,6 +8,8 @@ global:
 azure:
   servicebusSubscription: recordstopicsubscription
   servicebusTopic: recordstopic
+  reindexSubscription: reindextopicsubscription
+  reindexTopic: reindextopic
 
 ################################################################################
 # Specify the Gitlab branch being used for image creation
