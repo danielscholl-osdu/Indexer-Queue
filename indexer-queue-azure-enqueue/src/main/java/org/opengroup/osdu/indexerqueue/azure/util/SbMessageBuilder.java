@@ -73,16 +73,15 @@ public class SbMessageBuilder {
         }
 
         String dataPartitionId = message.getAsJsonObject().get(DpsHeaders.DATA_PARTITION_ID).getAsString();
+        String correlationId = message.getAsJsonObject().get(DpsHeaders.CORRELATION_ID).getAsString();
         String accountId = message.getAsJsonObject().get(DpsHeaders.ACCOUNT_ID).getAsString();
 
-        // Set the context for this thread.
-        // messageId is the correlation-id for the remaining workflow.
-        threadDpsHeaders.setThreadContext(dataPartitionId,messageId);
-        MDC.setContextMap(mdcContextMap.getContextMap(messageId, dataPartitionId));
+        threadDpsHeaders.setThreadContext(dataPartitionId,correlationId);
+        MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));
 
         // Populate attributes map for the recordChangedMessage.
         attributesMap.put(DpsHeaders.DATA_PARTITION_ID, dataPartitionId);
-        attributesMap.put(DpsHeaders.CORRELATION_ID, messageId);
+        attributesMap.put(DpsHeaders.CORRELATION_ID, correlationId);
 
         RecordChangedMessages recordChangedMessage = gson.fromJson(message.toString(), RecordChangedMessages.class);
         recordChangedMessage.setAttributes(attributesMap);

@@ -70,7 +70,7 @@ public class SbMessageBuilderTest {
 
     @Test
     public void shouldReturn_ValidRecordChangedMessage() throws IOException {
-        String expectedCorrelationId = "abc-1";
+        String expectedCorrelationId = "ee85038e-4510-49d9-b2ec-3651315a4d00";
         String expectedDataPartitionId = "common";
         String expectedData = "[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}]";
 
