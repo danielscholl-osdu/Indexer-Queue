@@ -391,7 +391,6 @@ The following software have components provided under the terms of this license:
 - Kotlin Stdlib Common (from https://kotlinlang.org/)
 - Kotlin Stdlib Jdk7 (from <https://kotlinlang.org/>, https://kotlinlang.org/)
 - Kotlin Stdlib Jdk8 (from <https://kotlinlang.org/>, https://kotlinlang.org/)
-- LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
 - Lucene Core (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-core)
 - Maven Incremental Build support utilities (from https://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-incremental)
 - Metrics Core (from https://repo1.maven.org/maven2/io/dropwizard/metrics/metrics-core)
@@ -539,6 +538,7 @@ The following software have components provided under the terms of this license:
 - HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
 - Jodd BeanUtil (from http://jodd.org)
 - Jodd Core (from http://jodd.org)
+- LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Stax2 API (from http://github.com/FasterXML/stax2-api)
 
@@ -550,6 +550,7 @@ The following software have components provided under the terms of this license:
 - ASM Core (from http://asm.ow2.io/, http://asm.ow2.org/)
 - Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
 - AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
+- FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
 - Hamcrest (from http://hamcrest.org/JavaHamcrest/)
 - Hamcrest Core (from http://hamcrest.org/, http://hamcrest.org/JavaHamcrest/, https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core)
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
@@ -662,6 +663,7 @@ EDL-1.0
 The following software have components provided under the terms of this license:
 
 - Jakarta Activation (from https://repo1.maven.org/maven2/com/sun/activation/jakarta.activation)
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 
 ========================================================================
 EPL-1.0
@@ -675,7 +677,6 @@ The following software have components provided under the terms of this license:
 - JUnit Jupiter Params (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Platform Commons (from http://junit.org/junit5/, https://junit.org/junit5/)
 - JUnit Platform Engine API (from http://junit.org/junit5/, https://junit.org/junit5/)
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
 - Jakarta Bean Validation API (from https://beanvalidation.org)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
@@ -738,6 +739,7 @@ GPL-3.0-only
 ========================================================================
 The following software have components provided under the terms of this license:
 
+- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - Jakarta Annotations API (from https://projects.eclipse.org/projects/ee4j.ca)
 - json-patch (from https://github.com/fge/json-patch)
 - null (from https://github.com/fge/jackson-coreutils)
@@ -926,7 +928,6 @@ The following software have components provided under the terms of this license:
 - HdrHistogram (from http://hdrhistogram.github.io/HdrHistogram/)
 - JBoss Logging 3 (from http://www.jboss.org)
 - JSON in Java (from https://github.com/douglascrockford/JSON-java)
-- LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
 - Microsoft Azure client library for Blob Storage (from https://github.com/Azure/azure-sdk-for-java)
 - RESTEasy JAX-RS Implementation (from https://repo1.maven.org/maven2/org/jboss/resteasy/resteasy-jaxrs)
 - RESTEasy Validator Provider BV 1.1 (from http://maven.apache.org)
@@ -936,7 +937,6 @@ unknown
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- Jakarta Activation API (from https://github.com/eclipse-ee4j/jaf, https://github.com/jakartaee/jaf-api, https://repo1.maven.org/maven2/jakarta/activation/jakarta.activation-api)
 - System Rules (from http://stefanbirkner.github.com/system-rules/, http://stefanbirkner.github.io/system-rules/)
 
 ========================================================================
