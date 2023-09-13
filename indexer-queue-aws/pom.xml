@@ -287,7 +287,6 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <classifier>spring-boot</classifier>
                             <mainClass>
                                 org.opengroup.osdu.indexerqueue.aws.api.IndexerQueue
                             </mainClass>
