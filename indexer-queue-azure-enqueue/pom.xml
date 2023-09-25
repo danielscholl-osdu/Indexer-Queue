@@ -135,6 +135,12 @@
       <groupId>org.opengroup.osdu</groupId>
       <artifactId>core-lib-azure</artifactId>
       <version>${osdu.corelibazure.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.microsoft.azure</groupId>
+          <artifactId>documentdb-bulkexecutor</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
