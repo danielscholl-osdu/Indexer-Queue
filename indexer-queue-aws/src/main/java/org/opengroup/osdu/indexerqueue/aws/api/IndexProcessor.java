@@ -16,15 +16,11 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 
 
 
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -33,14 +29,14 @@ import com.amazonaws.services.sqs.model.Message;
 
 
 public class IndexProcessor implements Callable<IndexProcessor> {
-    public CallableResult result;
-    public Exception exception;
-    public Message message;
-    public String messageId;
-    public String receiptHandle;
-    public StringBuilder response;
-    public String targetURL;
-    public String indexerServiceAccountJWT;
+    private CallableResult result;
+    private Exception exception;
+    private Message message;
+    private String messageId;
+    private String receiptHandle;
+    private StringBuilder response;
+    private String targetURL;
+    private String indexerServiceAccountJWT;
 
     public IndexProcessor(Message message, String targetUrl, String indexServiceAccountJWT){
         this.message = message;
@@ -74,19 +70,7 @@ public class IndexProcessor implements Callable<IndexProcessor> {
             sendRequest(connection, body);
 
             getResponse(connection);
-        } catch (MalformedURLException e) {
-            System.out.println(e.getMessage());
-            result = CallableResult.Fail;
-            exception = e;
-        } catch (ProtocolException e) {
-            System.out.println(e.getMessage());
-            result = CallableResult.Fail;
-            exception = e;
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            result = CallableResult.Fail;
-            exception = e;
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             result = CallableResult.Fail;
             exception = e;
@@ -119,16 +103,15 @@ public class IndexProcessor implements Callable<IndexProcessor> {
     private HttpURLConnection getConnection(String body, Map<String, String> attributes) throws IOException {
         URL url = new URL(this.targetURL);
         System.out.println(String.format("The url is: %s", url));
+
         HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Length",
-                Integer.toString(body.getBytes().length));;
-        connection.setRequestProperty("Content-Type",
-                "application/json");
         connection.setRequestProperty("data-partition-id", attributes.get("data-partition-id"));
         connection.setRequestProperty("Authorization", this.indexerServiceAccountJWT);
         connection.setRequestProperty("user", attributes.get("user"));
+        connection.setRequestProperty("Content-Length", Integer.toString(body.getBytes().length));
         connection.setRequestProperty("x-user-id", attributes.get("user"));
+        connection.setRequestProperty("Content-Type", "application/json");
         connection.setUseCaches(false);
         connection.setDoOutput(true);
         return connection;
@@ -154,5 +137,61 @@ public class IndexProcessor implements Callable<IndexProcessor> {
 
     public boolean expectionExists(){
         return exception != null;
+    }
+
+    public CallableResult getResult() {
+        return this.result;
+    }
+
+    public Exception getException() {
+        return this.exception;
+    }
+
+    public Message getMessage() {
+        return this.message;
+    }
+
+    public String getMessageId() {
+        return this.messageId;
+    }
+
+    public String getReceiptHandle() {
+        return this.receiptHandle;
+    }
+
+    public StringBuilder getResponse() {
+        return this.response;
+    }
+
+    /*public String getTargetURL() {
+        return this.targetURL;
+    }*/
+
+    public void setResult(CallableResult newResult) {
+        this.result = newResult;
+    }
+
+    public void setException(Exception newException) {
+        this.exception = newException;
+    }
+
+    public void setMessage(Message newMessage) {
+        this.message = newMessage;
+    }
+
+    public void setMessageId(String newMessageId) {
+        this.messageId = newMessageId;
+    }
+
+    /*public void setReceiptHandle(String newReceiptHandle) {
+        this.receiptHandle = newReceiptHandle;
+    }*/
+
+    public void setResponse(StringBuilder newResponse) {
+        this.response = newResponse;
+    }
+
+    public void setTargetURL(String newTargetURL) {
+        this.targetURL = newTargetURL;
     }
 }

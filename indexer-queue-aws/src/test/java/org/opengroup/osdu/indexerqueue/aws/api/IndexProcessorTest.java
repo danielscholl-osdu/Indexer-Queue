@@ -49,7 +49,7 @@ public class IndexProcessorTest {
     @Before
     public void setUp() {
         System.setOut(new PrintStream(outputStreamCaptor));
-        this.processor.message = message;
+        this.processor.setMessage(message);
     }
 
     @After
@@ -61,8 +61,8 @@ public class IndexProcessorTest {
     public void test_Call_badTargetUrl() {
 
 
-        this.processor.targetURL = invalidUrl;
-        this.processor.result = CallableResult.Pass;
+        this.processor.setTargetURL(invalidUrl);
+        this.processor.setResult(CallableResult.Pass);
 
         IndexProcessor result = processor.call();
 
@@ -73,8 +73,8 @@ public class IndexProcessorTest {
     @Test
     public void test_Call_localhost() {
 
-        this.processor.targetURL = localhostUrl;
-        this.processor.result = CallableResult.Pass;
+        this.processor.setTargetURL(localhostUrl);
+        this.processor.setResult(CallableResult.Pass);
 
         IndexProcessor result = processor.call();
 
@@ -97,8 +97,8 @@ public class IndexProcessorTest {
             try (MockedConstruction<RecordChangedMessages> msgs = Mockito.mockConstruction(RecordChangedMessages.class, (mockMsgs, context) -> {
                 when(mockMsgs.getMessageId()).thenReturn("messageId");
             })) {
-                this.processor.targetURL = localhostUrl;
-                this.processor.result = CallableResult.Pass;
+                this.processor.setTargetURL(localhostUrl);
+                this.processor.setResult(CallableResult.Pass);
 
                 message.setBody("body");
 
@@ -126,9 +126,9 @@ public class IndexProcessorTest {
             try (MockedConstruction<RecordChangedMessages> msgs = Mockito.mockConstruction(RecordChangedMessages.class, (mockMsgs, context) -> {
                 when(mockMsgs.getMessageId()).thenReturn("messageId");
             })) {
-                this.processor.response = new StringBuilder();
-                this.processor.targetURL = localhostUrl;
-                this.processor.result = CallableResult.Pass;
+                this.processor.setResponse(new StringBuilder());
+                this.processor.setTargetURL(localhostUrl);
+                this.processor.setResult(CallableResult.Pass);
 
                 message.setBody("body");
 
@@ -136,7 +136,7 @@ public class IndexProcessorTest {
                 IndexProcessor result = processor.call();
 
                 Assert.assertEquals(processor, result);
-                Assert.assertEquals(StreamString, result.response.toString());
+                Assert.assertEquals(StreamString, result.getResponse().toString());
                 Assert.assertFalse(processor.expectionExists());
             }
         }

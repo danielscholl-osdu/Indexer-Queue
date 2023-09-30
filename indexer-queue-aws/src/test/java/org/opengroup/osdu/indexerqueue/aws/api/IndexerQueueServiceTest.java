@@ -124,7 +124,7 @@ public class IndexerQueueServiceTest {
         when(message.getMessageAttributes()).thenReturn(new HashMap<String, MessageAttributeValue>());
 
         IndexProcessor indexProcessor = new IndexProcessor(message, "targetUrl", "indexServiceAccountJWT");
-        indexProcessor.messageId = "messageId";
+        indexProcessor.setMessageId("messageId");
         indexProcessors.add(indexProcessor);
 
         Mockito.when(sqsClient.sendMessage(any())).thenReturn(sendMessageResult);
@@ -133,7 +133,7 @@ public class IndexerQueueServiceTest {
         IndexerQueueService.sendMsgsToDeadLetterQueue(queueUrl, indexProcessors, sqsClient);
 
         //Exception exist
-        indexProcessor.exception = new Exception("Exception");
+        indexProcessor.setException(new Exception("Exception"));
         IndexerQueueService.sendMsgsToDeadLetterQueue(queueUrl, indexProcessors, sqsClient);
 
         // Assert
@@ -159,12 +159,12 @@ public class IndexerQueueServiceTest {
         when(message.getAttributes()).thenReturn(new HashMap<String, String>());
 
         IndexProcessor indexProcessor = new IndexProcessor(message, "targetUrl", "indexServiceAccountJWT");
-        indexProcessor.messageId = "messageId";
+        indexProcessor.setMessageId("messageId");
         indexProcessors.add(indexProcessor);
         when(sqsClient.changeMessageVisibilityBatch(any(), any())).thenReturn(null);
 
         // Act
-        IndexerQueueService.ChangeMessageVisibilityTimeout(sqsClient, queueUrl, indexProcessors);
+        IndexerQueueService.changeMessageVisibilityTimeout(sqsClient, queueUrl, indexProcessors);
 
         // Assert
         verify(sqsClient, times(1)).changeMessageVisibilityBatch(any(), any());
@@ -185,7 +185,7 @@ public class IndexerQueueServiceTest {
             when(msg.getReceiptHandle()).thenReturn("ReceiptHandle");
             when(msg.getAttributes()).thenReturn(map);
             IndexProcessor indexProcessor = new IndexProcessor(msg, "targetUrl", "indexServiceAccountJWT");
-            indexProcessor.messageId = "messageId";
+            indexProcessor.setMessageId("messageId");
             indexProcessors.add(indexProcessor);
         }
 
@@ -195,13 +195,13 @@ public class IndexerQueueServiceTest {
         when(message19.getReceiptHandle()).thenReturn("ReceiptHandle");
         when(message19.getAttributes()).thenReturn(map19);
         IndexProcessor indexProcessor9 = new IndexProcessor(message19, "targetUrl", "indexServiceAccountJWT");
-        indexProcessor9.messageId = "messageId";
+        indexProcessor9.setMessageId("messageId");
         indexProcessors.add(indexProcessor9);
 
         when(sqsClient.changeMessageVisibilityBatch(any(), any())).thenReturn(null);
 
         // Act
-        IndexerQueueService.ChangeMessageVisibilityTimeout(sqsClient, queueUrl, indexProcessors);
+        IndexerQueueService.changeMessageVisibilityTimeout(sqsClient, queueUrl, indexProcessors);
 
         // Assert
         verify(sqsClient, times(1)).changeMessageVisibilityBatch(any(), any());
@@ -245,7 +245,7 @@ public class IndexerQueueServiceTest {
         //Act
         List<CompletableFuture<IndexProcessor>> list = IndexerQueueService.createIndexCompletableFutures(messages, executorPool, "url");
 
-        assertEquals(list.size(), 1);
+        assertEquals(1, list.size());
     }
 
     @Test
@@ -262,7 +262,7 @@ public class IndexerQueueServiceTest {
         //Act
         List<CompletableFuture<ReIndexProcessor>> list = IndexerQueueService.createReIndexCompletableFutures(messages, executorPool, "url");
 
-        assertEquals(list.size(), 1);
+        assertEquals(1, list.size());
     }
 
 }

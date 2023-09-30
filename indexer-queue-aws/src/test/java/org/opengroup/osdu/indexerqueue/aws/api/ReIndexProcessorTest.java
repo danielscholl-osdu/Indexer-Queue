@@ -49,7 +49,7 @@ public class ReIndexProcessorTest {
     @Before
     public void setUp() {
         System.setOut(new PrintStream(outputStreamCaptor));
-        this.processor.message = message;
+        this.processor.setMessage(message);
     }
 
     @After
@@ -61,8 +61,8 @@ public class ReIndexProcessorTest {
     public void test_Call_badTargetUrl() {
 
 
-        this.processor.targetURL = invalidUrl;
-        this.processor.result = CallableResult.Pass;
+        this.processor.setTargetURL(invalidUrl);
+        this.processor.setResult(CallableResult.Pass);
 
         ReIndexProcessor result = processor.call();
 
@@ -74,8 +74,8 @@ public class ReIndexProcessorTest {
     @Test
     public void test_Call_localhost() {
 
-        this.processor.targetURL = localhostUrl;
-        this.processor.result = CallableResult.Pass;
+        this.processor.setTargetURL(localhostUrl);
+        this.processor.setResult(CallableResult.Pass);
 
         message.setBody("body");
 
@@ -98,8 +98,8 @@ public class ReIndexProcessorTest {
             when(mockUrl.openConnection()).thenReturn(mockConnection);
         })) {
 
-            this.processor.targetURL = localhostUrl;
-            this.processor.result = CallableResult.Pass;
+            this.processor.setTargetURL(localhostUrl);
+            this.processor.setResult(CallableResult.Pass);
 
             message.setBody("body");
 
@@ -123,9 +123,9 @@ public class ReIndexProcessorTest {
             when(mockUrl.openConnection()).thenReturn(mockConnection);
         })) {
 
-            this.processor.response = new StringBuilder();
-            this.processor.targetURL = localhostUrl;
-            this.processor.result = CallableResult.Pass;
+            this.processor.setResponse(new StringBuilder());
+            this.processor.setTargetURL(localhostUrl);
+            this.processor.setResult(CallableResult.Pass);
 
             message.setBody("body");
 
@@ -133,7 +133,7 @@ public class ReIndexProcessorTest {
             ReIndexProcessor result = processor.call();
 
             Assert.assertEquals(processor, result);
-            Assert.assertEquals(StreamString, result.response.toString());
+            Assert.assertEquals(StreamString, result.getResponse().toString());
             Assert.assertFalse(processor.expectionExists());
         }
     }

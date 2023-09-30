@@ -26,4 +26,24 @@ public class RecordChangedMessages {
     public String getMessageId(){
         return this.messageId;
     }
+
+    /*public String getData(){
+        return this.data;
+    }
+
+    public Map<String, String> getAttributes(){
+        return this.attributes;
+    }
+
+    public void setMessageId(String newMessageId){
+        this.messageId = newMessageId;
+    }
+
+    public void setData(String newData){
+        this.data = newData;
+    }
+
+    public void setAttributes(Map<String, String> newAttributes){
+        this.attributes = newAttributes;
+    }*/
 }

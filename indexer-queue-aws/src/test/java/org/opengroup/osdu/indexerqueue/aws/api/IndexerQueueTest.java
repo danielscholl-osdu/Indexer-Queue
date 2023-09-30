@@ -16,6 +16,7 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import org.junit.*;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.Timeout;
@@ -97,7 +98,10 @@ public class IndexerQueueTest {
 
         List<Message> messages = new ArrayList<Message>();
 
-        messages.add(new Message());
+        Message msg = new Message();
+        msg.addMessageAttributesEntry("authorization", new MessageAttributeValue());
+
+        messages.add(msg);
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
 
