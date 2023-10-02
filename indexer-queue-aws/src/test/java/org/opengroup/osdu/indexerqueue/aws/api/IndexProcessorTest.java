@@ -141,4 +141,12 @@ public class IndexProcessorTest {
             }
         }
     }
+
+    @Test
+    public void test_Get(){
+        IndexProcessor processor2 = new IndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
+        processor2.setResponse(new StringBuilder());
+        Assert.assertEquals(CallableResult.Pass, processor2.getResult());
+        Assert.assertNull(processor2.getReceiptHandle());
+    }
 }

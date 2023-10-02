@@ -144,4 +144,14 @@ public class ReIndexProcessorTest {
         Assert.assertFalse(processor.expectionExists());
 
     }
+
+    @Test
+    public void test_Get(){
+        ReIndexProcessor processor2 = new ReIndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
+        processor2.setResponse(new StringBuilder());
+        Assert.assertEquals(CallableResult.Pass, processor2.getResult());
+        Assert.assertNull(processor2.getReceiptHandle());
+        Assert.assertNull(processor2.getMessageId());
+        Assert.assertNull(processor2.getException());
+    }
 }
