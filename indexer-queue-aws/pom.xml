@@ -36,8 +36,8 @@
     <aws.version>1.11.1018</aws.version>
     <deployment.environment>dev</deployment.environment>
     <deployment.repositorybucket>osdu-local-maven-repository</deployment.repositorybucket>
-    <jackson-databind.version>2.13.2.2</jackson-databind.version>
-    <jackson.version>2.13.2</jackson.version>
+    <jackson-databind.version>2.15.2</jackson-databind.version>
+    <jackson.version>2.15.2</jackson.version>
     <spring-webmvc.version>5.3.22</spring-webmvc.version>
   </properties>
 
