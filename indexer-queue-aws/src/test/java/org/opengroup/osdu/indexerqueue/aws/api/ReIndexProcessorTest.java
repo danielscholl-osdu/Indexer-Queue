@@ -34,7 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IndexProcessorTest {
+public class ReIndexProcessorTest {
 
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
@@ -44,7 +44,7 @@ public class IndexProcessorTest {
 
     Message message = new Message();
     @InjectMocks
-    IndexProcessor processor = new IndexProcessor(message, invalidUrl, "indexServiceAccountJWT");
+    ReIndexProcessor processor = new ReIndexProcessor(message, invalidUrl, "indexServiceAccountJWT");
 
     @Before
     public void setUp() {
@@ -64,10 +64,11 @@ public class IndexProcessorTest {
         this.processor.setTargetURL(invalidUrl);
         this.processor.setResult(CallableResult.Pass);
 
-        IndexProcessor result = processor.call();
+        ReIndexProcessor result = processor.call();
 
         Assert.assertTrue(outputStreamCaptor.toString().trim().contains("no protocol: targetUrl_invalid"));
         Assert.assertEquals(processor, result);
+        Assert.assertTrue(processor.expectionExists());
     }
 
     @Test
@@ -76,10 +77,13 @@ public class IndexProcessorTest {
         this.processor.setTargetURL(localhostUrl);
         this.processor.setResult(CallableResult.Pass);
 
-        IndexProcessor result = processor.call();
+        message.setBody("body");
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("Connection refused (Connection refused)"));
+        ReIndexProcessor result = processor.call();
+
+        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("The url is: https://localhost "));
         Assert.assertEquals(processor, result);
+        Assert.assertTrue(processor.expectionExists());
 
     }
 
@@ -94,21 +98,17 @@ public class IndexProcessorTest {
             when(mockUrl.openConnection()).thenReturn(mockConnection);
         })) {
 
-            try (MockedConstruction<RecordChangedMessages> msgs = Mockito.mockConstruction(RecordChangedMessages.class, (mockMsgs, context) -> {
-                when(mockMsgs.getMessageId()).thenReturn("messageId");
-            })) {
-                this.processor.setTargetURL(localhostUrl);
-                this.processor.setResult(CallableResult.Pass);
+            this.processor.setTargetURL(localhostUrl);
+            this.processor.setResult(CallableResult.Pass);
 
-                message.setBody("body");
+            message.setBody("body");
 
 
-                IndexProcessor result = processor.call();
+            ReIndexProcessor result = processor.call();
 
-                Assert.assertTrue(outputStreamCaptor.toString().trim().contains("Underlying input stream returned zero bytes"));
-                Assert.assertEquals(processor, result);
-                Assert.assertTrue(processor.expectionExists());
-            }
+            Assert.assertTrue(outputStreamCaptor.toString().trim().contains("Underlying input stream returned zero bytes"));
+            Assert.assertEquals(processor, result);
+            Assert.assertTrue(processor.expectionExists());
         }
     }
 
@@ -123,30 +123,35 @@ public class IndexProcessorTest {
             when(mockUrl.openConnection()).thenReturn(mockConnection);
         })) {
 
-            try (MockedConstruction<RecordChangedMessages> msgs = Mockito.mockConstruction(RecordChangedMessages.class, (mockMsgs, context) -> {
-                when(mockMsgs.getMessageId()).thenReturn("messageId");
-            })) {
-                this.processor.setResponse(new StringBuilder());
-                this.processor.setTargetURL(localhostUrl);
-                this.processor.setResult(CallableResult.Pass);
+            this.processor.setResponse(new StringBuilder());
+            this.processor.setTargetURL(localhostUrl);
+            this.processor.setResult(CallableResult.Pass);
 
-                message.setBody("body");
+            message.setBody("body");
 
 
-                IndexProcessor result = processor.call();
+            ReIndexProcessor result = processor.call();
 
-                Assert.assertEquals(processor, result);
-                Assert.assertEquals(StreamString, result.getResponse().toString());
-                Assert.assertFalse(processor.expectionExists());
-            }
+            Assert.assertEquals(processor, result);
+            Assert.assertEquals(StreamString, result.getResponse().toString());
+            Assert.assertFalse(processor.expectionExists());
         }
     }
 
     @Test
+    public void test_Exception() {
+
+        Assert.assertFalse(processor.expectionExists());
+
+    }
+
+    @Test
     public void test_Get(){
-        IndexProcessor processor2 = new IndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
+        ReIndexProcessor processor2 = new ReIndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
         processor2.setResponse(new StringBuilder());
         Assert.assertEquals(CallableResult.Pass, processor2.getResult());
         Assert.assertNull(processor2.getReceiptHandle());
+        Assert.assertNull(processor2.getMessageId());
+        Assert.assertNull(processor2.getException());
     }
 }

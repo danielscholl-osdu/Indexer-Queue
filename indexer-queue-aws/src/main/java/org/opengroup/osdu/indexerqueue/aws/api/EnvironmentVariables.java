@@ -18,16 +18,31 @@ import org.opengroup.osdu.core.aws.ssm.K8sLocalParameterProvider;
 import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
 
 public class EnvironmentVariables {
-    public String region;
-    public String queueUrl;
-    public String targetURL;
-    public String deadLetterQueueUrl;
+    private String region;
+    private String queueUrl;
+    private String targetURL;
+    private String deadLetterQueueUrl;
     public EnvironmentVariables() throws K8sParameterNotFoundException {
         this.region = System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "us-east-1";
         this.targetURL =System.getenv("AWS_INDEXER_INDEX_API");
-        String environment = System.getenv("ENVIRONMENT");
         K8sLocalParameterProvider provider = new K8sLocalParameterProvider();
         this.queueUrl = provider.getParameterAsStringOrDefault("storage-sqs-url",System.getenv("AWS_STORAGE_QUEUE_URL") );
         this.deadLetterQueueUrl = provider.getParameterAsStringOrDefault("indexer-deadletter-queue-sqs-url", System.getenv("AWS_DEADLETTER_QUEUE_URL"));
+    }
+
+    public String getRegion() {
+        return this.region;
+    }
+
+    public String getQueueUrl() {
+        return this.queueUrl;
+    }
+
+    public String getTargetURL() {
+        return this.targetURL;
+    }
+
+    public String getDeadLetterQueueUrl() {
+        return this.deadLetterQueueUrl;
     }
 }
