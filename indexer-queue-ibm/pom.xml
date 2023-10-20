@@ -159,7 +159,7 @@
 		<dependency>
 			<groupId>org.opengroup.osdu</groupId>
 			<artifactId>os-core-common</artifactId>
-			<version>0.23.3</version>
+			<version>0.24.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>io.netty</groupId>
