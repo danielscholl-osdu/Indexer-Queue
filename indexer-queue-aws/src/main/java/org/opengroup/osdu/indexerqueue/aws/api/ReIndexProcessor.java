@@ -17,22 +17,20 @@ import com.amazonaws.services.sqs.model.Message;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class ReIndexProcessor implements Callable<ReIndexProcessor> {
-    public CallableResult result;
-    public Exception exception;
-    public Message message;
-    public String messageId;
-    public String receiptHandle;
-    public StringBuilder response;
-    public String targetURL;
-    public String indexerServiceAccountJWT;
+    private CallableResult result;
+    private Exception exception;
+    private Message message;
+    private String messageId;
+    private String receiptHandle;
+    private StringBuilder response;
+    private String targetURL;
+    private String indexerServiceAccountJWT;
     public ReIndexProcessor(Message message, String targetUrl, String indexServiceAccountJWT){
         this.message = message;
         this.targetURL = targetUrl;
@@ -62,22 +60,10 @@ public class ReIndexProcessor implements Callable<ReIndexProcessor> {
             sendRequest(connection, body);
 
             getResponse(connection);
-        } catch (MalformedURLException e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
             result = CallableResult.Fail;
             exception = e;
-        } catch (ProtocolException e) {
             System.out.println(e.getMessage());
-            result = CallableResult.Fail;
-            exception = e;
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            result = CallableResult.Fail;
-            exception = e;
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-            result = CallableResult.Fail;
-            exception = e;
         }
         System.out.println(result);
         if(result == CallableResult.Fail) {
@@ -122,6 +108,42 @@ public class ReIndexProcessor implements Callable<ReIndexProcessor> {
         connection.setUseCaches(false);
         connection.setDoOutput(true);
         return connection;
+    }
+
+    public CallableResult getResult() {
+        return this.result;
+    }
+
+    public String getReceiptHandle() {
+        return this.receiptHandle;
+    }
+
+    public String getMessageId() {
+        return this.messageId;
+    }
+
+    public Exception getException() {
+        return this.exception;
+    }
+
+    public StringBuilder getResponse() {
+        return this.response;
+    }
+
+    public void setResult(CallableResult newResult) {
+        this.result = newResult;
+    }
+
+    public void setMessage(Message newMessage) {
+        this.message = newMessage;
+    }
+
+    public void setResponse(StringBuilder newResponse) {
+        this.response = newResponse;
+    }
+
+    public void setTargetURL(String newTargetURL) {
+        this.targetURL = newTargetURL;
     }
 
 }

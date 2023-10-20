@@ -28,6 +28,10 @@ import java.util.stream.Collectors;
 
 public class IndexerQueueService {
 
+    private IndexerQueueService() {
+        // Private constructor
+    }
+
     public static List<IndexProcessor> processIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
             throws ExecutionException, InterruptedException {
 
@@ -41,10 +45,10 @@ public class IndexerQueueService {
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList()));
 
-        List<IndexProcessor> processed = results.get();
+//        List<IndexProcessor> processed = results.get();
 //        executorPool.shutdown();
 
-        return processed;
+        return results.get();
     }
     public static List<ReIndexProcessor> processReIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
             throws ExecutionException, InterruptedException {
@@ -59,10 +63,10 @@ public class IndexerQueueService {
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList()));
 
-        List<ReIndexProcessor> processed = results.get();
+//        List<ReIndexProcessor> processed = results.get();
 //        executorPool.shutdown();
 
-        return processed;
+        return results.get();
     }
     public static List<DeleteMessageBatchResult> deleteMessages(List<DeleteMessageBatchRequest> deleteBatchRequests, AmazonSQS sqsClient) {
         return deleteBatchRequests.stream().map(deleteRequest -> sqsClient.deleteMessageBatch(deleteRequest)).collect(Collectors.toList());
@@ -120,12 +124,12 @@ public class IndexerQueueService {
 
     private static SendMessageResult sendMsgToDeadLetterQueue(String deadLetterQueueUrl, IndexProcessor indexProcessor, AmazonSQS sqsClient){
         String exceptionMessage;
-        Map<String, MessageAttributeValue> messageAttributes = indexProcessor.message.getMessageAttributes();
+        Map<String, MessageAttributeValue> messageAttributes = indexProcessor.getMessage().getMessageAttributes();
         MessageAttributeValue exceptionAttribute = new MessageAttributeValue()
                 .withDataType("String");
 
         if(indexProcessor.expectionExists()){
-            exceptionMessage = indexProcessor.exception.getMessage();
+            exceptionMessage = indexProcessor.getException().getMessage();
         } else {
             exceptionMessage = "Empty";
         }
@@ -133,21 +137,21 @@ public class IndexerQueueService {
         String exceptionAsString = String.format("Exception message: %s", exceptionMessage);
         exceptionAttribute.setStringValue(exceptionAsString);
         messageAttributes.put("Exception", exceptionAttribute);
-        SendMessageRequest send_msg_request = new SendMessageRequest()
+        SendMessageRequest sendMsgRequest = new SendMessageRequest()
                 .withQueueUrl(deadLetterQueueUrl)
-                .withMessageBody(indexProcessor.message.getBody())
+                .withMessageBody(indexProcessor.getMessage().getBody())
                 .withMessageAttributes(messageAttributes);
-        return sqsClient.sendMessage(send_msg_request);
+        return sqsClient.sendMessage(sendMsgRequest);
     }
-    public static void ChangeMessageVisibilityTimeout(AmazonSQS sqsClient, String sqsQueueUrl,List<IndexProcessor> indexProcessors){    
+    public static void changeMessageVisibilityTimeout(AmazonSQS sqsClient, String sqsQueueUrl,List<IndexProcessor> indexProcessors){
 
         List<ChangeMessageVisibilityBatchRequestEntry> entries =
-                new ArrayList<ChangeMessageVisibilityBatchRequestEntry>();
+                new ArrayList<>();
         for (IndexProcessor indexProcessor : indexProcessors){
             entries.add(
-                    new ChangeMessageVisibilityBatchRequestEntry(indexProcessor.messageId, indexProcessor.message.getReceiptHandle())
+                    new ChangeMessageVisibilityBatchRequestEntry(indexProcessor.getMessageId(), indexProcessor.getMessage().getReceiptHandle())
                             .withVisibilityTimeout(
-                                    exponentialTimeOutWindow(parseIntOrDefault(indexProcessor.message.getAttributes().get("ApproximateReceiveCount"), 0))
+                                    exponentialTimeOutWindow(parseIntOrDefault(indexProcessor.getMessage().getAttributes().get("ApproximateReceiveCount"), 0))
                             )
             );
 
@@ -157,13 +161,13 @@ public class IndexerQueueService {
             }
         }
 
-        if (entries.size() > 0)
+        if (!entries.isEmpty())
             sqsClient.changeMessageVisibilityBatch(sqsQueueUrl, entries);
 
     }
-    private static Integer exponentialTimeOutWindow(int ReceiveCount){
+    private static Integer exponentialTimeOutWindow(int receiveCount){
         // max receive count to 10 in SQS setting
-        switch (ReceiveCount){
+        switch (receiveCount){
             case 0: case 1: case 2: return 5;
             case 3: case 4: return 10;
             case 5: case 6: return 30;
