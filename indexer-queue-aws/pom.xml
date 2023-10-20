@@ -123,6 +123,18 @@
             <version>${aws.version}</version>
         </dependency>
 
+        <!-- AWS managed packages -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-core</artifactId>
+            <version>${aws.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>${aws.version}</version>
+        </dependency>
+
         <!-- Third party Apache 2.0 license packages -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
