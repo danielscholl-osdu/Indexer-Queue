@@ -10,7 +10,6 @@ The following software have components provided under the terms of this license:
 
 - Apache Commons Codec (from http://commons.apache.org/proper/commons-codec/, https://commons.apache.org/proper/commons-codec/)
 - Apache Geronimo JMS Spec 2.0 (from http://geronimo.apache.org/maven/${siteId}/${version})
-- Apache Log4j JUL Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-jul)
 - Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
 - AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
 - Google Guice - Core Library (from https://repo1.maven.org/maven2/com/google/inject/guice)
@@ -351,9 +350,9 @@ The following software have components provided under the terms of this license:
 - JBoss Marshalling API (from https://repo1.maven.org/maven2/org/jboss/marshalling/jboss-marshalling)
 - JBoss Marshalling River (from https://repo1.maven.org/maven2/org/jboss/marshalling/jboss-marshalling-river)
 - JCIP Annotations under Apache License (from http://stephenc.github.com/jcip-annotations)
+- JJWT :: Legacy Transitive Dependency Jar (from https://repo1.maven.org/maven2/io/jsonwebtoken/jjwt)
 - JMES Path Query library (from https://aws.amazon.com/sdkforjava)
 - JSON Small and Fast Parser (from https://repo1.maven.org/maven2/net/minidev/json-smart, https://urielch.github.io/)
-- JSON Web Token support for the JVM (from https://github.com/jwtk/jjwt)
 - JSON library from Android SDK (from http://developer.android.com/sdk)
 - JSONassert (from http://github.com/skyscreamer/yoga, https://github.com/skyscreamer/JSONassert)
 - JSR 311 API (from https://jsr311.dev.java.net, https://jsr311.dev.java.net/)
@@ -800,7 +799,6 @@ The following software have components provided under the terms of this license:
 - Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client, http://hc.apache.org/httpcomponents-client-ga)
 - Apache Log4j API (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api)
 - Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
-- Apache Log4j SLF4J Binding (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl)
 - Apache Log4j to SLF4J Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-to-slf4j)
 - Azure Java Client Authentication Library for AutoRest (from https://github.com/Azure/autorest-clientruntime-for-java)
 - Azure Java Client Runtime for ARM (from https://github.com/Azure/autorest-clientruntime-for-java)
@@ -902,6 +900,13 @@ cockroach
 The following software have components provided under the terms of this license:
 
 - JavaMail API (compat) (from https://repo1.maven.org/maven2/javax/mail/mail)
+
+========================================================================
+ietf-trust
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
 
 ========================================================================
 mit-old-style-no-advert

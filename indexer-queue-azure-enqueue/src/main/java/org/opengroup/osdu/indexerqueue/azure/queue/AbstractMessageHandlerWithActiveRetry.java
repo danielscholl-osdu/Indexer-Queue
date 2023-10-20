@@ -139,7 +139,11 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
         }
     }
 
-    private void logMessageForRetry(String messageBody, Exception e, int retryNumber, boolean isLastRetry) {
+  private void logWorkerStart(String messageId, String workerName, String received_message_from_service_bus) {
+  }
+
+
+  private void logMessageForRetry(String messageBody, Exception e, int retryNumber, boolean isLastRetry) {
         if (isLastRetry) {
             LOGGER.error(String.format(RETRY_LOG_MESSAGE_TEMPLATE + " Retries limit exceed and message will be sent to dead letter queue", e.getClass().getName(), e.getMessage(), e.getMessage()));
         } else {

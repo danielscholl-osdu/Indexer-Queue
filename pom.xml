@@ -26,7 +26,7 @@
         <appengine.maven.plugin>1.0.0</appengine.maven.plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
-        <log4j.version>2.17.1</log4j.version>
+        <log4j.version>2.21.0</log4j.version>
         <json-smart.version>2.4.7</json-smart.version>
         <jackson-databind.version>2.13.4</jackson-databind.version>
     </properties>
