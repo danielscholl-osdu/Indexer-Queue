@@ -10,7 +10,6 @@ The following software have components provided under the terms of this license:
 
 - Apache Commons Codec (from http://commons.apache.org/proper/commons-codec/, https://commons.apache.org/proper/commons-codec/)
 - Apache Geronimo JMS Spec 2.0 (from http://geronimo.apache.org/maven/${siteId}/${version})
-- Apache Log4j JUL Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-jul)
 - Apache Maven Compiler Plugin (from https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-compiler-plugin)
 - AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
 - Google Guice - Core Library (from https://repo1.maven.org/maven2/com/google/inject/guice)
@@ -405,6 +404,7 @@ The following software have components provided under the terms of this license:
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
 - MongoDB Driver (from https://www.mongodb.com/)
 - MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
+- MongoDB Java Driver (unmaintained) (from http://www.mongodb.org)
 - Netty Reactive Streams Implementation (from https://repo1.maven.org/maven2/com/typesafe/netty/netty-reactive-streams)
 - Netty/Buffer (from https://repo1.maven.org/maven2/io/netty/netty-buffer)
 - Netty/Codec (from https://repo1.maven.org/maven2/io/netty/netty-codec)
@@ -588,6 +588,7 @@ The following software have components provided under the terms of this license:
 - "Java Concurrency in Practice" book annotations (from http://jcip.net/)
 - FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
 - MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
+- MongoDB Java Driver (unmaintained) (from http://www.mongodb.org)
 
 ========================================================================
 CC-BY-4.0
@@ -800,7 +801,6 @@ The following software have components provided under the terms of this license:
 - Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client, http://hc.apache.org/httpcomponents-client-ga)
 - Apache Log4j API (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api)
 - Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
-- Apache Log4j SLF4J Binding (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl)
 - Apache Log4j to SLF4J Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-to-slf4j)
 - Azure Java Client Authentication Library for AutoRest (from https://github.com/Azure/autorest-clientruntime-for-java)
 - Azure Java Client Runtime for ARM (from https://github.com/Azure/autorest-clientruntime-for-java)
@@ -834,7 +834,6 @@ The following software have components provided under the terms of this license:
 - Microsoft Azure common module for Storage (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure internal Avro module for Storage (from https://github.com/Azure/azure-sdk-for-java)
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
-- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
 - Netty/Codec/HTTP (from https://repo1.maven.org/maven2/io/netty/netty-codec-http)
 - Netty/Common (from https://repo1.maven.org/maven2/io/netty/netty-common)
 - Plexus Compiler Api (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-api)
@@ -850,6 +849,7 @@ The following software have components provided under the terms of this license:
 - Spring Data for Azure Cosmos DB SQL API (from https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/cosmos/azure-spring-data-cosmos)
 - adal4j (from https://github.com/AzureAD/azure-activedirectory-library-for-java)
 - micrometer-core (from https://github.com/micrometer-metrics/micrometer)
+- mockito-inline (from http://mockito.org, https://github.com/mockito/mockito)
 - mockito-junit-jupiter (from https://github.com/mockito/mockito)
 - msal4j (from https://github.com/AzureAD/microsoft-authentication-library-for-java)
 - msal4j-persistence-extension (from https://github.com/AzureAD/microsoft-authentication-extensions-for-java)
@@ -884,13 +884,6 @@ The following software have components provided under the terms of this license:
 - Reflections (from http://code.google.com/p/reflections/, http://github.com/ronmamo/reflections)
 
 ========================================================================
-X11
-========================================================================
-The following software have components provided under the terms of this license:
-
-- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
-
-========================================================================
 cc-pd
 ========================================================================
 The following software have components provided under the terms of this license:
@@ -903,6 +896,13 @@ cockroach
 The following software have components provided under the terms of this license:
 
 - JavaMail API (compat) (from https://repo1.maven.org/maven2/javax/mail/mail)
+
+========================================================================
+ietf-trust
+========================================================================
+The following software have components provided under the terms of this license:
+
+- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
 
 ========================================================================
 mit-old-style-no-advert
