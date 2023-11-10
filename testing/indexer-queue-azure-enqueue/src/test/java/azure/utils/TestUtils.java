@@ -1,5 +1,8 @@
 package azure.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Strings;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -18,14 +21,15 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Logger;
 
 import org.opengroup.osdu.azure.util.AzureServicePrincipal;
 
+import static azure.pubsub.PubsubEndpointIntegrationTest.indentatedBody;
+
 public class TestUtils {
+    static Logger log=Logger.getLogger(TestUtils.class.getName());
     protected static String token = null;
 
     protected static final String domain = System.getProperty("DOMAIN", System.getenv("DOMAIN"));
@@ -72,74 +76,99 @@ public class TestUtils {
                                       String query) throws Exception {
 
         log(httpMethod, TestUtils.getApiPath(path + query), headers, requestBody);
+        ClientResponse response = null;
         Client client = TestUtils.getClient();
+        client.setConnectTimeout(300000);
+        client.setReadTimeout(300000);
+        client.setFollowRedirects(false);
 
         WebResource webResource = client.resource(TestUtils.getApiPath(path + query));
-
-        WebResource.Builder builder = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON);
-        headers.forEach(builder::header);
-        int retryCount = 2;
-        try{
-            ClientResponse response = builder.method(httpMethod, ClientResponse.class, requestBody);
-            while (retryCount > 0) {
+        int count = 1;
+        int MaxRetry = 3;
+        while (count < MaxRetry) {
+            try {
+                headers.put("correlation-id", headers.getOrDefault("correlation-id", UUID.randomUUID().toString()));
+                WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON)
+                  .header("Authorization", token);
+                headers.forEach((k, v) -> builder.header(k, v));
+                //removing Auth header before logging
+                headers.remove("Authorization");
+                log.info(String.format("Request method: %s\nRequest Headers: %s\nRequest Body: %s", httpMethod, headers, indentatedBody(requestBody)));
+                log.info(String.format("Attempt: #%s/%s, CorrelationId: %s", count, MaxRetry, headers.get("correlation-id")));
+                response = builder.method(httpMethod, ClientResponse.class, requestBody);
                 if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
-                  System.out.println("got resoponse : " + response.getStatusInfo());
-                  Thread.sleep(5000);
-                  System.out.println("Retrying.. ");
-                  response = builder.method(httpMethod, ClientResponse.class, requestBody);
-                } else
-                  break;
-                retryCount--;
+                    count++;
+                    Thread.sleep(5000);
+                    continue;
+                } else {
+                    break;
+                }
+            } catch (Exception ex) {
+                log.severe("Exception While Making Request: " + ex.getMessage());
+                ex.printStackTrace();
+                count++;
+                if (count == MaxRetry) {
+                  throw new AssertionError("Error: Send request error", ex);
+                }
+            } finally {
+                //log response
+                if (response != null)
+                  log.info(String.format("This is the response received : %s\nResponse Headers: %s\nResponse Status code: %s", response, response.getHeaders(), response.getStatus()));
             }
-            System.out.println("sending response from TestUtils send method");
-            return response;
-        } catch (Exception e) {
-            if (e.getCause() instanceof SocketTimeoutException) {
-              System.out.println("Retrying in case of socket timeout exception");
-              return builder.method(httpMethod, ClientResponse.class, requestBody);
-            }
-            e.printStackTrace();
-            throw new AssertionError("Error: Send request error", e);
         }
+        return response;
     }
 
     public static ClientResponse send(String url, String path, String httpMethod, Map<String, String> headers,
                                       String requestBody, String query) throws Exception {
 
-        log(httpMethod, url + path, headers, requestBody);
-        Client client = TestUtils.getClient();
+      log(httpMethod, url + path, headers, requestBody);
+      Client client = TestUtils.getClient();
+      ClientResponse response = null;
+      client.setConnectTimeout(300000);
+      client.setReadTimeout(300000);
+      client.setFollowRedirects(false);
 
-        WebResource webResource = client.resource(url + path);
-        WebResource.Builder builder = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON);
-        headers.forEach(builder::header);
-        int retryCount = 2;
-        try{
-            ClientResponse response = builder.method(httpMethod, ClientResponse.class, requestBody);
-            while (retryCount > 0) {
-                if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
-                  System.out.println("got resoponse : " + response.getStatusInfo());
-                  Thread.sleep(5000);
-                  System.out.println("Retrying.. ");
-                  response = builder.method(httpMethod, ClientResponse.class, requestBody);
-                } else
-                  break;
-                retryCount--;
+      WebResource webResource = client.resource(url + path);
+      int count = 1;
+      int MaxRetry = 3;
+      while (count < MaxRetry) {
+          try {
+            headers.put("correlation-id", headers.getOrDefault("correlation-id", UUID.randomUUID().toString()));
+            WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON)
+              .header("Authorization", token);
+            headers.forEach((k, v) -> builder.header(k, v));
+            //removing Auth header before logging
+            headers.remove("Authorization");
+            log.info(String.format("Http Method: %s\nRequest URL: %s\nRequest Headers: %s\nRequest Body: %s", httpMethod, url, headers, indentatedBody(requestBody)));
+            log.info(String.format("Attempt: #%s/%s, CorrelationId: %s", count, MaxRetry, headers.get("correlation-id")));
+            response = builder.method(httpMethod, ClientResponse.class, requestBody);
+            if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
+              count++;
+              Thread.sleep(5000);
+              continue;
+            } else {
+              break;
             }
-            System.out.println("sending response from TestUtils send method");
-            return response;
-        } catch (Exception e) {
-            if (e.getCause() instanceof SocketTimeoutException) {
-              System.out.println("Retrying in case of socket timeout exception");
-              return builder.method(httpMethod, ClientResponse.class, requestBody);
+          } catch (Exception ex) {
+            log.severe("Exception While Making Request: " + ex.getMessage());
+            ex.printStackTrace();
+            count++;
+            if (count == MaxRetry) {
+              throw new AssertionError("Error: Send request error", ex);
             }
-            e.printStackTrace();
-            throw new AssertionError("Error: Send request error", e);
-        }
+          } finally {
+              //log response
+              if (response != null)
+                    log.info(String.format("This is the response received : %s\nResponse Headers: %s\nResponse Status code: %s", response, response.getHeaders(), response.getStatus()));
+          }
+      }
+      return response;
     }
 
     private static void log(String method, String url, Map<String, String> headers, String body) {
-        System.out.println(String.format("%s: %s", method, url));
-        System.out.println(body);
+        log.info(String.format("%s: %s", method, url));
+        log.info(body);
     }
 
     protected static Client getClient() {
@@ -163,6 +192,7 @@ public class TestUtils {
             sc.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
+            e.printStackTrace();
         }
         allowMethods("PATCH");
         return Client.create();
