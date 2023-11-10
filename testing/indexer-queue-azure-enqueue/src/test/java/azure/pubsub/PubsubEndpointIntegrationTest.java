@@ -17,14 +17,15 @@ import azure.utils.HeaderUtils;
 import azure.utils.LegalTagUtils;
 import azure.utils.TenantUtils;
 import azure.utils.TestUtils;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.sun.jersey.api.client.ClientResponse;
 import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,8 +34,10 @@ import static org.junit.Assert.assertTrue;
  * Integration test to generate a new record using storage service and check whether it is searchable.
  * This flow checks that indexer-queue is successfully sending messages to indexer service.
  */
+@Slf4j
 public class PubsubEndpointIntegrationTest {
     // Generate unique record id using timestamp
+    Logger log = Logger.getLogger(PubsubEndpointIntegrationTest.class.getName());
     protected static final String RECORD_ID = TenantUtils.getTenantName() + ":inttest:" + System.currentTimeMillis();
     protected static final String KIND = TenantUtils.getTenantName() + ":wks:inttest:1.0."
             + System.currentTimeMillis();
@@ -71,6 +74,7 @@ public class PubsubEndpointIntegrationTest {
 
         String jsonInput = createJsonBody(RECORD_ID, "tian");
         ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+        log.info(String.format("This is the storage service response received : %s\n and the correlation-id : %s\n status code : %s",storageServiceResponse, storageServiceResponse.getHeaders().get("correlation-id"), storageServiceResponse.getStatus()));
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
@@ -78,9 +82,20 @@ public class PubsubEndpointIntegrationTest {
         Thread.sleep(60000);
         String searchUrl=System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
         ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
+        log.info(String.format("This is the response received : %s", response));
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+        log.info(String.format("This is the json object response received : %s", indentatedBody(json)));
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
+    }
+
+    public static String indentatedBody(String responseBody) {
+        JsonParser jsonParser = new JsonParser();
+        if(responseBody==null)
+            return responseBody;
+        JsonElement jsonElement = jsonParser.parse(responseBody);
+        String indentedResponseEntity =new GsonBuilder().setPrettyPrinting().create().toJson(jsonElement);
+        return indentedResponseEntity;
     }
 
     protected static String createJsonBody(String id, String name) {

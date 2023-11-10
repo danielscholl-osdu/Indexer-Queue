@@ -800,7 +800,6 @@ The following software have components provided under the terms of this license:
 - Apache HttpClient (from http://hc.apache.org/httpcomponents-client, http://hc.apache.org/httpcomponents-client-ga, https://repo1.maven.org/maven2/org/apache/httpcomponents/client5/httpclient5)
 - Apache HttpClient Cache (from http://hc.apache.org/httpcomponents-client, http://hc.apache.org/httpcomponents-client-ga)
 - Apache Log4j API (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api)
-- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
 - Apache Log4j to SLF4J Adapter (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-to-slf4j)
 - Azure Java Client Authentication Library for AutoRest (from https://github.com/Azure/autorest-clientruntime-for-java)
 - Azure Java Client Runtime for ARM (from https://github.com/Azure/autorest-clientruntime-for-java)
@@ -896,13 +895,6 @@ cockroach
 The following software have components provided under the terms of this license:
 
 - JavaMail API (compat) (from https://repo1.maven.org/maven2/javax/mail/mail)
-
-========================================================================
-ietf-trust
-========================================================================
-The following software have components provided under the terms of this license:
-
-- Apache Log4j Core (from https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core)
 
 ========================================================================
 mit-old-style-no-advert

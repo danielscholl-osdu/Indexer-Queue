@@ -18,7 +18,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sun.jersey.api.client.ClientResponse;
 
+import java.util.logging.Logger;
+
 public class LegalTagUtils {
+    static Logger log = Logger.getLogger(LegalTagUtils.class.getName());
     public static String createRandomName() {
         return TenantUtils.getTenantName() + "-storage-" + System.currentTimeMillis();
     }
@@ -32,7 +35,7 @@ public class LegalTagUtils {
         String body = getBody(countryOfOrigin, name, expDate, dataType);
         ClientResponse response = TestUtils.send(getLegalUrl(), "legaltags", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), body,
                 "");
-
+        log.info(String.format("Create Legal Tag Response: %s", response));
         Thread.sleep(100);
         return response;
     }
