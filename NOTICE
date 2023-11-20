@@ -404,7 +404,6 @@ The following software have components provided under the terms of this license:
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
 - MongoDB Driver (from https://www.mongodb.com/)
 - MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
-- MongoDB Java Driver (unmaintained) (from http://www.mongodb.org)
 - Netty Reactive Streams Implementation (from https://repo1.maven.org/maven2/com/typesafe/netty/netty-reactive-streams)
 - Netty/Buffer (from https://repo1.maven.org/maven2/io/netty/netty-buffer)
 - Netty/Codec (from https://repo1.maven.org/maven2/io/netty/netty-codec)
@@ -588,7 +587,6 @@ The following software have components provided under the terms of this license:
 - "Java Concurrency in Practice" book annotations (from http://jcip.net/)
 - FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
 - MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
-- MongoDB Java Driver (unmaintained) (from http://www.mongodb.org)
 
 ========================================================================
 CC-BY-4.0
@@ -833,6 +831,7 @@ The following software have components provided under the terms of this license:
 - Microsoft Azure common module for Storage (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure internal Avro module for Storage (from https://github.com/Azure/azure-sdk-for-java)
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
+- MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
 - Netty/Codec/HTTP (from https://repo1.maven.org/maven2/io/netty/netty-codec-http)
 - Netty/Common (from https://repo1.maven.org/maven2/io/netty/netty-common)
 - Plexus Compiler Api (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-api)
@@ -860,13 +859,6 @@ MPL-1.1
 The following software have components provided under the terms of this license:
 
 - Javassist (from http://www.javassist.org/)
-
-========================================================================
-RSA-MD
-========================================================================
-The following software have components provided under the terms of this license:
-
-- AWS Java SDK for Amazon SQS (from https://aws.amazon.com/sdkforjava)
 
 ========================================================================
 SunPro
