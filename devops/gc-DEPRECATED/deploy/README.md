@@ -36,7 +36,6 @@ First you need to set variables in **values.yaml** file using any code editor. S
 **data.partitionHost** | partition service host | string | "http://partition" | yes
 **data.springProfilesActive** | active spring profile | string | gcp | yes
 **data.cloudTaskTargetHost** | your target host | string | - | yes
-**data.googleAudiences** | your Google Cloud [client ID](https://console.cloud.google.com/apis/credentials) | string | - | yes
 **data.googleCloudProject** | your Google Cloud project ID | string | - | yes
 **data.googleCloudProjectRegion** | your Google Cloud project region | string | - | yes
 **data.indexerQueueIdentifier** | config for cloud tasks queue | string | - | yes

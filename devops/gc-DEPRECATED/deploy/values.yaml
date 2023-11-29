@@ -9,7 +9,6 @@ data:
   partitionHost: "http://partition"
   springProfilesActive: "gcp"
   cloudTaskTargetHost: ""
-  googleAudiences: ""
   googleCloudProject: ""
   googleCloudProjectRegion: ""
   indexerQueueIdentifier: ""
