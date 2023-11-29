@@ -5,7 +5,6 @@ variables:
   GC_HELM_SETS: >-
     --set data.cloudTaskTargetHost=$OSDU_GCP_CLOUD_TASK_TARGET_HOST 
     --set data.indexerQueueIdentifier=$OSDU_GCP_INDEXER_QUEUE_CLOUDTASK_NAME
-    --set data.googleAudiences=$GOOGLE_AUDIENCE
 
 gc-test:
   extends:

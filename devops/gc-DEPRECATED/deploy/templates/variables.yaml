@@ -14,7 +14,6 @@ data:
   INDEXER_HOST: {{ .Values.data.indexerHost | quote }}
   {{- else }}
   CLOUD_TASK_TARGET_HOST: {{ .Values.data.cloudTaskTargetHost | quote }}
-  GOOGLE_AUDIENCES: {{ .Values.data.googleAudiences | quote }}
   GOOGLE_CLOUD_PROJECT: {{ .Values.data.googleCloudProject | quote }}
   GOOGLE_CLOUD_PROJECT_REGION: {{ .Values.data.googleCloudProjectRegion | quote }} 
   INDEXER_QUEUE_IDENTIFIER: {{ .Values.data.indexerQueueIdentifier | quote }}
