@@ -24,12 +24,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
+import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
+import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -76,6 +78,10 @@ public class AbstractMessageHandlerWithActiveRetryTest {
     private MdcContextMap mdcContextMap;
     @Mock
     private MessageAttributesExtractor messageAttributesExtractor;
+    @Mock
+    private SbMessageBuilder sbMessageBuilder;
+    @Mock
+    private IMetricService metricService;
 
     private AbstractMessageHandlerWithActiveRetry messageHandler;
 
@@ -84,7 +90,7 @@ public class AbstractMessageHandlerWithActiveRetryTest {
         messageProperties = new HashMap<>();
         messageHandler = new AbstractMessageHandlerWithActiveRetry(receiveClient,
                 messagePublisher, retryUtil, dpsHeaders, mdcContextMap,
-                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT) {
+                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT, sbMessageBuilder, metricService) {
             @Override
             public void processMessage(IMessage message) {
                 testMessageProcessor.doTheProcessing(message);
@@ -97,6 +103,8 @@ public class AbstractMessageHandlerWithActiveRetryTest {
     @Test
     public void testShouldProcessMessagesSuccessfully() {
         when(message.getLockToken()).thenReturn(UUID);
+        when(message.getMessageBody()).thenReturn(messageBody);
+        when(messageBody.getBinaryData()).thenReturn(singletonList(TEST_MESSAGE_BODY.getBytes(UTF_8)));
         messageHandler.onMessageAsync(message);
 
         verify(testMessageProcessor, only()).doTheProcessing(message);
