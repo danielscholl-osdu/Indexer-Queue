@@ -35,11 +35,11 @@ public class MetricServiceImpl implements IMetricService {
     }
 
     @Override
-    public void sendIndexLatencyMetric(double value, String dataPartitionId, String correlationId, boolean success) {
-        this.sendMetric(LATENCY_METRIC_NAME, value, dataPartitionId, correlationId, success);
+    public void sendIndexLatencyMetric(double value, String topicName, String dataPartitionId, String correlationId, boolean success) {
+        this.sendMetric(LATENCY_METRIC_NAME, value, topicName, dataPartitionId, correlationId, success);
     }
 
-    private void sendMetric(String name, double value, String dataPartitionId, String correlationId, boolean success) {
+    private void sendMetric(String name, double value, String topicName, String dataPartitionId, String correlationId, boolean success) {
         Date date = new Date(System.currentTimeMillis());
         MetricTelemetry metric = new MetricTelemetry();
         metric.setName(name);
@@ -48,6 +48,7 @@ public class MetricServiceImpl implements IMetricService {
         metric.getProperties().putIfAbsent("success", Boolean.toString(success));
         metric.getProperties().putIfAbsent("correlation-id", correlationId);
         metric.getProperties().putIfAbsent("data-partition-id", dataPartitionId);
+        metric.getProperties().putIfAbsent("topic", topicName);
         telemetryClient.trackMetric(metric);
         telemetryClient.flush();
     }

@@ -113,7 +113,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
             recordChangedMessage = sbMessageBuilder.getServiceBusMessage(messageBody, messageId);
             processMessage(message);
             long stopTime = System.currentTimeMillis();
-            this.captureMetrics(recordChangedMessage, enqueueTime, stopTime, true);
+            this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, true);
             logWorkerEnd(messageId, this.workerName, String.format("Successfully processed message. End to end time from enqueue : %d", stopTime - enqueueTime), stopTime - startTime, true);
             if (message.getProperties().get(PROPERTY_RETRY) != null) {
                 Integer retryValue = (Integer) message.getProperties().get(PROPERTY_RETRY);
@@ -125,12 +125,12 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
             LOGGER.warn(String.format("No retry exception occurred while sending message %s to indexer service: %s",
                 messageBody, e.getMessage()));
             long stopTime = System.currentTimeMillis();
-            this.captureMetrics(recordChangedMessage, enqueueTime, stopTime, false);
+            this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, false);
             return receiveClient.deadLetterAsync(message.getLockToken());
         } catch (ValidStorageRecordNotFoundException e) {
           LOGGER.debug(e.getMessage() + ". Record not found. No retry on message: {}", messageBody);
           long stopTime = System.currentTimeMillis();
-          this.captureMetrics(recordChangedMessage, enqueueTime, stopTime, true);
+          this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, true);
           return this.receiveClient.completeAsync(message.getLockToken());
         } catch (Exception e) {
             if (message.getProperties().get(PROPERTY_RETRY) == null) {
@@ -144,7 +144,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
                 if (retryValue > maxDeliveryCount) {
                     logMessageForRetry(messageBody, e, retryValue, true);
                     long stopTime = System.currentTimeMillis();
-                    this.captureMetrics(recordChangedMessage, enqueueTime, stopTime, false);
+                    this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, false);
                     return receiveClient.deadLetterAsync(message.getLockToken());
                 } else {
                     retryValue++;
@@ -163,17 +163,22 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
   private void logWorkerStart(String messageId, String workerName, String received_message_from_service_bus) {
   }
 
-    private void captureMetrics(RecordChangedMessages recordChangedMessage, long enqueueTime, long stopTime, boolean success) {
-        try {
-            Type listType = new TypeToken<List<RecordInfo>>() {}.getType();
-            List<RecordInfo> recordInfos = new Gson().fromJson(recordChangedMessage.getData(), listType);
-            long latency = stopTime - enqueueTime;
+    private void captureMetrics(RecordChangedMessages recordChangedMessage, String topicName, long enqueueTime, long stopTime, boolean success) {
+        if (recordChangedMessage == null) {
+            LOGGER.error("Error recording indexing SLI metrics", "RecordChangedMessages is null");
+        } else {
+            try {
+                Type listType = new TypeToken<List<RecordInfo>>() {
+                }.getType();
+                List<RecordInfo> recordInfos = new Gson().fromJson(recordChangedMessage.getData(), listType);
+                long latency = stopTime - enqueueTime;
 
-            for (RecordInfo record : recordInfos) {
-                this.metricService.sendIndexLatencyMetric(latency, recordChangedMessage.getDataPartitionId(), recordChangedMessage.getCorrelationId(), success);
+                for (RecordInfo record : recordInfos) {
+                    this.metricService.sendIndexLatencyMetric(latency, topicName, recordChangedMessage.getDataPartitionId(), recordChangedMessage.getCorrelationId(), success);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error recording indexing SLI metrics", e.getMessage(), e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Error recording indexing SLI metrics", e.getMessage(), e);
         }
     }
 

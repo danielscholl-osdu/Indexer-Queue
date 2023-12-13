@@ -39,7 +39,7 @@ public class MetricServiceTest {
     public void shouldSendHitsMetricSuccessfully() {
         ArgumentCaptor<MetricTelemetry> metricCaptor = ArgumentCaptor.forClass(MetricTelemetry.class);
 
-        this.sut.sendIndexLatencyMetric(1l, "opendes", "correlationId-1", true);
+        this.sut.sendIndexLatencyMetric(1l, "records-changed", "opendes", "correlationId-1", true);
 
         verify(telemetryClient, times(1)).trackMetric(metricCaptor.capture());
         assertEquals("[Indexer service] Record indexing latency", metricCaptor.getValue().getName());

@@ -18,5 +18,5 @@ public interface IMetricService {
 
     String getLatencyMetricName();
 
-    void sendIndexLatencyMetric(double value, String dataPartitionId, String correlationId, boolean success);
+    void sendIndexLatencyMetric(double value, String topicName, String dataPartitionId, String correlationId, boolean success);
 }

@@ -108,7 +108,7 @@ public class AbstractMessageHandlerWithActiveRetryTest {
         messageHandler.onMessageAsync(message);
 
         verify(testMessageProcessor, only()).doTheProcessing(message);
-        verify(receiveClient, only()).completeAsync(UUID);
+        verify(receiveClient, times(1)).completeAsync(UUID);
         verify(message, times(1)).getLockToken();
         verify(message, times(1)).getEnqueuedTimeUtc();
         verify(message, times(1)).getMessageId();
@@ -157,7 +157,7 @@ public class AbstractMessageHandlerWithActiveRetryTest {
 
         assertEquals(6, messageProperties.get(PROPERTY_RETRY));
 
-        verify(receiveClient, only()).deadLetterAsync(UUID);
+        verify(receiveClient, times(1)).deadLetterAsync(UUID);
         verifyNoInteractions(messagePublisher);
     }
 
@@ -170,7 +170,7 @@ public class AbstractMessageHandlerWithActiveRetryTest {
 
         messageHandler.onMessageAsync(message);
 
-        verify(receiveClient, only()).deadLetterAsync(UUID);
+        verify(receiveClient, times(1)).deadLetterAsync(UUID);
         verifyNoInteractions(messagePublisher);
     }
 
@@ -201,7 +201,7 @@ public class AbstractMessageHandlerWithActiveRetryTest {
 
     assertNull(messageProperties.get(PROPERTY_RETRY));
 
-    verify(receiveClient, only()).completeAsync(UUID);
+    verify(receiveClient, times(1)).completeAsync(UUID);
     verifyNoInteractions(messagePublisher);
 
   }
