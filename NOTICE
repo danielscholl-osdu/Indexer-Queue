@@ -853,7 +853,7 @@ The following software have components provided under the terms of this license:
 - SLF4J JDK14 Provider (from http://www.slf4j.org)
 - SLF4J Simple Provider (from http://www.slf4j.org)
 - Spongy Castle (from http://rtyley.github.io/spongycastle/)
-- Spring Data for Azure Cosmos DB SQL API (from https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/cosmos/azure-spring-data-cosmos)
+- Spring Data for Azure Cosmos DB SQL API (from https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/cosmos/azure-spring-data-cosmos, https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-data-cosmos)
 - adal4j (from https://github.com/AzureAD/azure-activedirectory-library-for-java)
 - micrometer-core (from https://github.com/micrometer-metrics/micrometer)
 - mockito-inline (from http://mockito.org, https://github.com/mockito/mockito)
@@ -896,13 +896,6 @@ cockroach
 The following software have components provided under the terms of this license:
 
 - JavaMail API (compat) (from https://repo1.maven.org/maven2/javax/mail/mail)
-
-========================================================================
-mit-old-style-no-advert
-========================================================================
-The following software have components provided under the terms of this license:
-
-- Brave (from https://repo1.maven.org/maven2/io/zipkin/brave/brave)
 
 ========================================================================
 public-domain
