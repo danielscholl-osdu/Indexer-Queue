@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -44,6 +45,10 @@ public class MetricServiceTest {
         verify(telemetryClient, times(1)).trackMetric(metricCaptor.capture());
         assertEquals("[Indexer service] Record indexing latency", metricCaptor.getValue().getName());
         assertEquals(1, metricCaptor.getValue().getValue(), 1);
+        assertEquals("true", metricCaptor.getValue().getProperties().get("success"));
+        assertEquals("correlationId-1", metricCaptor.getValue().getProperties().get("correlation-id"));
+        assertEquals("opendes", metricCaptor.getValue().getProperties().get("data-partition-id"));
+        assertEquals("records-changed", metricCaptor.getValue().getProperties().get("topic"));
         verify(telemetryClient, times(1)).flush();
     }
 }
