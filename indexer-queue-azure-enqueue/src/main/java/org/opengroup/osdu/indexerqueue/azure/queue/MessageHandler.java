@@ -11,11 +11,8 @@
 
 package org.opengroup.osdu.indexerqueue.azure.queue;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.SubscriptionClient;
-import org.opengroup.osdu.core.common.model.indexer.RecordInfo;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
@@ -27,9 +24,6 @@ import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
-import java.lang.reflect.Type;
-import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -54,7 +48,7 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
                    MessageAttributesExtractor messageAttributesExtractor,
                    Integer maxDeliveryCount,
                    String appName) {
-        super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount);
+        super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount, sbMessageBuilder, metricService);
         this.indexUpdateMessageHandler = indexUpdateMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;
         this.metricService = metricService;
@@ -66,7 +60,6 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
      */
     public void processMessage(IMessage message) throws Exception {
         String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
-        long enqueueTime = message.getEnqueuedTimeUtc().toEpochMilli();
         String messageId = message.getMessageId();
 
         try {
@@ -75,24 +68,9 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
             recordChangedMessage.setMessageId(messageId);
 
             indexUpdateMessageHandler.sendMessagesToIndexer(recordChangedMessage);
-
-            long stopTime = System.currentTimeMillis();
-            this.captureMetrics(recordChangedMessage, enqueueTime, stopTime);
         } finally {
             MDC.clear();
             ThreadScopeContextHolder.getContext().clear();
-        }
-    }
-
-    private void captureMetrics(RecordChangedMessages recordChangedMessage, long enqueueTime, long stopTime) {
-        try {
-            Type listType = new TypeToken<List<RecordInfo>>() {}.getType();
-            List<RecordInfo> recordInfos = new Gson().fromJson(recordChangedMessage.getData(), listType);
-            for (RecordInfo record : recordInfos) {
-                this.metricService.sendIndexLatencyMetric(stopTime - enqueueTime, recordChangedMessage.getDataPartitionId(), recordChangedMessage.getCorrelationId());
-            }
-        } catch (Exception e) {
-            logger.error("Error recording metrics", e);
         }
     }
 }
