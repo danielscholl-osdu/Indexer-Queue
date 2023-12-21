@@ -36,7 +36,7 @@ public class IndexProcessor implements Callable<IndexProcessor> {
     private Message message;
     private String messageId;
     private String receiptHandle;
-    private StringBuilder response;
+    private StringBuilder response = new StringBuilder();
     private String targetURL;
     private String indexerServiceAccountJWT;
 
