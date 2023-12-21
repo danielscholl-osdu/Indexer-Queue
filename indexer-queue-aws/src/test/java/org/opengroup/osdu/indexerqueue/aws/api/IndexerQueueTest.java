@@ -71,13 +71,11 @@ public class IndexerQueueTest {
 
     @Before
     public void setUp() {
-        this.environmentVariables.set("PARAMETER_MOUNT_PATH", "/mnt/params");
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @After
     public void tearDown() {
-        this.environmentVariables.clear("PARAMETER_MOUNT_PATH");
         System.setOut(standardOut);
     }
 
