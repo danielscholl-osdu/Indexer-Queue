@@ -63,14 +63,14 @@ public class IndexerQueue {
                 System.out.printf("Connecting to the SQS Queue: %s%n", environmentVariables.getQueueUrl());
                 AmazonSQSConfig sqsConfig = new AmazonSQSConfig(environmentVariables.getRegion());
                 AmazonSQS sqsClient = sqsConfig.AmazonSQS();
-                System.out.printf("Creating a thread pool with %s threads%n", MAX_INDEX_THREADS);
-                ThreadPoolExecutor executorPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(MAX_INDEX_THREADS);
                 System.out.printf("Dead letter queue url: %s%n", environmentVariables.getDeadLetterQueueUrl());
                 messages = IndexerQueueService.getMessages(sqsClient, environmentVariables.getQueueUrl(), MAX_BATCH_REQUEST_COUNT, MAX_MESSAGE_ALLOWED);
                 System.out.printf("Processing %s messages from storage queue%n", messages.size());
 
 
                 if (!messages.isEmpty()) {
+                    System.out.printf("Creating a thread pool with %s threads%n", MAX_INDEX_THREADS);
+                    ThreadPoolExecutor executorPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(MAX_INDEX_THREADS);
                     List<Message> reIndexMessages = messages.stream().filter(
                             msg -> msg.getMessageAttributes().containsKey("ReIndexCursor")
                     ).collect(Collectors.toList());
