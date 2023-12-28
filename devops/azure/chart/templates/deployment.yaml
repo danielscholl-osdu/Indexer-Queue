@@ -84,6 +84,10 @@ spec:
               value: { { .Values.azure.reindexTopic } }
             - name: azure_reindex_topic_subscription
               value: { { .Values.azure.reindexSubscription } }
+            - name: azure_schemachanged_topic_name
+              value: { { .Values.azure.schemachangedTopic } }
+            - name: azure_schemachanged_topic_subscription
+              value: { { .Values.azure.schemachangedSubscription } }
             - name: KEYVAULT_URI
               valueFrom:
                  configMapKeyRef:

@@ -22,6 +22,8 @@ azure:
   servicebusTopic: recordstopic
   reindexSubscription: reindextopicsubscription
   reindexTopic: reindextopic
+  schemachangedTopic: schemachangedtopic
+  schemachangedSubscription: schemachangedtopicsubscription
 
 image:
   repository: community.opengroup.org:5555/osdu/platform/system/indexer-queue
