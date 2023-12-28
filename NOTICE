@@ -378,7 +378,7 @@ The following software have components provided under the terms of this license:
 - Java Native Access Platform (from https://github.com/java-native-access/jna)
 - JavaBeans Activation Framework (from <http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp>, http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp, https://repo1.maven.org/maven2/com/sun/activation/javax.activation)
 - JavaMail API (compat) (from https://repo1.maven.org/maven2/javax/mail/mail)
-- Javassist (from http://www.javassist.org/)
+- Javassist (from http://www.javassist.org/, https://www.javassist.org/)
 - JetBrains Java Annotations (from https://github.com/JetBrains/java-annotations)
 - Joda-Time (from http://joda-time.sourceforge.net, http://www.joda.org/joda-time/, https://www.joda.org/joda-time/)
 - KeePassJava2 :: All (from https://repo1.maven.org/maven2/org/linguafranca/pwdb/KeePassJava2)
@@ -435,7 +435,7 @@ The following software have components provided under the terms of this license:
 - Okio (from https://github.com/square/okio/, https://repo1.maven.org/maven2/com/squareup/okio/okio)
 - OpenCensus (from https://github.com/census-instrumentation/opencensus-java)
 - PWDB :: Database (from https://repo1.maven.org/maven2/org/linguafranca/pwdb/database)
-- Plexus :: Component Annotations (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-component-annotations)
+- Plexus :: Component Annotations (deprecated) (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-component-annotations)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Plexus Compiler Api (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-api)
 - Plexus Javac Component (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-javac)
@@ -780,7 +780,7 @@ The following software have components provided under the terms of this license:
 
 - Java Native Access (from https://github.com/java-native-access/jna, https://github.com/twall/jna)
 - Java Native Access Platform (from https://github.com/java-native-access/jna)
-- Javassist (from http://www.javassist.org/)
+- Javassist (from http://www.javassist.org/, https://www.javassist.org/)
 
 ========================================================================
 LGPL-3.0-only
@@ -867,7 +867,7 @@ MPL-1.1
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- Javassist (from http://www.javassist.org/)
+- Javassist (from http://www.javassist.org/, https://www.javassist.org/)
 
 ========================================================================
 SunPro
