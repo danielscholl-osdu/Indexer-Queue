@@ -81,13 +81,13 @@ spec:
             - name: azure_servicebus_topic_subscription
               value: {{ .Values.azure.servicebusSubscription }}
             - name: azure_reindex_topic_name
-              value: { { .Values.azure.reindexTopic } }
+              value: {{ .Values.azure.reindexTopic }}
             - name: azure_reindex_topic_subscription
-              value: { { .Values.azure.reindexSubscription } }
+              value: {{ .Values.azure.reindexSubscription }}
             - name: azure_schemachanged_topic_name
-              value: { { .Values.azure.schemachangedTopic } }
+              value: {{ .Values.azure.schemachangedTopic }}
             - name: azure_schemachanged_topic_subscription
-              value: { { .Values.azure.schemachangedSubscription } }
+              value: {{ .Values.azure.schemachangedSubscription }}
             - name: KEYVAULT_URI
               valueFrom:
                  configMapKeyRef:
