@@ -2,7 +2,6 @@ package org.opengroup.osdu.indexerqueue.azure.queue;
 
 import com.microsoft.azure.servicebus.Message;
 import com.microsoft.azure.servicebus.MessageBody;
-import com.microsoft.azure.servicebus.SubscriptionClient;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,15 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
-import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
-import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
-import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
-import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertEquals;
@@ -34,23 +28,12 @@ public class MessageHandlerTest {
     @InjectMocks
     private MessageHandler sut;
     @Mock
-    private SubscriptionClient subscriptionClient;
-    @Mock
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock
     private SbMessageBuilder sbMessageBuilder;
     @Mock
     private Message message;
-    @Mock
-    private IMetricService metricService;
-    @Mock
-    private ThreadDpsHeaders dpsHeaders;
-    @Mock
-    private MdcContextMap mdcContextMap;
-    @Mock
-    private MessageAttributesExtractor messageAttributesExtractor;
 
-    private static final UUID uuid = UUID.randomUUID();
     private RecordChangedMessages recordChangedMessages = new RecordChangedMessages();
     private MessageBody messageBody = new Message().getMessageBody();
 
@@ -72,7 +55,7 @@ public class MessageHandlerTest {
         verify(indexUpdateMessageHandler, times(1)).sendMessagesToIndexer(recordChangedMessages);
         verify(message, times(1)).getMessageId();
         verify(message, times(1)).getMessageBody();
-        verify(message, times(2)).getEnqueuedTimeUtc();
+        verify(message, times(1)).getEnqueuedTimeUtc();
     }
 
     @Test

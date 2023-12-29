@@ -14,10 +14,15 @@
 
 package org.opengroup.osdu.indexerqueue.azure.queue;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.SubscriptionClient;
 import org.opengroup.osdu.azure.servicebus.AbstractMessageHandler;
+import org.opengroup.osdu.core.common.model.indexer.RecordInfo;
+import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
+import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHolder;
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
@@ -25,12 +30,15 @@ import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
+import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import java.lang.reflect.Type;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -53,6 +61,8 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
     private final ThreadDpsHeaders dpsHeaders;
     private final MdcContextMap mdcContextMap;
     private final MessageAttributesExtractor messageAttributesExtractor;
+    private SbMessageBuilder sbMessageBuilder;
+    private IMetricService metricService;
 
     /***
      * Constructor.
@@ -68,7 +78,9 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
                                                  final MdcContextMap mdcContextMap,
                                                  final MessageAttributesExtractor messageAttributesExtractor,
                                                  final String workerServiceName,
-                                                 final Integer maximumDeliveryCount) {
+                                                 final Integer maximumDeliveryCount,
+                                                 final SbMessageBuilder sbMessageBuilder,
+                                                 final IMetricService metricService) {
         super(workerServiceName, client);
         this.receiveClient = client;
         this.messagePublisher = publisher;
@@ -78,6 +90,8 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
         this.dpsHeaders = dpsHeaders;
         this.mdcContextMap = mdcContextMap;
         this.messageAttributesExtractor = messageAttributesExtractor;
+        this.sbMessageBuilder = sbMessageBuilder;
+        this.metricService = metricService;
     }
 
     /***
@@ -87,33 +101,38 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
      */
     @Override
     public CompletableFuture<Void> onMessageAsync(final IMessage message) {
+        String messageBody = "";
         long startTime = System.currentTimeMillis();
         long enqueueTime = message.getEnqueuedTimeUtc().toEpochMilli();
         String messageId = message.getMessageId();
+        RecordChangedMessages recordChangedMessage = null;
       try {
+            messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
             setupLoggerContext(message);
             logWorkerStart(messageId, this.workerName, "Received message from service bus");
+            recordChangedMessage = sbMessageBuilder.getServiceBusMessage(messageBody, messageId);
             processMessage(message);
             long stopTime = System.currentTimeMillis();
+            this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, true);
             logWorkerEnd(messageId, this.workerName, String.format("Successfully processed message. End to end time from enqueue : %d", stopTime - enqueueTime), stopTime - startTime, true);
             if (message.getProperties().get(PROPERTY_RETRY) != null) {
                 Integer retryValue = (Integer) message.getProperties().get(PROPERTY_RETRY);
-                String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
                 LOGGER.debug("Successfully sent message {} after {} retries", messageBody, retryValue);
             }
             return this.receiveClient.completeAsync(message.getLockToken());
 
         } catch (IndexerNoRetryException e) {
-            String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
             LOGGER.warn(String.format("No retry exception occurred while sending message %s to indexer service: %s",
                 messageBody, e.getMessage()));
+            long stopTime = System.currentTimeMillis();
+            this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, false);
             return receiveClient.deadLetterAsync(message.getLockToken());
         } catch (ValidStorageRecordNotFoundException e) {
-          String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
           LOGGER.debug(e.getMessage() + ". Record not found. No retry on message: {}", messageBody);
+          long stopTime = System.currentTimeMillis();
+          this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, true);
           return this.receiveClient.completeAsync(message.getLockToken());
         } catch (Exception e) {
-            String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
             if (message.getProperties().get(PROPERTY_RETRY) == null) {
                 int retryDuration = retryUtil.generateNextRetryTerm(1);
                 message.getProperties().put(PROPERTY_RETRY, 1);
@@ -124,6 +143,8 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
                 Integer retryValue = (Integer) message.getProperties().get(PROPERTY_RETRY);
                 if (retryValue > maxDeliveryCount) {
                     logMessageForRetry(messageBody, e, retryValue, true);
+                    long stopTime = System.currentTimeMillis();
+                    this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, false);
                     return receiveClient.deadLetterAsync(message.getLockToken());
                 } else {
                     retryValue++;
@@ -142,6 +163,24 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
   private void logWorkerStart(String messageId, String workerName, String received_message_from_service_bus) {
   }
 
+    private void captureMetrics(RecordChangedMessages recordChangedMessage, String topicName, long enqueueTime, long stopTime, boolean success) {
+        if (recordChangedMessage == null) {
+            LOGGER.error("Error recording indexing SLI metrics", "RecordChangedMessages is null");
+        } else {
+            try {
+                Type listType = new TypeToken<List<RecordInfo>>() {
+                }.getType();
+                List<RecordInfo> recordInfos = new Gson().fromJson(recordChangedMessage.getData(), listType);
+                long latency = stopTime - enqueueTime;
+
+                for (RecordInfo record : recordInfos) {
+                    this.metricService.sendIndexLatencyMetric(latency, topicName, recordChangedMessage.getDataPartitionId(), recordChangedMessage.getCorrelationId(), success);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error recording indexing SLI metrics", e.getMessage(), e);
+            }
+        }
+    }
 
   private void logMessageForRetry(String messageBody, Exception e, int retryNumber, boolean isLastRetry) {
         if (isLastRetry) {
