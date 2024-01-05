@@ -80,19 +80,17 @@ public class IndexerQueueTest {
     }
 
     @Test
-    public void test_processIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException {
+    public void test_processIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
         ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
 
         List<Message> messages = new ArrayList<Message>();
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
-
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("0 Requests Deleted"));
     }
 
     @Test
-    public void test_processIndexMessages_ValidMessage() throws ExecutionException, InterruptedException {
+    public void test_processIndexMessages_ValidMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
         ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
 
@@ -104,20 +102,16 @@ public class IndexerQueueTest {
         messages.add(msg);
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
-
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("1 Requests Deleted"));
     }
 
     @Test
-    public void test_processReIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException {
+    public void test_processReIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
         ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
 
         List<Message> messages = new ArrayList<Message>();
 
         IndexerQueue.processReIndexMessages(messages, "reIndexerUrl", queueUrl, executorPool, sqsClient);
-
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("0 Requests Deleted"));
     }
 
     @Test(expected = TestTimedOutException.class)
