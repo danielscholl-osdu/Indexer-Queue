@@ -17,8 +17,7 @@
 package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
+import com.amazonaws.services.sqs.model.*;
 import org.junit.*;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.Timeout;
@@ -26,6 +25,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
 
 import java.io.ByteArrayOutputStream;
@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import static org.mockito.Mockito.mock;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 
 public class IndexerQueueTest {
@@ -87,8 +87,12 @@ public class IndexerQueueTest {
         List<Message> messages = new ArrayList<Message>();
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
-    }
 
+        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
+        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
+    }
     @Test
     public void test_processIndexMessages_ValidMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
@@ -102,6 +106,11 @@ public class IndexerQueueTest {
         messages.add(msg);
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
+
+        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
+        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
     }
 
     @Test
@@ -112,6 +121,11 @@ public class IndexerQueueTest {
         List<Message> messages = new ArrayList<Message>();
 
         IndexerQueue.processReIndexMessages(messages, "reIndexerUrl", queueUrl, executorPool, sqsClient);
+
+        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
+        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
     }
 
     @Test(expected = TestTimedOutException.class)

@@ -69,6 +69,7 @@ public class IndexProcessorTest {
         IndexProcessor result = processor.call();
 
         Assert.assertEquals(processor, result);
+        Assert.assertTrue(processor.expectionExists());
     }
 
     @Test
@@ -80,6 +81,7 @@ public class IndexProcessorTest {
         IndexProcessor result = processor.call();
 
         Assert.assertEquals(processor, result);
+        Assert.assertTrue(processor.expectionExists());
 
     }
 
