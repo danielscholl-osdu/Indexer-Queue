@@ -40,27 +40,29 @@ az keyvault secret show --vault-name $KEY_VAULT_NAME --name $KEY_VAULT_SECRET_NA
 
 **Required to run service**
 
-| name | value | description | sensitive? | source |
-| ---  | ---   | ---         | ---        | ---    |
-| `azure_servicebus_topic_name` | `recordstopic` | Service Bus topic to listen on | no | output of infrastructure deployment |
-| `azure_servicebus_topic_subscription` | `recordstopicsubscription` | Service Bus subscription to listen from | no | output of infrastructure deployment |
-| `azure_reindex_topic_name` | `reindextopic` | Re-index topic to listen on | no | output of infrastructure deployment |
-| `azure_reindex_topic_subscription` | `reindextopicsubscription` | Re-index subscription to listen from | no | output of infrastructure deployment |
-| `indexer_worker_url` | ex `https://indexer.azurewebsites.net/api/indexer/v2/_dps/task-handlers/index-worker` | Indexer endpoint | no | output of infrastructure deployment |
-| `azure_application_insights_instrumentation_key` | `********` | Instrumentation key of the associated application insights resource | yes | output of infrastructure deployment |
-| `AZURE_TENANT_ID` | `*******` | AD tenant to authenticate users from | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-tenant-id` |
-| `AZURE_CLIENT_ID` | `******` | Identity to run the service locally. This enables access to Azure resources. You only need this if running locally | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-username` |
-| `AZURE_CLIENT_SECRET` | `******` | Secret for `$AZURE_CLIENT_ID` | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-password` |
-| `KEYVAULT_URI` | ex `https://foo-keyvault.vault.azure.net/` | URI of KeyVault that holds application secrets | no | output of infrastructure deployment |
-| `AZURE_APP_RESOURCE_ID` | `******` | AAD client application ID | yes | output of infrastructure deployment |
-| `aad_client_id` | `*****` | | yes | output of infrastructure deployment |
-| `partition_api` | ex `https://partition.azurewebsites.net/api/partition/v1` | partition service endpoint | no | |
-| `executor_n_threads` | 32 | Max no of threads used concurrently  | no | | 
-| `max_concurrent_calls` | 32 | Max no of concurrent calls to service bus | no | | 
-| `max_lock_renew_duration_seconds` | 600 | Message lock will be released after this duration | no | | 
-| `max_delivery_count` | 5 | Man no of times service bus re-tries a message before dead-lettering it | no | | 
-| `azure_istioauth_enabled` | `true` (depends on if service is running in Kubernetes environment with Istio installed) | Configuring use of Istio | no | Set to false if running locally | 
-| `server_port` | 8080 | | | |
+| name                                             | value                                                                                    | description                                                                                                        | sensitive? | source |
+|--------------------------------------------------|------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------| ---        | ---    |
+| `azure_servicebus_topic_name`                    | `recordstopic`                                                                           | Service Bus topic to listen on                                                                                     | no | output of infrastructure deployment |
+| `azure_servicebus_topic_subscription`            | `recordstopicsubscription`                                                               | Service Bus subscription to listen from                                                                            | no | output of infrastructure deployment |
+| `azure_reindex_topic_name`                       | `reindextopic`                                                                           | Re-index topic to listen on                                                                                        | no | output of infrastructure deployment |
+| `azure_reindex_topic_subscription`               | `reindextopicsubscription`                                                               | Re-index subscription to listen from                                                                               | no | output of infrastructure deployment |
+| `azure_schemachanged_topic_name`                 | `schemachangedtopic`                                                                     | Schema changed topic to listen on                                                                                  | no | output of infrastructure deployment |
+| `azure_schemachanged_topic_subscription`         | `schemachangedtopicsubscription`                                                         | Schema changed subscription to listen from                                                                         | no | output of infrastructure deployment |
+| `indexer_worker_url`                             | ex `https://indexer.azurewebsites.net/api/indexer/v2/_dps/task-handlers/index-worker`    | Indexer endpoint                                                                                                   | no | output of infrastructure deployment |
+| `azure_application_insights_instrumentation_key` | `********`                                                                               | Instrumentation key of the associated application insights resource                                                | yes | output of infrastructure deployment |
+| `AZURE_TENANT_ID`                                | `*******`                                                                                | AD tenant to authenticate users from                                                                               | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-tenant-id` |
+| `AZURE_CLIENT_ID`                                | `******`                                                                                 | Identity to run the service locally. This enables access to Azure resources. You only need this if running locally | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-username` |
+| `AZURE_CLIENT_SECRET`                            | `******`                                                                                 | Secret for `$AZURE_CLIENT_ID`                                                                                      | yes | keyvault secret: `$KEYVAULT_URI/secrets/app-dev-sp-password` |
+| `KEYVAULT_URI`                                   | ex `https://foo-keyvault.vault.azure.net/`                                               | URI of KeyVault that holds application secrets                                                                     | no | output of infrastructure deployment |
+| `AZURE_APP_RESOURCE_ID`                          | `******`                                                                                 | AAD client application ID                                                                                          | yes | output of infrastructure deployment |
+| `aad_client_id`                                  | `*****`                                                                                  |                                                                                                                    | yes | output of infrastructure deployment |
+| `partition_api`                                  | ex `https://partition.azurewebsites.net/api/partition/v1`                                | partition service endpoint                                                                                         | no | |
+| `executor_n_threads`                             | 32                                                                                       | Max no of threads used concurrently                                                                                | no | | 
+| `max_concurrent_calls`                           | 32                                                                                       | Max no of concurrent calls to service bus                                                                          | no | | 
+| `max_lock_renew_duration_seconds`                | 600                                                                                      | Message lock will be released after this duration                                                                  | no | | 
+| `max_delivery_count`                             | 5                                                                                        | Man no of times service bus re-tries a message before dead-lettering it                                            | no | | 
+| `azure_istioauth_enabled`                        | `true` (depends on if service is running in Kubernetes environment with Istio installed) | Configuring use of Istio                                                                                           | no | Set to false if running locally | 
+| `server_port`                                    | 8080                                                                                     |                                                                                                                    | | |
 
 **Required to run integration test**
 

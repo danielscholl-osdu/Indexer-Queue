@@ -108,6 +108,7 @@ public class SubscriptionManager {
             try {
                 subscribe(executorService, partition, azureBootstrapConfig.getServiceBusTopic(), azureBootstrapConfig.getServiceBusTopicSubscription(), publishTopicName);
                 subscribe(executorService, partition, azureBootstrapConfig.getReindexTopic(), azureBootstrapConfig.getReindexTopicSubscription(), publishTopicName);
+                subscribe(executorService, partition, azureBootstrapConfig.getSchemachangedTopic(), azureBootstrapConfig.getSchemachangedSubscription(), azureBootstrapConfig.getSchemachangedTopic());
                 partitions.add(partition);
             }
             catch (Exception e) {
