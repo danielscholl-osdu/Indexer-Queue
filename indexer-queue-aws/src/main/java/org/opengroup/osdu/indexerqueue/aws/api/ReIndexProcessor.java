@@ -109,6 +109,7 @@ public class ReIndexProcessor implements Callable<ReIndexProcessor> {
         connection.setRequestProperty("x-user-id", attributes.get("user"));
         connection.setUseCaches(false);
         connection.setDoOutput(true);
+        connection.setConnectTimeout(10000);
         return connection;
     }
 

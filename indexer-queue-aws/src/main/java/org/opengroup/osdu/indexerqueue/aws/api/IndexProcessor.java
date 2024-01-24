@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import com.amazonaws.services.sqs.model.Message;
+import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
 
 
 public class IndexProcessor implements Callable<IndexProcessor> {
@@ -36,9 +37,10 @@ public class IndexProcessor implements Callable<IndexProcessor> {
     private Message message;
     private String messageId;
     private String receiptHandle;
-    private StringBuilder response;
+    private StringBuilder response = new StringBuilder();
     private String targetURL;
     private String indexerServiceAccountJWT;
+    private static final JaxRsDpsLog logger = LogProvider.getLogger();
 
     public IndexProcessor(Message message, String targetUrl, String indexServiceAccountJWT){
         this.message = message;
@@ -62,7 +64,7 @@ public class IndexProcessor implements Callable<IndexProcessor> {
 
         try {
             this.messageId = message.getMessageId();
-            System.out.println(String.format("Processing message: %s", this.messageId));
+            logger.info(String.format("Processing message: %s", this.messageId));
 
             RecordChangedMessages convertedMessage = getConvertedMessage(message);
             String body = mapper.writeValueAsString(convertedMessage);
@@ -73,13 +75,14 @@ public class IndexProcessor implements Callable<IndexProcessor> {
 
             getResponse(connection);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.info(e.getMessage());
             result = CallableResult.Fail;
+            logger.error("Indexer queue Could not send indexer processing message", e);
             exception = e;
         }
-        System.out.println(result);
+        logger.info(result.toString());
         if(result == CallableResult.Fail) {
-            System.out.println(exception.getMessage());
+            logger.info(exception.getMessage());
         }
         return this;
     }
@@ -104,7 +107,7 @@ public class IndexProcessor implements Callable<IndexProcessor> {
 
     private HttpURLConnection getConnection(String body, Map<String, String> attributes) throws IOException {
         URL url = new URL(this.targetURL);
-        System.out.println(String.format("The url is: %s", url));
+        logger.info(String.format("The url is: %s", url));
 
         HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -116,6 +119,7 @@ public class IndexProcessor implements Callable<IndexProcessor> {
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setUseCaches(false);
         connection.setDoOutput(true);
+        connection.setConnectTimeout(10000);
         return connection;
     }
 

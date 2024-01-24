@@ -34,41 +34,33 @@ public class IndexerQueueService {
         // Private constructor
     }
 
-    public static List<IndexProcessor> processIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
-            throws ExecutionException, InterruptedException {
-
-        List<CompletableFuture<IndexProcessor>> futures = createIndexCompletableFutures(messages, executorPool, url);
-
-        CompletableFuture[] cfs = futures.toArray(new CompletableFuture[0]);
-        CompletableFuture<List<IndexProcessor>> results = CompletableFuture
-                .allOf(cfs)
-                .thenApply(ignored -> futures
-                        .stream()
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList()));
+    private static <T> List<T> processIndexMessages(List<CompletableFuture<T>> indexProcesses) throws ExecutionException, InterruptedException{
+        CompletableFuture[] cfs = indexProcesses.toArray(new CompletableFuture[0]);
+        CompletableFuture<List<T>> results = CompletableFuture
+            .allOf(cfs)
+            .thenApply(ignored -> indexProcesses
+                .stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList()));
 
 //        List<IndexProcessor> processed = results.get();
 //        executorPool.shutdown();
 
         return results.get();
     }
+
+    public static List<IndexProcessor> processIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
+        throws ExecutionException, InterruptedException {
+
+        List<CompletableFuture<IndexProcessor>> futures = createIndexCompletableFutures(messages, executorPool, url);
+
+        return processIndexMessages(futures);
+    }
     public static List<ReIndexProcessor> processReIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
-            throws ExecutionException, InterruptedException {
+            throws ExecutionException, InterruptedException{
 
         List<CompletableFuture<ReIndexProcessor>> futures = createReIndexCompletableFutures(messages, executorPool, url);
-
-        CompletableFuture[] cfs = futures.toArray(new CompletableFuture[0]);
-        CompletableFuture<List<ReIndexProcessor>> results = CompletableFuture
-                .allOf(cfs)
-                .thenApply(ignored -> futures
-                        .stream()
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList()));
-
-//        List<ReIndexProcessor> processed = results.get();
-//        executorPool.shutdown();
-
-        return results.get();
+        return processIndexMessages(futures);
     }
     public static List<DeleteMessageBatchResult> deleteMessages(List<DeleteMessageBatchRequest> deleteBatchRequests, AmazonSQS sqsClient) {
         return deleteBatchRequests.stream().map(deleteRequest -> sqsClient.deleteMessageBatch(deleteRequest)).collect(Collectors.toList());

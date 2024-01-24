@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html
-FROM amazoncorretto:8
+FROM amazoncorretto:17
 
 ARG JAR_FILE=indexer-queue-aws/target/indexer-queue*.jar
 WORKDIR /

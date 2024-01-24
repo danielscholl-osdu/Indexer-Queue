@@ -62,12 +62,12 @@ public class IndexerQueueServiceTest {
     @Test
     public void test_getMessages_10Messages_pass() {
         // Arrange
-        int numOfmessages = 10;
+        int numOfMessages = 10;
         int maxMessageCount = 10;
 
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
+        receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
         receiveMessageRequest.withMessageAttributeNames("All");
         receiveMessageRequest.withAttributeNames("All");
         List<Message> messages = new ArrayList<>();
@@ -81,7 +81,7 @@ public class IndexerQueueServiceTest {
         Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
 
         // Act
-         List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfmessages, maxMessageCount);
+         List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfMessages, maxMessageCount);
 
         // Assert
         assertEquals(messages.get(1), actualMessages.get(1));
@@ -91,12 +91,12 @@ public class IndexerQueueServiceTest {
     @Test
     public void test_getMessages_0Messages_pass() {
         // Arrange
-        int numOfmessages = 10;
+        int numOfMessages = 10;
         int maxMessageCount = 10;
 
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
+        receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
         receiveMessageRequest.withMessageAttributeNames("All");
         receiveMessageRequest.withAttributeNames("All");
 
@@ -107,7 +107,7 @@ public class IndexerQueueServiceTest {
         Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
 
         // Act
-        List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfmessages, maxMessageCount);
+        List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfMessages, maxMessageCount);
 
         // Assert
         assertEquals(messages.size(), actualMessages.size());
@@ -214,13 +214,13 @@ public class IndexerQueueServiceTest {
     @Test(expected = NullPointerException.class)
     public void test_getMessages_invalidqueuename_fail() {
         // Arrange
-        int numOfmessages = 10;
+        int numOfMessages = 10;
         int maxMessageCount = 10;
 
         String invalidQueueName = "invalid";
 
         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        receiveMessageRequest.setMaxNumberOfMessages(numOfmessages);
+        receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
         receiveMessageRequest.withMessageAttributeNames("data-partition-id", "account-id");
 
         List<Message> messages = new ArrayList<>();
@@ -230,7 +230,7 @@ public class IndexerQueueServiceTest {
         Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
 
         // Act
-        List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, invalidQueueName, numOfmessages, maxMessageCount);
+        IndexerQueueService.getMessages(sqsClient, invalidQueueName, numOfMessages, maxMessageCount);
     }
 
     @Test

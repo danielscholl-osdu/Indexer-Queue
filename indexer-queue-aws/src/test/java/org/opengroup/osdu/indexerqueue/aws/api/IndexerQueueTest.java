@@ -17,8 +17,7 @@
 package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.MessageAttributeValue;
+import com.amazonaws.services.sqs.model.*;
 import org.junit.*;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.Timeout;
@@ -26,6 +25,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
 
 import java.io.ByteArrayOutputStream;
@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeoutException;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import static org.mockito.Mockito.mock;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 
 public class IndexerQueueTest {
@@ -71,18 +71,16 @@ public class IndexerQueueTest {
 
     @Before
     public void setUp() {
-        this.environmentVariables.set("PARAMETER_MOUNT_PATH", "/mnt/params");
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
     @After
     public void tearDown() {
-        this.environmentVariables.clear("PARAMETER_MOUNT_PATH");
         System.setOut(standardOut);
     }
 
     @Test
-    public void test_processIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException {
+    public void test_processIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
         ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
 
@@ -90,11 +88,13 @@ public class IndexerQueueTest {
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("0 Requests Deleted"));
+        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
+        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
     }
-
     @Test
-    public void test_processIndexMessages_ValidMessage() throws ExecutionException, InterruptedException {
+    public void test_processIndexMessages_ValidMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
         ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
 
@@ -107,11 +107,14 @@ public class IndexerQueueTest {
 
         IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("1 Requests Deleted"));
+        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
+        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
     }
 
     @Test
-    public void test_processReIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException {
+    public void test_processReIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException, TimeoutException {
 
         ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
 
@@ -119,7 +122,10 @@ public class IndexerQueueTest {
 
         IndexerQueue.processReIndexMessages(messages, "reIndexerUrl", queueUrl, executorPool, sqsClient);
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("0 Requests Deleted"));
+        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
+        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
+        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
     }
 
     @Test(expected = TestTimedOutException.class)

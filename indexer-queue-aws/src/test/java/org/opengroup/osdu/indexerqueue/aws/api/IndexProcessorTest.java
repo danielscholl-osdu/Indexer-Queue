@@ -68,8 +68,8 @@ public class IndexProcessorTest {
 
         IndexProcessor result = processor.call();
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("no protocol: targetUrl_invalid"));
         Assert.assertEquals(processor, result);
+        Assert.assertTrue(processor.expectionExists());
     }
 
     @Test
@@ -80,8 +80,8 @@ public class IndexProcessorTest {
 
         IndexProcessor result = processor.call();
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("Connection refused (Connection refused)"));
         Assert.assertEquals(processor, result);
+        Assert.assertTrue(processor.expectionExists());
 
     }
 
@@ -107,7 +107,6 @@ public class IndexProcessorTest {
 
                 IndexProcessor result = processor.call();
 
-                Assert.assertTrue(outputStreamCaptor.toString().trim().contains("Underlying input stream returned zero bytes"));
                 Assert.assertEquals(processor, result);
                 Assert.assertTrue(processor.expectionExists());
             }
