@@ -1,12 +1,10 @@
 package azure.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Strings;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.opengroup.osdu.azure.util.AzureServicePrincipal;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -14,17 +12,12 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
-
-import org.opengroup.osdu.azure.util.AzureServicePrincipal;
 
 import static azure.pubsub.PubsubEndpointIntegrationTest.indentatedBody;
 
@@ -194,28 +187,6 @@ public class TestUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        allowMethods("PATCH");
         return Client.create();
-    }
-
-    private static void allowMethods(String... methods) {
-        try {
-            Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
-
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
-
-            methodsField.setAccessible(true);
-
-            String[] oldMethods = (String[]) methodsField.get(null);
-            Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
-            methodsSet.addAll(Arrays.asList(methods));
-            String[] newMethods = methodsSet.toArray(new String[0]);
-
-            methodsField.set(null/*static field*/, newMethods);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 }
