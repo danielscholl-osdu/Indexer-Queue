@@ -10,6 +10,8 @@ azure:
   servicebusTopic: recordstopic
   reindexSubscription: reindextopicsubscription
   reindexTopic: reindextopic
+  schemachangedTopic: schemachangedtopic
+  schemachangedSubscription: schemachangedtopicsubscription
 
 ################################################################################
 # Specify the Gitlab branch being used for image creation

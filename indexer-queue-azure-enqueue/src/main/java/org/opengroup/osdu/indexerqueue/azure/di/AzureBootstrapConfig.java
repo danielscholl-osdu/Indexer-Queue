@@ -46,6 +46,12 @@ public class AzureBootstrapConfig {
     @Value("${azure.reindex.topic-subscription}")
     private String reindexTopicSubscription;
 
+    @Value("${azure.schemachanged.topic-name}")
+    private String schemachangedTopic;
+
+    @Value("${azure.schemachanged.topic-subscription}")
+    private String schemachangedSubscription;
+
     @Value("${indexer.worker.url}")
     private String indexerWorkerURL;
 

@@ -77,8 +77,8 @@ public class SubscriptionManagerTest {
 
         sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
-        verify(azureBootstrapConfig, times(2)).getMaxConcurrentCalls();
-        verify(azureBootstrapConfig, times(2)).getMaxLockRenewDurationInSeconds();
+        verify(azureBootstrapConfig, times(3)).getMaxConcurrentCalls();
+        verify(azureBootstrapConfig, times(3)).getMaxLockRenewDurationInSeconds();
     }
 
     @Test
@@ -90,7 +90,7 @@ public class SubscriptionManagerTest {
 
         sut.fetchPartitionsAndSubscribe(executorService, partitions);
 
-        verify(azureBootstrapConfig, times(2)).getMaxConcurrentCalls();
-        verify(azureBootstrapConfig, times(2)).getMaxLockRenewDurationInSeconds();
+        verify(azureBootstrapConfig, times(3)).getMaxConcurrentCalls();
+        verify(azureBootstrapConfig, times(3)).getMaxLockRenewDurationInSeconds();
     }
 }
