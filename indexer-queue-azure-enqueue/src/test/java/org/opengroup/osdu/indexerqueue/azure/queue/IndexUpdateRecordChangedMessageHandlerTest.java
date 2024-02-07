@@ -80,7 +80,7 @@ public class IndexUpdateRecordChangedMessageHandlerTest {
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
         when(httpClientBuilder.build()).thenThrow(exp);
         try {
-            sut.sendMessagesToIndexer(recordChangedMessages);
+            sut.sendRecordChangedMessagesToIndexer(recordChangedMessages);
         }
         catch (Exception e) {
             assertEquals("httpClientBuilder build failed", e.getMessage());
@@ -96,7 +96,7 @@ public class IndexUpdateRecordChangedMessageHandlerTest {
 
         try {
             before = new java.sql.Timestamp(new Date().getTime());
-            sut.sendMessagesToIndexer(recordChangedMessages);
+            sut.sendRecordChangedMessagesToIndexer(recordChangedMessages);
         } catch (Exception e) {
             java.sql.Timestamp after = new java.sql.Timestamp(new Date().getTime());
             long actualWaitTime = after.getTime() - before.getTime();
@@ -112,7 +112,7 @@ public class IndexUpdateRecordChangedMessageHandlerTest {
         StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),200,"success");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
-        sut.sendMessagesToIndexer(recordChangedMessages);
+        sut.sendRecordChangedMessagesToIndexer(recordChangedMessages);
 
         assertEquals(httpMock.constructed().size(),1);
         verify(httpClient,times(1)).execute(any());
@@ -128,7 +128,7 @@ public class IndexUpdateRecordChangedMessageHandlerTest {
         when(httpResponse.getStatusLine()).thenReturn(status);
 
         try {
-            sut.sendMessagesToIndexer(recordChangedMessages);
+            sut.sendRecordChangedMessagesToIndexer(recordChangedMessages);
         } catch (Exception e) {
             assertEquals(httpMock.constructed().size(),1);
             verify(httpClient,times(1)).execute(any());
@@ -144,6 +144,6 @@ public class IndexUpdateRecordChangedMessageHandlerTest {
         StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1), RequestStatus.NO_RETRY,"error");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
-        assertThrows(IndexerNoRetryException.class, () -> sut.sendMessagesToIndexer(recordChangedMessages));
+        assertThrows(IndexerNoRetryException.class, () -> sut.sendRecordChangedMessagesToIndexer(recordChangedMessages));
     }
 }

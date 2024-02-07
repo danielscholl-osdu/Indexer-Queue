@@ -21,7 +21,7 @@ import java.util.Map;
  * A class to extract RecordChangedMessages from the serviceBusMessage. Extract properties like data-partition-id, correlation-id, account-id and set the thread context.
  */
 @Component
-public class SbMessageBuilder {
+public class RecordsChangedSbMessageBuilder {
     // It should be moved to core common later
     private final String ANCESTRY_KINDS = "ancestry_kinds";
 

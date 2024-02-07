@@ -12,7 +12,7 @@ import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class SubscriptionManager {
     @Autowired
     private RetryUtil retryUtil;
     @Autowired
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Autowired
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Autowired
@@ -136,7 +136,7 @@ public class SubscriptionManager {
             Integer maxDeliveryCount = Integer.valueOf(azureBootstrapConfig.getMaxDeliveryCount());
             String appName = azureBootstrapConfig.getAppName();
             RecordChangedMessageHandler recordChangedMessageHandler = new RecordChangedMessageHandler(subscriptionClient,
-                    messageSender, indexUpdateMessageHandler, sbMessageBuilder,
+                    messageSender, indexUpdateMessageHandler, recordsChangedSbMessageBuilder,
                     metricService, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, maxDeliveryCount, appName);
             subscriptionClient.registerMessageHandler(
                 recordChangedMessageHandler,

@@ -14,9 +14,12 @@
 
 package org.opengroup.osdu.indexerqueue.azure.queue;
 
+import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 
 public interface IIndexUpdateMessageHandler {
 
-    void sendMessagesToIndexer(RecordChangedMessages recordChangedMessage);
+    void sendRecordChangedMessagesToIndexer(RecordChangedMessages recordChangedMessage);
+
+    void sendSchemaChangedMessagesToIndexer(SchemaChangedMessages schemaChangedMessages);
 }

@@ -31,7 +31,7 @@ import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -79,7 +79,7 @@ public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
     @Mock
     private MessageAttributesExtractor messageAttributesExtractor;
     @Mock
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Mock
     private IMetricService metricService;
 
@@ -90,7 +90,7 @@ public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
         messageProperties = new HashMap<>();
         messageHandler = new AbstractMessageHandlerWithActiveRetry(receiveClient,
                 messagePublisher, retryUtil, dpsHeaders, mdcContextMap,
-                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT, sbMessageBuilder, metricService) {
+                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT, recordsChangedSbMessageBuilder, metricService) {
             @Override
             public void processMessage(IMessage message) {
                 testMessageProcessor.doTheProcessing(message);

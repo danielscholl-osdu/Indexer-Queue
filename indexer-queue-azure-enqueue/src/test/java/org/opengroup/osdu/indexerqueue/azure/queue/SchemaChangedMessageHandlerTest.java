@@ -2,15 +2,14 @@ package org.opengroup.osdu.indexerqueue.azure.queue;
 
 import com.microsoft.azure.servicebus.Message;
 import com.microsoft.azure.servicebus.MessageBody;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
-import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
+import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
+import org.opengroup.osdu.indexerqueue.azure.util.SchemaChangedSbMessageBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -18,29 +17,32 @@ import java.time.Instant;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RecordChangedMessageHandlerTest {
+public class SchemaChangedMessageHandlerTest {
 
-    private static final String RECORD_INFO_PAYLOAD = "[{\"id\":\"testId\", \"kind\":\"testKind\", \"op\": \"testOp\"}]";
+    private static final String SCHEMA_INFO_PAYLOAD = "[{\"kind\":\"testKind\", \"op\": \"testOp\"}]";
 
     @InjectMocks
-    private RecordChangedMessageHandler sut;
+    private SchemaChangedMessageHandler sut;
     @Mock
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock
-    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
+    private SchemaChangedSbMessageBuilder schemaChangedSbMessageBuilder;
     @Mock
     private Message message;
 
-    private RecordChangedMessages recordChangedMessages = new RecordChangedMessages();
+    private SchemaChangedMessages schemaChangedMessages = new SchemaChangedMessages();
     private MessageBody messageBody = new Message().getMessageBody();
 
     @BeforeEach
     public void init() throws IOException {
-        recordChangedMessages.setData(RECORD_INFO_PAYLOAD);
-        when(recordsChangedSbMessageBuilder.getServiceBusMessage(anyString(), anyString())).thenReturn(recordChangedMessages);
+        schemaChangedMessages.setData(SCHEMA_INFO_PAYLOAD);
+        when(schemaChangedSbMessageBuilder.buildSchemaChangedServiceBusMessage(anyString())).thenReturn(schemaChangedMessages);
         when(message.getEnqueuedTimeUtc()).thenReturn(Instant.now());
         when(message.getMessageId()).thenReturn(EMPTY);
         when(message.getMessageBody()).thenReturn(messageBody);
@@ -52,7 +54,7 @@ public class RecordChangedMessageHandlerTest {
         sut.processMessage(message);
 
         // Verify
-        verify(indexUpdateMessageHandler, times(1)).sendRecordChangedMessagesToIndexer(recordChangedMessages);
+        verify(indexUpdateMessageHandler, times(1)).sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
         verify(message, times(1)).getMessageId();
         verify(message, times(1)).getMessageBody();
         verify(message, times(1)).getEnqueuedTimeUtc();
@@ -62,14 +64,14 @@ public class RecordChangedMessageHandlerTest {
     public void shouldThrow_whenSendMessagesToIndexerThrows() throws Exception{
         //Setup
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
-        doThrow(exp).when(indexUpdateMessageHandler).sendRecordChangedMessagesToIndexer(recordChangedMessages);
+        doThrow(exp).when(indexUpdateMessageHandler).sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
 
         // Execute
         try {
             sut.processMessage(message);
         }
         catch (Exception e) {
-        // Verify
+            // Verify
             assertEquals("httpClientBuilder build failed", e.getMessage());
         }
     }

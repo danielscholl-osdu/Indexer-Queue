@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.model.tenant.TenantInfo;
 import org.opengroup.osdu.core.common.provider.interfaces.ITenantFactory;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 
 import java.util.Collections;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class SubscriptionManagerTest {
     @InjectMocks
     private SubscriptionManager sut;
     @Mock
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Mock
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock
