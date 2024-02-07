@@ -30,24 +30,24 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /***
  * Defines callback for receiving messages from Azure Service Bus.
  */
-public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
+public class RecordChangedMessageHandler extends AbstractMessageHandlerWithActiveRetry {
 
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     private SbMessageBuilder sbMessageBuilder;
-    private Logger logger = LoggerFactory.getLogger(MessageHandler.class.getName());
+    private Logger logger = LoggerFactory.getLogger(RecordChangedMessageHandler.class.getName());
     private IMetricService metricService;
 
-    MessageHandler(SubscriptionClient client,
-                   MessagePublisher messagePublisher,
-                   IndexUpdateMessageHandler indexUpdateMessageHandler,
-                   SbMessageBuilder sbMessageBuilder,
-                   IMetricService metricService,
-                   RetryUtil retryUtil,
-                   ThreadDpsHeaders dpsHeaders,
-                   MdcContextMap mdcContextMap,
-                   MessageAttributesExtractor messageAttributesExtractor,
-                   Integer maxDeliveryCount,
-                   String appName) {
+    RecordChangedMessageHandler(SubscriptionClient client,
+                                MessagePublisher messagePublisher,
+                                IndexUpdateMessageHandler indexUpdateMessageHandler,
+                                SbMessageBuilder sbMessageBuilder,
+                                IMetricService metricService,
+                                RetryUtil retryUtil,
+                                ThreadDpsHeaders dpsHeaders,
+                                MdcContextMap mdcContextMap,
+                                MessageAttributesExtractor messageAttributesExtractor,
+                                Integer maxDeliveryCount,
+                                String appName) {
         super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount, sbMessageBuilder, metricService);
         this.indexUpdateMessageHandler = indexUpdateMessageHandler;
         this.sbMessageBuilder = sbMessageBuilder;

@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @ExtendWith(MockitoExtension.class)
-public class IndexUpdateMessageHandlerTest {
+public class IndexUpdateRecordChangedMessageHandlerTest {
     private static final String indexerWorkerUrl = "indexer-worker-url";
     private static final int maxTry = 5;
     private final String ACCOUNT_ID = "test-tenant";

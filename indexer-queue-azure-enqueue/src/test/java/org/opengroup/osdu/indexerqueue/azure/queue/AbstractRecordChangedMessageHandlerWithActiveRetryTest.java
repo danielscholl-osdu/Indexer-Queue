@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AbstractMessageHandlerWithActiveRetryTest {
+public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
 
     private static final String PROPERTY_RETRY = "RETRY";
     private static final String WORKER_NAME = "worker_name";

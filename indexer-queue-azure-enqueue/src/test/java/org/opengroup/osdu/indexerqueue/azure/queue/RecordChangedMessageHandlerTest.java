@@ -21,12 +21,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MessageHandlerTest {
+public class RecordChangedMessageHandlerTest {
 
     private static final String RECORD_INFO_PAYLOAD = "[{\"id\":\"testId\", \"kind\":\"testKind\", \"op\": \"testOp\"}]";
 
     @InjectMocks
-    private MessageHandler sut;
+    private RecordChangedMessageHandler sut;
     @Mock
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock

@@ -135,11 +135,11 @@ public class SubscriptionManager {
         try {
             Integer maxDeliveryCount = Integer.valueOf(azureBootstrapConfig.getMaxDeliveryCount());
             String appName = azureBootstrapConfig.getAppName();
-            MessageHandler messageHandler = new MessageHandler(subscriptionClient,
+            RecordChangedMessageHandler recordChangedMessageHandler = new RecordChangedMessageHandler(subscriptionClient,
                     messageSender, indexUpdateMessageHandler, sbMessageBuilder,
                     metricService, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, maxDeliveryCount, appName);
             subscriptionClient.registerMessageHandler(
-                    messageHandler,
+                recordChangedMessageHandler,
                     new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),
                             false,
                             Duration.ofSeconds(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxLockRenewDurationInSeconds())),
