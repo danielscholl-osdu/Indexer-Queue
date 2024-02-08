@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 public class SchemaChangedSbMessageBuilder {
 
     public SchemaChangedMessages buildSchemaChangedServiceBusMessage(String serviceBusMessage) {
+        //TODO complete impl
         return null;
     }
 }
