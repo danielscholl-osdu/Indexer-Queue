@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.opengroup.osdu.core.aws</groupId>
             <artifactId>os-core-lib-aws</artifactId>
-            <version>0.25.0</version>
+            <version>0.26.0-rc2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
