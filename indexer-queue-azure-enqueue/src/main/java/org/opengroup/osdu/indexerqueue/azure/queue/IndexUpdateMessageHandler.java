@@ -18,6 +18,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.RequestStatus;
 import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
@@ -92,6 +93,32 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
      * @return
      */
   public void sendSchemaChangedMessagesToIndexer(SchemaChangedMessages schemaChangedMessages) {
-      //TODO complete impl
+      try (CloseableHttpClient indexWorkerClient = httpClientBuilder.build()) {
+          logger.debug("Sending schemaChangedMessages to indexer service {}: ", this.gson.toJson(schemaChangedMessages));
+          HttpPost indexWorkerRequest = new HttpPost(azureBootstrapConfig.getSchemaWorkerURL());
+          indexWorkerRequest.setEntity(new StringEntity(this.gson.toJson(schemaChangedMessages)));
+          indexWorkerRequest.setHeader(DpsHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+          Map<String, String> att = schemaChangedMessages.getAttributes();
+
+          indexWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
+          indexWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
+
+          CloseableHttpResponse response = indexWorkerClient.execute(indexWorkerRequest);
+
+          if (response.getStatusLine().getStatusCode() == RequestStatus.NO_RETRY) {
+              throw new IndexerNoRetryException(format("Failed to send message %s to Indexer. No retry response", schemaChangedMessages.getData()));
+          }
+
+          if (response.getStatusLine().getStatusCode() > 299) {
+              throw new IndexerRetryException(format("Failed to send message %s to Indexer. Response status: %d", schemaChangedMessages.getData(), response.getStatusLine().getStatusCode()));
+          }
+      } catch (AppException e) {
+          String errorMessage = "Exception occurred during sending schema change message to the Indexer:" + e.getMessage();
+          throw new IndexerRetryException(errorMessage);
+      } catch (IOException e) {
+          String errorMessage = "IOException occurred during sending schema change message to the Indexer:" + e.getMessage();
+          throw new IndexerRetryException(errorMessage);
+      }
   }
 }

@@ -76,6 +76,8 @@ spec:
                   key: appinsights
             - name: indexer_worker_url
               value: http://indexer-service/api/indexer/v2/_dps/task-handlers/index-worker
+            - name: schema_worker_url
+              value: http://indexer-service/api/indexer/v2/_dps/task-handlers/schema-worker
             - name: azure_servicebus_topic_name
               value: {{ .Values.azure.servicebusTopic }}
             - name: azure_servicebus_topic_subscription
