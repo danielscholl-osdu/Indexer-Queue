@@ -28,7 +28,7 @@ public class SchemaChangedMessageHandler extends AbstractMessageHandler {
      * Receives a single batch of messages from service bus and sends to builds it as `SchemaChangedMessages` for indexer service.
      * Messages are of type 'SchemaPubSubInfo'
      */
-    public void processMessage(IMessage message) throws Exception {
+    public void processMessage(IMessage message) {
         String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
         String messageId = message.getMessageId();
 
