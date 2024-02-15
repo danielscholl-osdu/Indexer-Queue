@@ -59,7 +59,7 @@ public class PubsubEndpointIntegrationTest {
     @After
     public void tearDown() throws Exception {
         String token = TestUtils.getToken();
-        TestUtils.send("records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
+        TestUtils.send(System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL")), "records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
         LegalTagUtils.delete(LEGAL_TAG, token);
     }
 
@@ -72,26 +72,22 @@ public class PubsubEndpointIntegrationTest {
         // Create record in storage service
 
         String jsonInput = createJsonBody(RECORD_ID, "tian");
-        ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+        ClientResponse storageServiceResponse = TestUtils.send(System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL")), "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
         // Sleep for one minute to wait for indexing to happen
         Thread.sleep(60000);
         String searchUrl=System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
-        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody());
+        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
     }
 
-    public static String indentatedBody(String responseBody) {
-        JsonParser jsonParser = new JsonParser();
-        if(responseBody==null)
-            return responseBody;
-        JsonElement jsonElement = jsonParser.parse(responseBody);
-        String indentedResponseEntity =new GsonBuilder().setPrettyPrinting().create().toJson(jsonElement);
-        return indentedResponseEntity;
+    @Test
+    public void should_beAbleToSearchRecord_whenSchemaChanges() {
+
     }
 
     protected static String createJsonBody(String id, String name) {

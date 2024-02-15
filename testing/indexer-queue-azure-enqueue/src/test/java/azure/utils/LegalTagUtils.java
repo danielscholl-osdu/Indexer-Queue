@@ -33,14 +33,14 @@ public class LegalTagUtils {
     protected static ClientResponse create(String countryOfOrigin, String name, String expDate, String dataType, String token)
             throws Exception {
         String body = getBody(countryOfOrigin, name, expDate, dataType);
-        ClientResponse response = TestUtils.send(getLegalUrl(), "legaltags", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), body);
+        ClientResponse response = TestUtils.send(getLegalUrl(), "legaltags", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), body, "");
         log.info(String.format("Create Legal Tag Response: %s", response));
         Thread.sleep(100);
         return response;
     }
 
     public static ClientResponse delete(String legalTagName, String token) throws Exception {
-        return TestUtils.send(getLegalUrl(), "legaltags/" + legalTagName, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "");
+        return TestUtils.send(getLegalUrl(), "legaltags/" + legalTagName, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
     }
 
     protected static String getLegalUrl() {

@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import static azure.pubsub.PubsubEndpointIntegrationTest.indentatedBody;
-
 public class TestUtils {
     static Logger log=Logger.getLogger(TestUtils.class.getName());
     protected static String token = null;
@@ -30,7 +28,7 @@ public class TestUtils {
 
     public static final String getAclSuffix() {
         String environment = getEnvironment();
-        
+
         if (environment.equalsIgnoreCase("empty")) environment = "";
         if (!environment.isEmpty())
             environment = "." + environment;
@@ -46,8 +44,7 @@ public class TestUtils {
         return System.getProperty("DEPLOY_ENV", System.getenv("DEPLOY_ENV"));
     }
 
-    public static String getApiPath(String api) throws Exception {
-        String baseUrl = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
+    public static String getApiPath(String baseUrl, String api) throws Exception {
         URL mergedURL = new URL(baseUrl + api);
         return mergedURL.toString();
     }
@@ -63,7 +60,7 @@ public class TestUtils {
         return "Bearer " + token;
     }
 
-    public static ClientResponse send(String path, String httpMethod, Map<String, String> headers, String requestBody,
+    public static ClientResponse send(String baseUrl, String path, String httpMethod, Map<String, String> headers, String requestBody,
                                       String query) throws Exception {
 
         ClientResponse response = null;
@@ -72,7 +69,7 @@ public class TestUtils {
         client.setReadTimeout(300000);
         client.setFollowRedirects(false);
 
-        WebResource webResource = client.resource(TestUtils.getApiPath(path + query));
+        WebResource webResource = client.resource(TestUtils.getApiPath(baseUrl, path + query));
         int count = 1;
         int MaxRetry = 3;
         while (count < MaxRetry) {
@@ -98,43 +95,6 @@ public class TestUtils {
             }
         }
         return response;
-    }
-
-    public static ClientResponse send(String url, String path, String httpMethod, Map<String, String> headers,
-                                      String requestBody) {
-
-      Client client = TestUtils.getClient();
-      ClientResponse response = null;
-      client.setConnectTimeout(300000);
-      client.setReadTimeout(300000);
-      client.setFollowRedirects(false);
-
-      WebResource webResource = client.resource(url + path);
-      int count = 1;
-      int MaxRetry = 3;
-      while (count < MaxRetry) {
-          try {
-            headers.put("correlation-id", headers.getOrDefault("correlation-id", UUID.randomUUID().toString()));
-            WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON)
-              .header("Authorization", token);
-            headers.forEach((k, v) -> builder.header(k, v));
-            response = builder.method(httpMethod, ClientResponse.class, requestBody);
-            if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
-              count++;
-              Thread.sleep(5000);
-            } else {
-              break;
-            }
-          } catch (Exception ex) {
-            log.severe("Exception While Making Request: " + ex.getMessage());
-            ex.printStackTrace();
-            count++;
-            if (count == MaxRetry) {
-              throw new AssertionError("Error: Send request error", ex);
-            }
-          }
-      }
-      return response;
     }
 
     protected static Client getClient() {
