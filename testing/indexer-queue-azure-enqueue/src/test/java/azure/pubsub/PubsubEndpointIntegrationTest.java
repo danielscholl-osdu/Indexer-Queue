@@ -37,7 +37,6 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class PubsubEndpointIntegrationTest {
     // Generate unique record id using timestamp
-    Logger log = Logger.getLogger(PubsubEndpointIntegrationTest.class.getName());
     protected static final String RECORD_ID = TenantUtils.getTenantName() + ":inttest:" + System.currentTimeMillis();
     protected static final String KIND = TenantUtils.getTenantName() + ":wks:inttest:1.0."
             + System.currentTimeMillis();
@@ -50,7 +49,7 @@ public class PubsubEndpointIntegrationTest {
     @Before
     public void setup() throws Exception {
         String token = TestUtils.getToken();
-        ClientResponse resp = LegalTagUtils.create(LEGAL_TAG, token);
+        LegalTagUtils.create(LEGAL_TAG, token);
     }
 
     /***
@@ -60,7 +59,7 @@ public class PubsubEndpointIntegrationTest {
     @After
     public void tearDown() throws Exception {
         String token = TestUtils.getToken();
-        ClientResponse response = TestUtils.send("records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
+        TestUtils.send("records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
         LegalTagUtils.delete(LEGAL_TAG, token);
     }
 
@@ -74,18 +73,15 @@ public class PubsubEndpointIntegrationTest {
 
         String jsonInput = createJsonBody(RECORD_ID, "tian");
         ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
-        log.info(String.format("This is the storage service response received : %s\n and the correlation-id : %s\n status code : %s",storageServiceResponse, storageServiceResponse.getHeaders().get("correlation-id"), storageServiceResponse.getStatus()));
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
         // Sleep for one minute to wait for indexing to happen
         Thread.sleep(60000);
         String searchUrl=System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
-        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
-        log.info(String.format("This is the response received : %s", response));
+        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody());
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
-        log.info(String.format("This is the json object response received : %s", indentatedBody(json)));
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
     }
 
