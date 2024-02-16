@@ -25,8 +25,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.logging.Logger;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -41,6 +39,8 @@ public class PubsubEndpointIntegrationTest {
     protected static final String KIND = TenantUtils.getTenantName() + ":wks:inttest:1.0."
             + System.currentTimeMillis();
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
+    protected static final String STORAGE_URL = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
+    protected static final String SEARCH_URL = System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
 
     /***
      * Create legal tag and create new unique record in storage service before running the test.
@@ -59,7 +59,7 @@ public class PubsubEndpointIntegrationTest {
     @After
     public void tearDown() throws Exception {
         String token = TestUtils.getToken();
-        TestUtils.send(System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL")), "records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
+        TestUtils.send(STORAGE_URL, "records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
         LegalTagUtils.delete(LEGAL_TAG, token);
     }
 
@@ -72,22 +72,16 @@ public class PubsubEndpointIntegrationTest {
         // Create record in storage service
 
         String jsonInput = createJsonBody(RECORD_ID, "tian");
-        ClientResponse storageServiceResponse = TestUtils.send(System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL")), "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+        ClientResponse storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
         // Sleep for one minute to wait for indexing to happen
         Thread.sleep(60000);
-        String searchUrl=System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
-        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
+        ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
-    }
-
-    @Test
-    public void should_beAbleToSearchRecord_whenSchemaChanges() {
-
     }
 
     protected static String createJsonBody(String id, String name) {
