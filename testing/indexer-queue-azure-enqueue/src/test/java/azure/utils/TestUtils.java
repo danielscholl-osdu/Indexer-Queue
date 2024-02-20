@@ -78,7 +78,10 @@ public class TestUtils {
                 WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON)
                   .header("Authorization", token);
                 headers.forEach((k, v) -> builder.header(k, v));
+                log.info("Method: "+httpMethod);
+                log.info("URI: "+webResource.getURI().toString());
                 response = builder.method(httpMethod, ClientResponse.class, requestBody);
+                log.info("Response code: "+response.getStatus()+", correlation-id: "+response.getHeaders().get("correlation-id"));
                 if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
                     count++;
                     Thread.sleep(5000);
@@ -86,7 +89,7 @@ public class TestUtils {
                     break;
                 }
             } catch (Exception ex) {
-                log.severe("Exception While Making Request: " + ex.getMessage());
+                log.severe("Exception: "+ ex.getMessage() +" while making request to endpoint: " + webResource.getURI().toString());
                 ex.printStackTrace();
                 count++;
                 if (count == MaxRetry) {
