@@ -43,11 +43,11 @@ public class PubsubEndpointIntegrationTest {
     protected static final String KIND = TenantUtils.getTenantName() + ":wks:inttest:1.0."
             + System.currentTimeMillis();
     protected static final String entityType = "kind"+System.currentTimeMillis();
-    protected static final String SCHEMA_UPDATE_KIND = "opendes:kindupdate:"+entityType+":1.0.0";
+    protected static final String SCHEMA_UPDATE_KIND = "osdu:kindupdate:"+entityType+":1.0.0";
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
     protected static final String STORAGE_URL = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
     protected static final String SEARCH_URL = System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
-    protected static final String SCHEMA_URL = System.getProperty("SCHEMA_SERVICE_URL", System.getenv("SCHEMA_SERVICE_URL"));
+    protected static final String SCHEMA_URL = System.getProperty("SCHEMA_HOST", System.getenv("SCHEMA_HOST"));
     protected static final String INDEXER_URL = System.getProperty("INDEXER_URL", System.getenv("INDEXER_URL"));
 
     protected static ObjectMapper mapper = new ObjectMapper();
@@ -160,7 +160,7 @@ public class PubsubEndpointIntegrationTest {
     private static SchemaInfo getSchemaInfo() {
         SchemaInfo schemaInfo = new SchemaInfo();
         SchemaIdentity schemaIdentity = new SchemaIdentity();
-        schemaIdentity.setAuthority("opendes");
+        schemaIdentity.setAuthority("osdu");
         schemaIdentity.setSource("kindupdate");
         schemaIdentity.setEntityType(entityType);
         schemaIdentity.setSchemaVersionMajor("1");
