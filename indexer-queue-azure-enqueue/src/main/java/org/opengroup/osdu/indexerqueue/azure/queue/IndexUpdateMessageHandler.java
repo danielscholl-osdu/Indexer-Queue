@@ -94,7 +94,7 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
      * @return
      */
   public void sendSchemaChangedMessagesToIndexer(SchemaChangedMessages schemaChangedMessages) {
-      try (CloseableHttpClient indexWorkerClient = httpClientBuilder.build()) {
+      try (CloseableHttpClient schemaWorkerClient = httpClientBuilder.build()) {
           logger.debug("Sending schemaChangedMessages to indexer service {}: ", this.gson.toJson(schemaChangedMessages));
           HttpPost schemaWorkerRequest = new HttpPost(azureBootstrapConfig.getSchemaWorkerURL());
           schemaWorkerRequest.setEntity(new StringEntity(this.gson.toJson(schemaChangedMessages)));
@@ -105,7 +105,7 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
           schemaWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
           schemaWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
 
-          CloseableHttpResponse response = indexWorkerClient.execute(schemaWorkerRequest);
+          CloseableHttpResponse response = schemaWorkerClient.execute(schemaWorkerRequest);
 
           if(response.getStatusLine().getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
               throw new IndexerNoRetryException("Unknown error occurred when sending schema change message to the Indexer: "+response.getStatusLine().getReasonPhrase());
