@@ -54,27 +54,34 @@ public class ServiceBusMessageAttributesExtractorTest {
     public void shouldExtractAttributesSuccessfully() {
         when(messageBody.getBinaryData()).thenReturn(singletonList(CORRECT_MESSAGE_BODY.getBytes(UTF_8)));
 
-        RecordChangedAttributes recordChangedAttributes = extractor.extractAttributesFromMessageBody(message);
+        RecordChangedAttributes recordChangedAttributes = extractor.extracRecordChangedtAttributesFromMessageBody(message);
+        SchemaChangedAttributes schemaChangedAttributes = extractor.extractSchemaChangedAttributesFromMessageBody(message);
 
         assertEquals(CORRELATION_ID, recordChangedAttributes.getCorrelationId());
         assertEquals(DATA_PARTITION_ID, recordChangedAttributes.getDataPartitionId());
+        assertEquals(CORRELATION_ID, schemaChangedAttributes.getCorrelationId());
+        assertEquals(DATA_PARTITION_ID, schemaChangedAttributes.getDataPartitionId());
     }
 
     @Test
     public void shouldNotFailIfMessageBodyIsEmpty() {
         when(messageBody.getBinaryData()).thenReturn(singletonList(EMPTY.getBytes(UTF_8)));
 
-        RecordChangedAttributes recordChangedAttributes = extractor.extractAttributesFromMessageBody(message);
+        RecordChangedAttributes recordChangedAttributes = extractor.extracRecordChangedtAttributesFromMessageBody(message);
+        SchemaChangedAttributes schemaChangedAttributes = extractor.extractSchemaChangedAttributesFromMessageBody(message);
 
         assertNull(recordChangedAttributes.getDataPartitionId(), recordChangedAttributes.getCorrelationId());
+        assertNull(schemaChangedAttributes.getDataPartitionId(), schemaChangedAttributes.getCorrelationId());
     }
 
     @Test
     public void shouldNotFailIfMessageBodyHasIncorrectStructure() {
         when(messageBody.getBinaryData()).thenReturn(singletonList(INCORRECT_MESSAGE_BODY.getBytes(UTF_8)));
 
-        RecordChangedAttributes recordChangedAttributes = extractor.extractAttributesFromMessageBody(message);
+        RecordChangedAttributes recordChangedAttributes = extractor.extracRecordChangedtAttributesFromMessageBody(message);
+        SchemaChangedAttributes schemaChangedAttributes = extractor.extractSchemaChangedAttributesFromMessageBody(message);
 
         assertNull(recordChangedAttributes.getDataPartitionId(), recordChangedAttributes.getCorrelationId());
+        assertNull(schemaChangedAttributes.getDataPartitionId(), schemaChangedAttributes.getCorrelationId());
     }
 }

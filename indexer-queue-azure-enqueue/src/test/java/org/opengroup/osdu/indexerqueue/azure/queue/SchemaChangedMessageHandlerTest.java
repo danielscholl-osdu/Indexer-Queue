@@ -23,13 +23,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
+import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
+import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
+import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
+import org.opengroup.osdu.indexerqueue.azure.util.SchemaChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.util.SchemaChangedSbMessageBuilder;
 
-import java.io.IOException;
 import java.time.Instant;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -48,22 +52,29 @@ public class SchemaChangedMessageHandlerTest {
     @Mock
     private SchemaChangedSbMessageBuilder schemaChangedSbMessageBuilder;
     @Mock
+    private ThreadDpsHeaders dpsHeaders;
+    @Mock
+    private MdcContextMap mdcContextMap;
+    @Mock
+    private MessageAttributesExtractor messageAttributesExtractor;
+    @Mock
     private Message message;
 
     private SchemaChangedMessages schemaChangedMessages = new SchemaChangedMessages();
     private MessageBody messageBody = new Message().getMessageBody();
 
     @BeforeEach
-    public void init() throws IOException {
+    public void init() {
         schemaChangedMessages.setData(SCHEMA_INFO_PAYLOAD);
         when(schemaChangedSbMessageBuilder.buildSchemaChangedServiceBusMessage(anyString())).thenReturn(schemaChangedMessages);
+        when(messageAttributesExtractor.extractSchemaChangedAttributesFromMessageBody(any())).thenReturn(new SchemaChangedAttributes());
         when(message.getEnqueuedTimeUtc()).thenReturn(Instant.now());
         when(message.getMessageId()).thenReturn(EMPTY);
         when(message.getMessageBody()).thenReturn(messageBody);
     }
 
     @Test
-    public void should_Invoke_SendMessagesToIndexer() throws Exception {
+    public void should_Invoke_SendMessagesToIndexer() {
         // Execute
         sut.processMessage(message);
 
@@ -75,7 +86,7 @@ public class SchemaChangedMessageHandlerTest {
     }
 
     @Test
-    public void shouldThrow_whenSendMessagesToIndexerThrows() throws Exception{
+    public void shouldThrow_whenSendMessagesToIndexerThrows() {
         //Setup
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
         doThrow(exp).when(indexUpdateMessageHandler).sendSchemaChangedMessagesToIndexer(schemaChangedMessages);

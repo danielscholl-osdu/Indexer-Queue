@@ -213,7 +213,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
     }
 
     private void setupLoggerContext(IMessage message) {
-        RecordChangedAttributes recordChangedAttributes = messageAttributesExtractor.extractAttributesFromMessageBody(message);
+        RecordChangedAttributes recordChangedAttributes = messageAttributesExtractor.extracRecordChangedtAttributesFromMessageBody(message);
         String correlationId = recordChangedAttributes.getCorrelationId();
         String dataPartitionId = recordChangedAttributes.getDataPartitionId();
         MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));

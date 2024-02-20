@@ -97,7 +97,7 @@ public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
             }
         };
         when(message.getEnqueuedTimeUtc()).thenReturn(INSTANT);
-        when(messageAttributesExtractor.extractAttributesFromMessageBody(any())).thenReturn(new RecordChangedAttributes());
+        when(messageAttributesExtractor.extracRecordChangedtAttributesFromMessageBody(any())).thenReturn(new RecordChangedAttributes());
     }
 
     @Test

@@ -18,7 +18,11 @@ import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.SubscriptionClient;
 import org.opengroup.osdu.azure.servicebus.AbstractMessageHandler;
 import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
+import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHolder;
+import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
+import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
+import org.opengroup.osdu.indexerqueue.azure.util.SchemaChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.util.SchemaChangedSbMessageBuilder;
 import org.slf4j.MDC;
 
@@ -28,14 +32,23 @@ public class SchemaChangedMessageHandler extends AbstractMessageHandler {
 
     private SchemaChangedSbMessageBuilder schemaChangedSbMessageBuilder;
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
+    private MessageAttributesExtractor messageAttributesExtractor;
+    private MdcContextMap mdcContextMap;
+    private ThreadDpsHeaders dpsHeaders;
 
     public SchemaChangedMessageHandler(String workerServiceName,
                                        SubscriptionClient client,
+                                       ThreadDpsHeaders dpsHeaders,
+                                       MdcContextMap mdcContextMap,
+                                       MessageAttributesExtractor messageAttributesExtractor,
                                        SchemaChangedSbMessageBuilder schemaChangedSbMessageBuilder,
                                        IndexUpdateMessageHandler indexUpdateMessageHandler) {
         super(workerServiceName, client);
         this.schemaChangedSbMessageBuilder = schemaChangedSbMessageBuilder;
         this.indexUpdateMessageHandler = indexUpdateMessageHandler;
+        this.dpsHeaders = dpsHeaders;
+        this.mdcContextMap = mdcContextMap;
+        this.messageAttributesExtractor = messageAttributesExtractor;
     }
 
     /*
@@ -45,6 +58,8 @@ public class SchemaChangedMessageHandler extends AbstractMessageHandler {
     public void processMessage(IMessage message) {
         String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
         String messageId = message.getMessageId();
+
+        setupLoggerContext(message);
 
         try {
             SchemaChangedMessages schemaChangedMessages = schemaChangedSbMessageBuilder.buildSchemaChangedServiceBusMessage(messageBody);
@@ -56,5 +71,13 @@ public class SchemaChangedMessageHandler extends AbstractMessageHandler {
             MDC.clear();
             ThreadScopeContextHolder.getContext().clear();
         }
+    }
+
+    private void setupLoggerContext(IMessage message) {
+        SchemaChangedAttributes schemaChangedAttributes = messageAttributesExtractor.extractSchemaChangedAttributesFromMessageBody(message);
+        String correlationId = schemaChangedAttributes.getCorrelationId();
+        String dataPartitionId = schemaChangedAttributes.getDataPartitionId();
+        MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));
+        dpsHeaders.setThreadContext(dataPartitionId, correlationId);
     }
 }

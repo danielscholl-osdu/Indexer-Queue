@@ -165,7 +165,7 @@ public class SubscriptionManager {
     private void registerSchemaChangedMessageHandler(SubscriptionClient subscriptionClient, MessagePublisher messageSender, ExecutorService executorService) {
         try {
             String appName = azureBootstrapConfig.getAppName();
-            SchemaChangedMessageHandler schemaChangedMessageHandler = new SchemaChangedMessageHandler(appName, subscriptionClient, schemaChangedSbMessageBuilder, indexUpdateMessageHandler);
+            SchemaChangedMessageHandler schemaChangedMessageHandler = new SchemaChangedMessageHandler(appName, subscriptionClient, dpsHeaders, mdcContextMap, messageAttributesExtractor, schemaChangedSbMessageBuilder, indexUpdateMessageHandler);
             subscriptionClient.registerMessageHandler(
                 schemaChangedMessageHandler,
                 new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),
