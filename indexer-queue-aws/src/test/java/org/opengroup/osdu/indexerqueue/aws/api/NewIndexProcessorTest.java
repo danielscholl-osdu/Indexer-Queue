@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class IndexProcessorTest {
+public class NewIndexProcessorTest {
 
     private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
@@ -46,7 +46,7 @@ public class IndexProcessorTest {
 
     Message message = new Message();
     @InjectMocks
-    IndexProcessor processor = new IndexProcessor(message, invalidUrl, "indexServiceAccountJWT");
+    NewIndexProcessor processor = new NewIndexProcessor(message, invalidUrl, "indexServiceAccountJWT");
 
     @Before
     public void setUp() {
@@ -66,7 +66,7 @@ public class IndexProcessorTest {
         this.processor.setTargetURL(invalidUrl);
         this.processor.setResult(CallableResult.Pass);
 
-        IndexProcessor result = processor.call();
+        NewIndexProcessor result = (NewIndexProcessor) processor.call();
 
         Assert.assertEquals(processor, result);
         Assert.assertTrue(processor.expectionExists());
@@ -78,7 +78,7 @@ public class IndexProcessorTest {
         this.processor.setTargetURL(localhostUrl);
         this.processor.setResult(CallableResult.Pass);
 
-        IndexProcessor result = processor.call();
+        NewIndexProcessor result = (NewIndexProcessor) processor.call();
 
         Assert.assertEquals(processor, result);
         Assert.assertTrue(processor.expectionExists());
@@ -105,7 +105,7 @@ public class IndexProcessorTest {
                 message.setBody("body");
 
 
-                IndexProcessor result = processor.call();
+                NewIndexProcessor result = (NewIndexProcessor) processor.call();
 
                 Assert.assertEquals(processor, result);
                 Assert.assertTrue(processor.expectionExists());
@@ -134,7 +134,7 @@ public class IndexProcessorTest {
                 message.setBody("body");
 
 
-                IndexProcessor result = processor.call();
+                NewIndexProcessor result = (NewIndexProcessor) processor.call();
 
                 Assert.assertEquals(processor, result);
                 Assert.assertEquals(StreamString, result.getResponse().toString());
@@ -145,7 +145,7 @@ public class IndexProcessorTest {
 
     @Test
     public void test_Get(){
-        IndexProcessor processor2 = new IndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
+        NewIndexProcessor processor2 = new NewIndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
         processor2.setResponse(new StringBuilder());
         Assert.assertEquals(CallableResult.Pass, processor2.getResult());
         Assert.assertNull(processor2.getReceiptHandle());

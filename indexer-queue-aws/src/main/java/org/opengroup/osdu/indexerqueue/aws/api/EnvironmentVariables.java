@@ -17,19 +17,60 @@
 package org.opengroup.osdu.indexerqueue.aws.api;
 
 import org.opengroup.osdu.core.aws.ssm.K8sLocalParameterProvider;
-import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
+import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class EnvironmentVariables {
-    private String region;
-    private String queueUrl;
-    private String targetURL;
-    private String deadLetterQueueUrl;
-    public EnvironmentVariables() throws K8sParameterNotFoundException {
+    private final String region;
+    private final String queueUrl;
+    private final String targetURL;
+    private final String deadLetterQueueUrl;
+    private final int maxAllowedMessages;
+    private final int maxIndexThreads;
+    private final int maxWaitTime;
+    private final int maxBatchRequestCount;
+    private final Properties appProperties;
+    private static final JaxRsDpsLog logger = LogProvider.getLogger();
+
+    public EnvironmentVariables() {
         this.region = System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "us-east-1";
-        this.targetURL =System.getenv("AWS_INDEXER_INDEX_API");
+        this.targetURL = System.getenv("AWS_INDEXER_INDEX_API");
         K8sLocalParameterProvider provider = new K8sLocalParameterProvider();
         this.queueUrl = provider.getParameterAsStringOrDefault("storage-sqs-url",System.getenv("AWS_STORAGE_QUEUE_URL") );
         this.deadLetterQueueUrl = provider.getParameterAsStringOrDefault("indexer-deadletter-queue-sqs-url", System.getenv("AWS_DEADLETTER_QUEUE_URL"));
+        appProperties = new Properties();
+        try {
+            try (InputStream inputStream = EnvironmentVariables.class.getResourceAsStream("BOOT-INF/classes/org/application.properties")) {
+                appProperties.load(inputStream);
+            }
+        } catch (IOException | NullPointerException e) {
+            logger.error("Could not load properties file.", e);
+        }
+        this.maxAllowedMessages = getPropertyOrDefault("MAX_RETRIEVED_MESSAGES", 10);
+        this.maxIndexThreads = getPropertyOrDefault("MAX_INDEX_THREADS", 50);
+        this.maxWaitTime = getPropertyOrDefault("MAX_WAIT_TIME", 10);
+        this.maxBatchRequestCount = getPropertyOrDefault("MAX_DELETED_MESSAGES", 10);
+    }
+
+    private int getPropertyOrDefault(String property, int defaultValue) {
+        String value = System.getenv(property);
+        if (value == null || value.isEmpty()) {
+            value = appProperties.getProperty(property);
+        }
+        int retValue = defaultValue;
+        if (value != null) {
+            try {
+                retValue = Integer.parseInt(value);
+            } catch (NumberFormatException | NullPointerException e) {
+                logger.error(String.format("Could not parse number of property %s with value %s", property, value), e);
+            }
+        } else {
+            logger.info(String.format("Property %s does not have a value set. Using %d as default.", property, defaultValue));
+        }
+        return retValue;
     }
 
     public String getRegion() {
@@ -46,5 +87,21 @@ public class EnvironmentVariables {
 
     public String getDeadLetterQueueUrl() {
         return this.deadLetterQueueUrl;
+    }
+
+    public int getMaxAllowedMessages() {
+        return this.maxAllowedMessages;
+    }
+
+    public int getMaxBatchRequestCount() {
+        return this.maxBatchRequestCount;
+    }
+
+    public int getMaxIndexThreads() {
+        return this.maxIndexThreads;
+    }
+
+    public int getMaxWaitTime() {
+        return this.maxWaitTime;
     }
 }
