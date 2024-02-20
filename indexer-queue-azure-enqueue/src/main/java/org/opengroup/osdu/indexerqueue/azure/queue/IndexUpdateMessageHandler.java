@@ -12,6 +12,7 @@
 package org.opengroup.osdu.indexerqueue.azure.queue;
 
 import com.google.gson.Gson;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -95,23 +96,23 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
   public void sendSchemaChangedMessagesToIndexer(SchemaChangedMessages schemaChangedMessages) {
       try (CloseableHttpClient indexWorkerClient = httpClientBuilder.build()) {
           logger.debug("Sending schemaChangedMessages to indexer service {}: ", this.gson.toJson(schemaChangedMessages));
-          HttpPost indexWorkerRequest = new HttpPost(azureBootstrapConfig.getSchemaWorkerURL());
-          indexWorkerRequest.setEntity(new StringEntity(this.gson.toJson(schemaChangedMessages)));
-          indexWorkerRequest.setHeader(DpsHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+          HttpPost schemaWorkerRequest = new HttpPost(azureBootstrapConfig.getSchemaWorkerURL());
+          schemaWorkerRequest.setEntity(new StringEntity(this.gson.toJson(schemaChangedMessages)));
+          schemaWorkerRequest.setHeader(DpsHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
           Map<String, String> att = schemaChangedMessages.getAttributes();
 
-          indexWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
-          indexWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
+          schemaWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
+          schemaWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
 
-          CloseableHttpResponse response = indexWorkerClient.execute(indexWorkerRequest);
+          CloseableHttpResponse response = indexWorkerClient.execute(schemaWorkerRequest);
 
-          if (response.getStatusLine().getStatusCode() == RequestStatus.NO_RETRY) {
-              throw new IndexerNoRetryException(format("Failed to send message %s to Indexer. No retry response", schemaChangedMessages.getData()));
+          if(response.getStatusLine().getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+              throw new IndexerNoRetryException("Unknown error occurred when sending schema change message to the Indexer: "+response.getStatusLine().getReasonPhrase());
           }
 
           if (response.getStatusLine().getStatusCode() > 299) {
-              throw new IndexerRetryException(format("Failed to send message %s to Indexer. Response status: %d", schemaChangedMessages.getData(), response.getStatusLine().getStatusCode()));
+              throw new IndexerRetryException(format("Failed to process schema change message %s to Indexer. Response status: %d", schemaChangedMessages.getData(), response.getStatusLine().getStatusCode()));
           }
       } catch (AppException e) {
           String errorMessage = "Exception occurred during sending schema change message to the Indexer:" + e.getMessage();

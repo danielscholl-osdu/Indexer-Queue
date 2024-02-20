@@ -23,6 +23,7 @@ import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerRetryException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -160,10 +162,12 @@ public class IndexUpdateMessageHandlerTest {
 
         try {
             sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
-        } catch (Exception e) {
+        } catch (IndexerRetryException e) {
             assertEquals(httpMock.constructed().size(),2);
             verify(httpClient,times(2)).execute(any());
             verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
+        } catch (Exception e) {
+            fail("Should only throw IndexerRetryException");
         }
     }
 
@@ -171,12 +175,28 @@ public class IndexUpdateMessageHandlerTest {
     public void shouldThrow_whenHttpPostMethod_ReturnsNoRetryResponseCode() throws Exception {
         when(httpClientBuilder.build()).thenReturn(httpClient);
         when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
-        when(azureBootstrapConfig.getSchemaWorkerURL()).thenReturn(schemaWorkerUrl);
         when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
         StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1), RequestStatus.NO_RETRY,"error");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
         assertThrows(IndexerNoRetryException.class, () -> sut.sendRecordChangedMessagesToIndexer(recordChangedMessages));
-        assertThrows(IndexerNoRetryException.class, () -> sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages));
+    }
+
+    @Test
+    public void shouldThrowIndexerNoRetryException_whenSchemaWorker_Returns500() throws Exception {
+        when(httpClientBuilder.build()).thenReturn(httpClient);
+        when(azureBootstrapConfig.getSchemaWorkerURL()).thenReturn(schemaWorkerUrl);
+        when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
+        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),500,"error");
+        when(httpResponse.getStatusLine()).thenReturn(status);
+        try {
+            sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
+        } catch (IndexerNoRetryException e) {
+            assertEquals(httpMock.constructed().size(),1);
+            verify(httpClient,times(1)).execute(any());
+            verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
+        } catch (Exception e) {
+            fail("Should only throw IndexerNoRetryException");
+        }
     }
 }
