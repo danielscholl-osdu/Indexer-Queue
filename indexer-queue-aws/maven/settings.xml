@@ -79,7 +79,7 @@
     <!-- <mirror> -->
     <!-- <id>aws-osdu-dev-maven</id> -->
     <!-- <name>aws-osdu-dev-maven</name> -->
-    <!-- <url>https://osdu-dev-888733619319.d.codeartifact.us-east-1.amazonaws.com/maven/osdu-maven/</url> -->
+    <!-- <url>${env.AWS_OSDU_DEV_MAVEN_URL}</url> -->
     <!-- <mirrorOf>*,!gitlab-os-core-common-maven</mirrorOf> -->
     <!-- </mirror> -->
     <!-- </mirrors> -->

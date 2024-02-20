@@ -17,124 +17,105 @@
 package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.model.*;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import org.junit.*;
-import org.junit.internal.runners.statements.FailOnTimeout;
-import org.junit.rules.Timeout;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-import org.junit.runners.model.TestTimedOutException;
-import org.mockito.Mock;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
-import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+import org.opengroup.osdu.core.aws.sqs.AmazonSQSConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeoutException;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-
-import static org.mockito.Mockito.mock;
+import uk.org.webcompere.systemstubs.rules.SystemExitRule;
+import uk.org.webcompere.systemstubs.security.AbortExecutionException;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+
+@RunWith(MockitoJUnitRunner.class)
 public class IndexerQueueTest {
 
-    private static final int MIN_TIMEOUT = 5000;
-    private final PrintStream standardOut = System.out;
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    @Captor
+    private ArgumentCaptor<ReceiveMessageRequest> receiveRequest;
 
     @Rule
-    public Timeout timeout = new Timeout(MIN_TIMEOUT) {
-        public Statement apply(Statement base, Description description) {
-            return new FailOnTimeout(base, MIN_TIMEOUT) {
-                @Override
-                public void evaluate() throws Throwable {
-                    try {
-                        super.evaluate();
-                        throw new TimeoutException();
-                    } catch (Exception e) {}
-                }
-            };
-        }
-    };
-
-    @Mock
-    private AmazonSQS sqsClient = mock(AmazonSQS.class);
-
-    private final String queueUrl ="localhost";
+    public SystemExitRule exitRule = new SystemExitRule();
 
     @Before
     public void setUp() {
         System.setOut(new PrintStream(outputStreamCaptor));
     }
 
-    @After
-    public void tearDown() {
-        System.setOut(standardOut);
-    }
-
     @Test
-    public void test_processIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException, TimeoutException {
-
-        ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
-
+    public void test_Main() throws InterruptedException {
+        AmazonSQS mockedSqs = Mockito.mock(AmazonSQS.class);
+        ReceiveMessageResult receiveResult = Mockito.mock(ReceiveMessageResult.class);
         List<Message> messages = new ArrayList<Message>();
+        int maxMessages = 12;
+        int maxWaitTime = 5;
+        String queueRegion = "someAwsRegion";
+        String queueUrl = "someSQSQueueURL";
+        try (MockedConstruction<EnvironmentVariables> envMock = Mockito.mockConstruction(EnvironmentVariables.class, (mock, context) -> {
+            when(mock.getMaxWaitTime()).thenReturn(maxWaitTime);
+            when(mock.getRegion()).thenReturn(queueRegion);
+            when(mock.getMaxAllowedMessages()).thenReturn(maxMessages);
+            when(mock.getQueueUrl()).thenReturn(queueUrl);
+        })) {
+            try (MockedConstruction<AmazonSQSConfig> queueMock = Mockito.mockConstruction(AmazonSQSConfig.class, (mock, context) -> {
+                when(mock.AmazonSQS()).thenReturn(mockedSqs);
+            })) {
+                try (MockedConstruction<IndexerQueueService> serviceMock = Mockito.mockConstruction(IndexerQueueService.class, (mock, context) -> {
+                    when(mock.isUnhealthy()).thenReturn(false).thenReturn(false).thenReturn(true);
+                    doNothing().when(mock).putMessages(messages);
+                    when(mock.getNumMessages()).thenReturn(maxMessages / 2).thenReturn(maxMessages * 2).thenReturn(maxMessages).thenAnswer(new Answer<Integer>() {
+                        @Override
+                        public Integer answer(InvocationOnMock invocationOnMock) throws Throwable {
+                            fail("Should not get to this point. Indicates unhealthy check is not validated!");
+                            return maxMessages;
+                        }
+                    });
+                })) {
+                    when(mockedSqs.receiveMessage(any(ReceiveMessageRequest.class))).thenAnswer(new Answer<ReceiveMessageResult>() {
+                        @Override
+                        public ReceiveMessageResult answer(InvocationOnMock invocationOnMock) throws Throwable {
+                            Thread.sleep((maxWaitTime - 1) * 1000);
+                            return receiveResult;
+                        }
+                    });
+                    when(receiveResult.getMessages()).thenReturn(messages);
+                    assertThrows(AbortExecutionException.class, () -> IndexerQueue.main(new String[0]));
+                    assertNotEquals(0, (long)exitRule.getExitCode());
 
-        IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
-
-        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
-        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
-        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
-        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
+                    verify(mockedSqs, times(1)).receiveMessage(receiveRequest.capture());
+                    ReceiveMessageRequest request = receiveRequest.getValue();
+                    assertEquals(queueUrl, request.getQueueUrl());
+                    assertEquals(maxMessages, request.getMaxNumberOfMessages().intValue());
+                    assertEquals(maxWaitTime, request.getWaitTimeSeconds().intValue());
+                    assertTrue(request.getMessageAttributeNames().contains("All"));
+                    assertTrue(request.getAttributeNames().contains("All"));
+                }
+            }
+        }
     }
-    @Test
-    public void test_processIndexMessages_ValidMessage() throws ExecutionException, InterruptedException, TimeoutException {
-
-        ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
-
-        List<Message> messages = new ArrayList<Message>();
-
-        Message msg = new Message();
-        msg.addMessageAttributesEntry("authorization", new MessageAttributeValue());
-
-        messages.add(msg);
-
-        IndexerQueue.processIndexMessages(messages, "indexerUrl", queueUrl, "deadLetterQueueUrl", executorPool, sqsClient);
-
-        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
-        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
-        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
-        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
-    }
-
-    @Test
-    public void test_processReIndexMessages_EmptyMessage() throws ExecutionException, InterruptedException, TimeoutException {
-
-        ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
-
-        List<Message> messages = new ArrayList<Message>();
-
-        IndexerQueue.processReIndexMessages(messages, "reIndexerUrl", queueUrl, executorPool, sqsClient);
-
-        Mockito.verify(sqsClient, Mockito.times(0)).sendMessage(Mockito.any(SendMessageRequest.class));
-        Mockito.verify(sqsClient, Mockito.times(0)).changeMessageVisibilityBatch(Mockito.anyString(), Mockito.any());
-        Mockito.verify(sqsClient, Mockito.times(0)).receiveMessage(Mockito.any(ReceiveMessageRequest.class));
-        Mockito.verify(sqsClient, Mockito.times(0)).deleteMessageBatch(Mockito.any(DeleteMessageBatchRequest.class));
-    }
-
-    @Test(expected = TestTimedOutException.class)
-    public void test_Main() throws K8sParameterNotFoundException {
-
-
-        IndexerQueue.main(new String[0]);
-
-    }
-
 }
-

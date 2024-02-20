@@ -17,254 +17,114 @@
 package org.opengroup.osdu.indexerqueue.aws.api;
 
 
+import org.springframework.test.util.ReflectionTestUtils;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.BlockingQueue;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class IndexerQueueServiceTest {
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Mock
     private AmazonSQS sqsClient = mock(AmazonSQS.class);
 
-    private ReceiveMessageResult receiveResult;
+    private static final int MAX_WAIT_TIME = 10;
+    private static final int MAX_THREADS = 20;
+    private static final int MAX_ALLOWED_MESSAGES = 25;
+    private static final int MAX_BATCH_SIZE = 8;
+    private static final String DEAD_LETTER_QUEUE_URL = "dead-letter-queue-url";
+    private static final String QUEUE_URL = "storage-queue-url";
+    private static final String TARGET_URL = "target-url";
 
-    private SendMessageResult sendMessageResult;
+    @Mock
+    private EnvironmentVariables environmentVariables = Mockito.mock(EnvironmentVariables.class);
 
-    private final String queueUrl ="localhost";
+    private MockedConstruction<WorkerThread> workerThreadMockedConstruction;
+
+    private MockedConstruction<MessageDeleter> deleterMockedConstruction;
+
+    private MockedConstruction<MessageRetrier> retrierMockedConstruction;
+
+    private MockedConstruction<MessageVisibilityModifier> visiblityMockedConstruction;
+
+    private AmazonSQS sqsSupplier() {
+        return sqsClient;
+    }
 
     @Before
     public void setUp() {
+        deleterMockedConstruction = Mockito.mockConstruction(MessageDeleter.class, (mock, context) -> {
+            assertEquals(MAX_BATCH_SIZE, context.arguments().get(1));
+            assertEquals(sqsClient, context.arguments().get(2));
+        });
+        retrierMockedConstruction = Mockito.mockConstruction(MessageRetrier.class, (mock, context) -> {
+            assertEquals(MAX_BATCH_SIZE, context.arguments().get(1));
+            assertEquals(sqsClient, context.arguments().get(2));
+        });
+        visiblityMockedConstruction = Mockito.mockConstruction(MessageVisibilityModifier.class, (mock, context) -> {
+            assertEquals(MAX_BATCH_SIZE, context.arguments().get(1));
+            assertEquals(sqsClient, context.arguments().get(2));
+        });
 
-        receiveResult = new ReceiveMessageResult();
-        sendMessageResult = new SendMessageResult();
+        workerThreadMockedConstruction = Mockito.mockConstruction(WorkerThread.class, (mock, context) -> {
+            assertEquals(TARGET_URL, context.arguments().get(5));
+        });
 
+        when(environmentVariables.getDeadLetterQueueUrl()).thenReturn(DEAD_LETTER_QUEUE_URL);
+        when(environmentVariables.getQueueUrl()).thenReturn(QUEUE_URL);
+        when(environmentVariables.getMaxAllowedMessages()).thenReturn(MAX_ALLOWED_MESSAGES);
+        when(environmentVariables.getTargetURL()).thenReturn(TARGET_URL);
+        when(environmentVariables.getMaxWaitTime()).thenReturn(MAX_WAIT_TIME);
+        when(environmentVariables.getMaxBatchRequestCount()).thenReturn(MAX_BATCH_SIZE);
+        when(environmentVariables.getMaxIndexThreads()).thenReturn(MAX_THREADS);
+    }
+
+    @After
+    public void tearDown() {
+        workerThreadMockedConstruction.close();
+        deleterMockedConstruction.close();
+        retrierMockedConstruction.close();
+        visiblityMockedConstruction.close();
     }
 
     @Test
-    public void test_getMessages_10Messages_pass() {
+    public void test_healthCheck_fails_whenWorkersExit() throws InterruptedException {
         // Arrange
-        int numOfMessages = 10;
-        int maxMessageCount = 10;
-
-
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
-        receiveMessageRequest.withMessageAttributeNames("All");
-        receiveMessageRequest.withAttributeNames("All");
+        int numMessages = 10;
         List<Message> messages = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < numMessages; i++) {
             Message msg = new Message();
             messages.add(msg);
         }
 
-        receiveResult.setMessages(messages);
+        IndexerQueueService service = new IndexerQueueService(environmentVariables, this::sqsSupplier);
 
-        Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
+        service.putMessages(messages);
 
-        // Act
-         List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfMessages, maxMessageCount);
+        BlockingQueue incomingQueue = (BlockingQueue) ReflectionTestUtils.getField(service, "receivedMessages");
+        assertEquals(numMessages, incomingQueue.size());
 
-        // Assert
-        assertEquals(messages.get(1), actualMessages.get(1));
-        assertEquals(messages.size(), actualMessages.size());
+        assertEquals(1, retrierMockedConstruction.constructed().size());
+        assertEquals(1, deleterMockedConstruction.constructed().size());
+        assertEquals(1, visiblityMockedConstruction.constructed().size());
+        assertEquals(MAX_THREADS, workerThreadMockedConstruction.constructed().size());
+        assertTrue(service.isUnhealthy());
+        assertEquals(2 * MAX_THREADS, workerThreadMockedConstruction.constructed().size());
+        assertEquals(1, retrierMockedConstruction.constructed().size());
+        assertEquals(1, deleterMockedConstruction.constructed().size());
+        assertEquals(1, visiblityMockedConstruction.constructed().size());
     }
-
-    @Test
-    public void test_getMessages_0Messages_pass() {
-        // Arrange
-        int numOfMessages = 10;
-        int maxMessageCount = 10;
-
-
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
-        receiveMessageRequest.withMessageAttributeNames("All");
-        receiveMessageRequest.withAttributeNames("All");
-
-        List<Message> messages = new ArrayList<>();
-
-        receiveResult.setMessages(messages);
-
-        Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
-
-        // Act
-        List<Message> actualMessages = IndexerQueueService.getMessages(sqsClient, queueUrl, numOfMessages, maxMessageCount);
-
-        // Assert
-        assertEquals(messages.size(), actualMessages.size());
-    }
-
-
-    @Test
-    public void test_sendMsgsToDeadLetterQueue(){
-
-        // Arrange
-
-        List<IndexProcessor> indexProcessors = new ArrayList<IndexProcessor>();
-
-        Message message = mock(Message.class);
-        when(message.getBody()).thenReturn("body");
-        when(message.getMessageAttributes()).thenReturn(new HashMap<String, MessageAttributeValue>());
-
-        IndexProcessor indexProcessor = new IndexProcessor(message, "targetUrl", "indexServiceAccountJWT");
-        indexProcessor.setMessageId("messageId");
-        indexProcessors.add(indexProcessor);
-
-        Mockito.when(sqsClient.sendMessage(any())).thenReturn(sendMessageResult);
-
-        //Exception not exist
-        IndexerQueueService.sendMsgsToDeadLetterQueue(queueUrl, indexProcessors, sqsClient);
-
-        //Exception exist
-        indexProcessor.setException(new Exception("Exception"));
-        IndexerQueueService.sendMsgsToDeadLetterQueue(queueUrl, indexProcessors, sqsClient);
-
-        // Assert
-        verify(sqsClient, times(2)).sendMessage(any());
-
-    }
-
-
-
-
-
-
-
-
-    @Test
-    public void test_ChangeMessageVisibilityTimeout() {
-      // Arrange
-
-        List<IndexProcessor> indexProcessors = new ArrayList<IndexProcessor>();
-
-        Message message = mock(Message.class);
-        when(message.getReceiptHandle()).thenReturn("ReceiptHandle");
-        when(message.getAttributes()).thenReturn(new HashMap<String, String>());
-
-        IndexProcessor indexProcessor = new IndexProcessor(message, "targetUrl", "indexServiceAccountJWT");
-        indexProcessor.setMessageId("messageId");
-        indexProcessors.add(indexProcessor);
-        when(sqsClient.changeMessageVisibilityBatch(any(), any())).thenReturn(null);
-
-        // Act
-        IndexerQueueService.changeMessageVisibilityTimeout(sqsClient, queueUrl, indexProcessors);
-
-        // Assert
-        verify(sqsClient, times(1)).changeMessageVisibilityBatch(any(), any());
-    }
-
-
-
-    @Test
-    public void test_ChangeMessageVisibilityTimeout_max10() {
-        // Arrange
-
-        List<IndexProcessor> indexProcessors = new ArrayList<IndexProcessor>();
-
-        for(int i = 1; i < 10; i++){
-            Message msg = mock(Message.class);
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("ApproximateReceiveCount", String.valueOf(i));
-            when(msg.getReceiptHandle()).thenReturn("ReceiptHandle");
-            when(msg.getAttributes()).thenReturn(map);
-            IndexProcessor indexProcessor = new IndexProcessor(msg, "targetUrl", "indexServiceAccountJWT");
-            indexProcessor.setMessageId("messageId");
-            indexProcessors.add(indexProcessor);
-        }
-
-        Message message19 = mock(Message.class);
-        Map<String, String> map19 = new HashMap<String, String>();
-        map19.put("ApproximateReceiveCount", "19");
-        when(message19.getReceiptHandle()).thenReturn("ReceiptHandle");
-        when(message19.getAttributes()).thenReturn(map19);
-        IndexProcessor indexProcessor9 = new IndexProcessor(message19, "targetUrl", "indexServiceAccountJWT");
-        indexProcessor9.setMessageId("messageId");
-        indexProcessors.add(indexProcessor9);
-
-        when(sqsClient.changeMessageVisibilityBatch(any(), any())).thenReturn(null);
-
-        // Act
-        IndexerQueueService.changeMessageVisibilityTimeout(sqsClient, queueUrl, indexProcessors);
-
-        // Assert
-        verify(sqsClient, times(1)).changeMessageVisibilityBatch(any(), any());
-    }
-
-
-
-    @Test(expected = NullPointerException.class)
-    public void test_getMessages_invalidqueuename_fail() {
-        // Arrange
-        int numOfMessages = 10;
-        int maxMessageCount = 10;
-
-        String invalidQueueName = "invalid";
-
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
-        receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
-        receiveMessageRequest.withMessageAttributeNames("data-partition-id", "account-id");
-
-        List<Message> messages = new ArrayList<>();
-
-        receiveResult.setMessages(messages);
-
-        Mockito.when(sqsClient.receiveMessage(receiveMessageRequest)).thenReturn(receiveResult);
-
-        // Act
-        IndexerQueueService.getMessages(sqsClient, invalidQueueName, numOfMessages, maxMessageCount);
-    }
-
-    @Test
-    public void test_createIndexCompletableFutures(){
-        //Arrange
-        ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
-
-        List<Message> messages = new ArrayList<Message>();
-        Message msg = new Message();
-        Map<String, MessageAttributeValue> attributes = new HashMap<String, MessageAttributeValue>();
-        attributes.put("authorization", new MessageAttributeValue());
-        msg.setMessageAttributes(attributes);
-        messages.add(msg);
-        //Act
-        List<CompletableFuture<IndexProcessor>> list = IndexerQueueService.createIndexCompletableFutures(messages, executorPool, "url");
-
-        assertEquals(1, list.size());
-    }
-
-    @Test
-    public void test_createReIndexCompletableFutures(){
-        //Arrange
-        ThreadPoolExecutor executorPool = mock(ThreadPoolExecutor.class);
-
-        List<Message> messages = new ArrayList<Message>();
-        Message msg = new Message();
-        Map<String, MessageAttributeValue> attributes = new HashMap<String, MessageAttributeValue>();
-        attributes.put("authorization", new MessageAttributeValue());
-        msg.setMessageAttributes(attributes);
-        messages.add(msg);
-        //Act
-        List<CompletableFuture<ReIndexProcessor>> list = IndexerQueueService.createReIndexCompletableFutures(messages, executorPool, "url");
-
-        assertEquals(1, list.size());
-    }
-
 }
