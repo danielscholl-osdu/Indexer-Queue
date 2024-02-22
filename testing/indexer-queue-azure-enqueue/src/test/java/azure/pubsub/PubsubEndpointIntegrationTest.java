@@ -47,7 +47,7 @@ public class PubsubEndpointIntegrationTest {
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
     protected static final String STORAGE_URL = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
     protected static final String SEARCH_URL = System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
-    protected static final String SCHEMA_URL = System.getProperty("SCHEMA_HOST", System.getenv("SCHEMA_HOST"));
+    protected static final String SCHEMA_URL = System.getProperty("SCHEMA_HOST", System.getenv("SCHEMA_HOST"))+"/";
     protected static final String INDEXER_URL = System.getProperty("INDEXER_URL", System.getenv("INDEXER_URL"));
 
     protected static ObjectMapper mapper = new ObjectMapper();
