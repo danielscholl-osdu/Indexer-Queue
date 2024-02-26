@@ -108,7 +108,11 @@ public class IndexerQueueService implements AutoCloseable {
             logger.error(String.format("There were %d failed workers that had to be restarted.", numFailedWorkers));
         } 
         
-        return isWorkerDone(retryFuture, "Retry thread is done") || isWorkerDone(deleteFuture, "Delete thread is done") || isWorkerDone(visibilityFuture, "Visibility thread is done");
+
+        boolean retryDone = isWorkerDone(retryFuture, "Retry thread is done");
+        boolean deleteDone = isWorkerDone(deleteFuture, "Delete thread is done");
+        boolean visibilityDone = isWorkerDone(visibilityFuture, "Visibility thread is done");
+        return retryDone || deleteDone || visibilityDone;
     }
 
     @Override
