@@ -123,7 +123,7 @@ public class PubsubEndpointIntegrationTest {
         assertEquals(201, storageServiceResponse.getStatus());
 
         //new record should be searchable with modified query
-        Thread.sleep(180000);
+        Thread.sleep(60000);
         response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBodyQueryWithLastName(SCHEMA_UPDATE_KIND, "doe"), "");
         json = response.getEntity(String.class);
         jsonObject = new JsonParser().parse(json).getAsJsonObject();
