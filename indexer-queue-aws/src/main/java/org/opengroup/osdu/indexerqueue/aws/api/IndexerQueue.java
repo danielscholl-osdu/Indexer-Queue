@@ -57,13 +57,15 @@ public class IndexerQueue {
     private void run() throws InterruptedException {
         try (IndexerQueueService service = new IndexerQueueService(environmentVariables, this::getSqsClient)) {
             int maxMessages = environmentVariables.getMaxAllowedMessages();
-            AmazonSQS sqsClient = this.getSqsClient();
+            AmazonSQS sqsClient = getSqsClient();
             boolean shouldLoop = true;
+            
             ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
             receiveMessageRequest.setMaxNumberOfMessages(maxMessages);
             receiveMessageRequest.withMessageAttributeNames(ALL_MESSAGES_ATTRIBUTES);
             receiveMessageRequest.withAttributeNames(ALL_MESSAGES_ATTRIBUTES);
             receiveMessageRequest.setWaitTimeSeconds(environmentVariables.getMaxWaitTime());
+            
             while (shouldLoop) {
                 try {
                     if (service.getNumMessages() < maxMessages) {
@@ -72,6 +74,7 @@ public class IndexerQueue {
                     } else {
                         Thread.sleep(10000);
                     }
+                    
                     if (service.isUnhealthy()) {
                         logger.error("Service is unhealthy. Halting.");
                         shouldLoop = false;
@@ -87,14 +90,15 @@ public class IndexerQueue {
         // Done to ensure that the IndexerQueue exits with non-zero status code
         System.exit(2);
     }
+    
+    public static void main(String[] args) throws InterruptedException {
+        IndexerQueue queue = new IndexerQueue();
+        queue.run();
+    }
 
     private AmazonSQS getSqsClient() {
         AmazonSQSConfig sqsConfig = new AmazonSQSConfig(environmentVariables.getRegion());
         return sqsConfig.AmazonSQS();
-    }
-    public static void main(String[] args) throws InterruptedException {
-        IndexerQueue queue = new IndexerQueue();
-        queue.run();
     }
 }
 

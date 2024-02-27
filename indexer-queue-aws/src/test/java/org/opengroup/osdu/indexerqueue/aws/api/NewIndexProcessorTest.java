@@ -64,7 +64,7 @@ public class NewIndexProcessorTest {
 
 
         this.processor.setTargetURL(invalidUrl);
-        this.processor.setResult(CallableResult.Pass);
+        this.processor.setResult(CallableResult.PASS);
 
         NewIndexProcessor result = (NewIndexProcessor) processor.call();
 
@@ -76,7 +76,7 @@ public class NewIndexProcessorTest {
     public void test_Call_localhost() {
 
         this.processor.setTargetURL(localhostUrl);
-        this.processor.setResult(CallableResult.Pass);
+        this.processor.setResult(CallableResult.PASS);
 
         NewIndexProcessor result = (NewIndexProcessor) processor.call();
 
@@ -100,7 +100,7 @@ public class NewIndexProcessorTest {
                 when(mockMsgs.getMessageId()).thenReturn("messageId");
             })) {
                 this.processor.setTargetURL(localhostUrl);
-                this.processor.setResult(CallableResult.Pass);
+                this.processor.setResult(CallableResult.PASS);
 
                 message.setBody("body");
 
@@ -129,7 +129,7 @@ public class NewIndexProcessorTest {
             })) {
                 this.processor.setResponse(new StringBuilder());
                 this.processor.setTargetURL(localhostUrl);
-                this.processor.setResult(CallableResult.Pass);
+                this.processor.setResult(CallableResult.PASS);
 
                 message.setBody("body");
 
@@ -147,7 +147,7 @@ public class NewIndexProcessorTest {
     public void test_Get(){
         NewIndexProcessor processor2 = new NewIndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
         processor2.setResponse(new StringBuilder());
-        Assert.assertEquals(CallableResult.Pass, processor2.getResult());
+        Assert.assertEquals(CallableResult.PASS, processor2.getResult());
         Assert.assertNull(processor2.getReceiptHandle());
     }
 }

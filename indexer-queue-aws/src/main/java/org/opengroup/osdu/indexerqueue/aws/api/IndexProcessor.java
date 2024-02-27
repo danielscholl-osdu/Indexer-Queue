@@ -49,7 +49,7 @@ public abstract class IndexProcessor implements Callable<IndexProcessor> {
         this.message = message;
         this.targetURL = targetUrl;
         this.receiptHandle = message.getReceiptHandle();
-        result = CallableResult.Pass;
+        result = CallableResult.PASS;
         this.indexerServiceAccountJWT = indexServiceAccountJWT;
     }
 
@@ -141,12 +141,12 @@ public abstract class IndexProcessor implements Callable<IndexProcessor> {
             getResponse(connection);
         } catch (Exception e) {
             logger.info(e.getMessage());
-            result = CallableResult.Fail;
+            result = CallableResult.FAIL;
             logger.error(String.format("Could not send %s message", this.getType()), e);
             exception = e;
         }
         logger.info(result.toString());
-        if(result == CallableResult.Fail) {
+        if(result == CallableResult.FAIL) {
             logger.info(exception.getMessage());
         }
         return this;

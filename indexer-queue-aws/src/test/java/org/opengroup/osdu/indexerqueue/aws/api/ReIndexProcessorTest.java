@@ -63,7 +63,7 @@ public class ReIndexProcessorTest {
 
 
         this.processor.setTargetURL(invalidUrl);
-        this.processor.setResult(CallableResult.Pass);
+        this.processor.setResult(CallableResult.PASS);
 
         ReIndexProcessor result = (ReIndexProcessor) processor.call();
 
@@ -75,7 +75,7 @@ public class ReIndexProcessorTest {
     public void test_Call_localhost() {
 
         this.processor.setTargetURL(localhostUrl);
-        this.processor.setResult(CallableResult.Pass);
+        this.processor.setResult(CallableResult.PASS);
 
         message.setBody("body");
 
@@ -98,7 +98,7 @@ public class ReIndexProcessorTest {
         })) {
 
             this.processor.setTargetURL(localhostUrl);
-            this.processor.setResult(CallableResult.Pass);
+            this.processor.setResult(CallableResult.PASS);
 
             message.setBody("body");
 
@@ -124,7 +124,7 @@ public class ReIndexProcessorTest {
 
             this.processor.setResponse(new StringBuilder());
             this.processor.setTargetURL(localhostUrl);
-            this.processor.setResult(CallableResult.Pass);
+            this.processor.setResult(CallableResult.PASS);
 
             message.setBody("body");
 
@@ -148,7 +148,7 @@ public class ReIndexProcessorTest {
     public void test_Get(){
         ReIndexProcessor processor2 = new ReIndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
         processor2.setResponse(new StringBuilder());
-        Assert.assertEquals(CallableResult.Pass, processor2.getResult());
+        Assert.assertEquals(CallableResult.PASS, processor2.getResult());
         Assert.assertNull(processor2.getReceiptHandle());
         Assert.assertNull(processor2.getMessageId());
         Assert.assertNull(processor2.getException());

@@ -47,6 +47,7 @@ public class IndexerQueueService implements AutoCloseable {
     private final Future<?> deleteFuture;
     private final Future<?> visibilityFuture;
     private final List<Future<?>> workerFutures;
+    
     public IndexerQueueService(EnvironmentVariables variables, Supplier<AmazonSQS> sqsSupplier) {
         int maxMessages = variables.getMaxAllowedMessages();
         int maxThreads = variables.getMaxIndexThreads();
@@ -62,6 +63,7 @@ public class IndexerQueueService implements AutoCloseable {
         retryFuture = cleanupExecutor.submit(new MessageRetrier(retryMessages, maxBatchThreads, sqsSupplier.get(), variables.getDeadLetterQueueUrl()));
         deleteFuture = cleanupExecutor.submit(new MessageDeleter(deleteMessages, maxBatchThreads, sqsSupplier.get(), variables.getQueueUrl()));
         visibilityFuture = cleanupExecutor.submit(new MessageVisibilityModifier(changeVisibilityMessages, maxBatchThreads, sqsSupplier.get(), variables.getQueueUrl()));
+        
         workerFutures = new ArrayList<>();
         for (int i = 0; i < maxThreads; ++i) {
             workerFutures.add(primaryExecutor.submit(generateNewWorker()));
@@ -80,26 +82,23 @@ public class IndexerQueueService implements AutoCloseable {
         receivedMessages.addAll(messages);
     }
 
-    private boolean isWorkerDone(Future<?> future, String message) throws InterruptedException {
-        boolean retVal = future.isDone();
-        if (retVal) {
-            boolean hasException = false;
+    private boolean isWorkerDone(Future<?> future, String message) {
+        if (future.isDone()) {
             try {
                 future.get(100, TimeUnit.MILLISECONDS);
-            } catch (ExecutionException | TimeoutException e) {
+            } catch (Exception e) {
                 logger.error(message, e);
-                hasException = true;
             }
-            if (!hasException) {
-                logger.error(String.format("%s finished with no reason.", message));
-            }
+            
+            return true;
         }
-        return retVal;
+        
+        return false;
     }
 
     public boolean isUnhealthy() throws InterruptedException {
         int numFailedWorkers = 0;
-        for (int i = 0; i < workerFutures.size(); ++i) {
+        for (int i = 0; i < workerFutures.size(); i++) {
             if (isWorkerDone(workerFutures.get(i), String.format("Worker thread %d is done", i))) {
                 workerFutures.set(i, primaryExecutor.submit(generateNewWorker()));
                 ++numFailedWorkers;
@@ -107,7 +106,9 @@ public class IndexerQueueService implements AutoCloseable {
         }
         if (numFailedWorkers > 0) {
             logger.error(String.format("There were %d failed workers that had to be restarted.", numFailedWorkers));
-        }
+        } 
+        
+
         boolean retryDone = isWorkerDone(retryFuture, "Retry thread is done");
         boolean deleteDone = isWorkerDone(deleteFuture, "Delete thread is done");
         boolean visibilityDone = isWorkerDone(visibilityFuture, "Visibility thread is done");

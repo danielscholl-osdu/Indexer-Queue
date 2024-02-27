@@ -84,10 +84,10 @@ public class WorkerThread implements Runnable {
             processor = future.get(this.maxWaitForProcessing, TimeUnit.MILLISECONDS);
             result = processor.getResult();
         } catch (TimeoutException | ExecutionException e) {
-            result = CallableResult.Fail;
+            result = CallableResult.FAIL;
         }
 
-        if (result == CallableResult.Pass) {
+        if (result == CallableResult.PASS) {
             logger.info(String.format("Message %s processed successfully.", processor.getMessageId()));
             deleteMessage.put(incomingMessage);
         } else {

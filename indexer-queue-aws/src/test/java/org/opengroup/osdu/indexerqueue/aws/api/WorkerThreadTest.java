@@ -109,7 +109,7 @@ public class WorkerThreadTest {
         Message message = getAuthorizedMessage(newIndexMessageId);
         Future<?> workerThreadExecutor = executorService.submit(() -> {
             try (MockedConstruction<NewIndexProcessor> newIndexProcessor = Mockito.mockConstruction(NewIndexProcessor.class, (mock, context) -> {
-                when(mock.getResult()).thenReturn(CallableResult.Pass);
+                when(mock.getResult()).thenReturn(CallableResult.PASS);
                 when(mock.call()).thenReturn(mock);
             })) {
                 WorkerThread testingImplementation = getWorker();
@@ -139,7 +139,7 @@ public class WorkerThreadTest {
         Message message = getAuthorizedMessage(reIndexMessageId, reIndexCursor);
         Future<?> workerThreadExecutor = executorService.submit(() -> {
             try (MockedConstruction<ReIndexProcessor> reIndexProcessor = Mockito.mockConstruction(ReIndexProcessor.class, (mock, context) -> {
-                when(mock.getResult()).thenReturn(CallableResult.Pass);
+                when(mock.getResult()).thenReturn(CallableResult.PASS);
                 when(mock.call()).thenReturn(mock);
                 assertEquals(REINDEX_URL, context.arguments().get(1));
             })) {
@@ -173,7 +173,7 @@ public class WorkerThreadTest {
             assertNull(messageArgument.getMessageAttributes().get(REINDEX_KEY));
             assertEquals(NEWINDEX_URL, context.arguments().get(1));
             assertEquals(AUTHORIZED_TOKEN, context.arguments().get(2));
-            when(mock.getResult()).thenReturn(CallableResult.Fail);
+            when(mock.getResult()).thenReturn(CallableResult.FAIL);
             when(mock.call()).thenReturn(mock);
         })) {
             WorkerThread testingImplementation = getWorker();
