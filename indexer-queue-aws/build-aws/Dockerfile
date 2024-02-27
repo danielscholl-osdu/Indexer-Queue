@@ -15,7 +15,7 @@
 # https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html
 FROM amazoncorretto:17
 
-ARG JAR_FILE=indexer-queue-aws/target/indexer-queue*.jar
+ARG JAR_FILE=indexer-queue-aws/target/indexer-queue*-spring-boot.jar
 WORKDIR /
 COPY ${JAR_FILE} app.jar
 EXPOSE 8080

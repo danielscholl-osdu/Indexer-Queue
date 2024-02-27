@@ -19,18 +19,10 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
 import org.opengroup.osdu.core.aws.sqs.AmazonSQSConfig;
-import org.opengroup.osdu.core.aws.ssm.K8sParameterNotFoundException;
-import org.opengroup.osdu.core.common.logging.DefaultLogger;
 import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
-import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 public class IndexerQueue {
     /**
@@ -45,124 +37,68 @@ public class IndexerQueue {
      */
 
     private static final JaxRsDpsLog logger = LogProvider.getLogger();
+    private static final String ALL_MESSAGES_ATTRIBUTES = "All";
+    private final EnvironmentVariables environmentVariables;
+    private final String queueUrl;
 
-    private static final int MAX_MESSAGE_ALLOWED = 100000;
-    private static final int MAX_INDEX_THREADS = 50;
-    private static final int MAX_BATCH_REQUEST_COUNT = 10;
-
-    public static void main(String[] args) throws K8sParameterNotFoundException {
-        EnvironmentVariables environmentVariables = new EnvironmentVariables();
-        List<Message> messages;
-        String indexerUrl = String.format("%s/%s", environmentVariables.getTargetURL(), "api/indexer/v2/_dps/task-handlers/index-worker");
-        String reIndexUrl = String.format("%s/%s", environmentVariables.getTargetURL(), "api/indexer/v2/reindex?force_clean=false");
+    IndexerQueue() {
+        environmentVariables = new EnvironmentVariables();
+        String targetUrl = environmentVariables.getTargetURL();
+        queueUrl = environmentVariables.getQueueUrl();
         // System print lines go to cloudwatch automatically within ECS
         logger.info("Running Queue processor with the following environment variables:");
-        logger.info(String.format("Region: %s%n", environmentVariables.getRegion()));
-        logger.info(String.format("Queue Name: %s%n", environmentVariables.getQueueUrl()));
-        logger.info(String.format("Dead letter queue name: %s%n", environmentVariables.getDeadLetterQueueUrl()));
-        logger.info(String.format("Target url: %s%n", environmentVariables.getTargetURL()));
-        logger.info(String.format("Connecting to the SQS Queue: %s%n", environmentVariables.getQueueUrl()));
+        logger.info(String.format("Region: %s", environmentVariables.getRegion()));
+        logger.info(String.format("Queue Name: %s", queueUrl));
+        logger.info(String.format("Dead letter queue name: %s", environmentVariables.getDeadLetterQueueUrl()));
+        logger.info(String.format("Target url: %s", targetUrl));
+        logger.info(String.format("Connecting to the SQS Queue: %s", queueUrl));
+    }
 
-        while (true) {
-
-            try {
-                System.out.println("Starting Indexer Queue and obtaining Arguments");
-
-                System.out.printf("Connecting to the SQS Queue: %s%n", environmentVariables.getQueueUrl());
-                AmazonSQSConfig sqsConfig = new AmazonSQSConfig(environmentVariables.getRegion());
-                AmazonSQS sqsClient = sqsConfig.AmazonSQS();
-                System.out.printf("Dead letter queue url: %s%n", environmentVariables.getDeadLetterQueueUrl());
-                messages = IndexerQueueService.getMessages(sqsClient, environmentVariables.getQueueUrl(), MAX_BATCH_REQUEST_COUNT, MAX_MESSAGE_ALLOWED);
-                System.out.printf("Processing %s messages from storage queue%n", messages.size());
-
-
-                if (!messages.isEmpty()) {
-                    System.out.printf("Creating a thread pool with %s threads%n", MAX_INDEX_THREADS);
-                    ThreadPoolExecutor executorPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(MAX_INDEX_THREADS);
-                    List<Message> reIndexMessages = messages.stream().filter(
-                            msg -> msg.getMessageAttributes().containsKey("ReIndexCursor")
-                    ).collect(Collectors.toList());
-                    System.out.printf("Size of Reindex message list is %s %n", reIndexMessages.size());
-                    processReIndexMessages(reIndexMessages, reIndexUrl, environmentVariables.getQueueUrl(), executorPool, sqsClient);
-                    messages.removeAll(reIndexMessages);
-                    processIndexMessages(messages, indexerUrl, environmentVariables.getQueueUrl(), environmentVariables.getDeadLetterQueueUrl(), executorPool, sqsClient);
-                    executorPool.shutdown();
+    private void run() throws InterruptedException {
+        try (IndexerQueueService service = new IndexerQueueService(environmentVariables, this::getSqsClient)) {
+            int maxMessages = environmentVariables.getMaxAllowedMessages();
+            AmazonSQS sqsClient = getSqsClient();
+            boolean shouldLoop = true;
+            
+            ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl);
+            receiveMessageRequest.setMaxNumberOfMessages(maxMessages);
+            receiveMessageRequest.withMessageAttributeNames(ALL_MESSAGES_ATTRIBUTES);
+            receiveMessageRequest.withAttributeNames(ALL_MESSAGES_ATTRIBUTES);
+            receiveMessageRequest.setWaitTimeSeconds(environmentVariables.getMaxWaitTime());
+            
+            while (shouldLoop) {
+                try {
+                    if (service.getNumMessages() < maxMessages) {
+                        List<Message> retrievedMessages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
+                        service.putMessages(retrievedMessages);
+                    } else {
+                        Thread.sleep(10000);
+                    }
+                    
+                    if (service.isUnhealthy()) {
+                        logger.error("Service is unhealthy. Halting.");
+                        shouldLoop = false;
+                    }
+                } catch (InterruptedException e) {
+                    shouldLoop = false;
+                    logger.error("Interrupted while waiting.", e);
                 }
-
-                Thread.sleep(5000);
-
-            } catch (ExecutionException e) {
-                System.out.println(e.getMessage());
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-            } catch (NullPointerException e) {
-                System.out.println(e.getMessage());
-            } catch (Exception e) {
-                System.out.println("except: "+e.getMessage());
             }
-
+        } finally {
+            logger.error("Service state change to unhealthy while processing storage messages. Terminating pod.");
         }
+        // Done to ensure that the IndexerQueue exits with non-zero status code
+        System.exit(2);
+    }
+    
+    public static void main(String[] args) throws InterruptedException {
+        IndexerQueue queue = new IndexerQueue();
+        queue.run();
     }
 
-    public static void processIndexMessages(List<Message> messages, String indexerUrl, String queueUrl, String deadLetterQueueUrl, ThreadPoolExecutor executorPool, AmazonSQS sqsClient)
-            throws ExecutionException, InterruptedException, TimeoutException {
-        logger.info(String.format("Processing %s IndexMessage%n", messages.size()));
-         /*
-            Messages without authorization attributes will be removed them from queue and send directly to DLQ
-         */
-        List<IndexProcessor> nonAuthorizedProcessors = messages.stream()
-                .filter(msg -> !msg.getMessageAttributes().containsKey("authorization"))
-                .map(msg -> new IndexProcessor(msg, indexerUrl, "", CallableResult.Fail))
-                .collect(Collectors.toList());
-        // batching messages for deletion
-        ArrayList<IndexProcessor> deleteMessageList = new ArrayList<>(nonAuthorizedProcessors);
-        ArrayList<IndexProcessor> deadletters = new ArrayList<>(nonAuthorizedProcessors);
-
-        List<Message> authorizedMessages = messages.stream()
-            .filter(msg ->
-                msg.getMessageAttributes().containsKey("authorization")
-            )
-            .collect(Collectors.toList());
-        /*
-            Max retry handles by AWS SQS. If max number of reads from queue failed to process a given message,
-            the message is automatically sent to DLQ by SQS policy.
-            As long as the IndexerService doesn't add more stuff back to the queue with retry counter and new message ID
-         */
-        // process only authorized messages
-        List<IndexProcessor> indexProcessors = IndexerQueueService.processIndexQueue(authorizedMessages, indexerUrl, executorPool);
-        logger.info(String.format("%s Authorized Index Messages Processed%n", indexProcessors.size()));
-
-        List<IndexProcessor> failedProcessors = indexProcessors.stream().filter(indexProcessor -> indexProcessor.getResult() == CallableResult.Fail || indexProcessor.getException() != null).collect(Collectors.toList());
-        logger.info(String.format("Total %s Index Messages Failed%n", failedProcessors.size()));
-
-        // check if the message exponential visibility timeout
-        IndexerQueueService.changeMessageVisibilityTimeout(sqsClient, queueUrl, failedProcessors);
-        List<SendMessageResult> deadLetterResults = IndexerQueueService.sendMsgsToDeadLetterQueue(deadLetterQueueUrl, deadletters, sqsClient);
-        logger.info(String.format("%s Index Messages Dead Lettered%n", deadLetterResults.size()));
-        deleteMessageList.addAll(indexProcessors.stream().filter(indexProcessor -> indexProcessor.getResult() == CallableResult.Pass).collect(Collectors.toList()));
-        List<DeleteMessageBatchRequestEntry> deleteEntries = deleteMessageList.stream().map(indexProcessor -> new DeleteMessageBatchRequestEntry(indexProcessor.getMessageId(), indexProcessor.getReceiptHandle())).collect(Collectors.toList());
-        logger.info(String.format("%s Index Messages Deleting (Succeeded and Non-Authorized)%n", deleteEntries.size()));
-        List<DeleteMessageBatchRequest> deleteBatchRequests = IndexerQueueService.createMultipleBatchDeleteRequest(queueUrl, deleteEntries, MAX_BATCH_REQUEST_COUNT);
-        logger.info(String.format("%s Delete Batch Request Created%n", deleteBatchRequests.size()));
-
-        List<DeleteMessageBatchResult> deleteMessageBatchResults = IndexerQueueService.deleteMessages(deleteBatchRequests, sqsClient);
-        logger.info(String.format("%s Requests Deleted%n", deleteMessageBatchResults.size()));
-    }
-
-    public static void processReIndexMessages(List<Message> reIndexMessages, String reIndexUrl, String queueUrl, ThreadPoolExecutor executorPool, AmazonSQS sqsClient) throws ExecutionException, InterruptedException, TimeoutException {
-        List<ReIndexProcessor> reIndexProcessors = IndexerQueueService.processReIndexQueue(reIndexMessages, reIndexUrl, executorPool);
-        List<ReIndexProcessor> failedProcessors = reIndexProcessors.stream().filter(indexProcessor -> indexProcessor.getResult() == CallableResult.Fail || indexProcessor.getException() != null).collect(Collectors.toList());
-        logger.info(String.format("Total %s ReIndex Messages Failed%n", failedProcessors.size()));
-        reIndexProcessors.removeAll(failedProcessors);
-        ArrayList<ReIndexProcessor> deleteMessageList = new ArrayList<>();
-        deleteMessageList.addAll(reIndexProcessors.stream().filter(indexProcessor -> indexProcessor.getResult() == CallableResult.Pass).collect(Collectors.toList()));
-        List<DeleteMessageBatchRequestEntry> deleteEntries = deleteMessageList.stream().map(indexProcessor -> new DeleteMessageBatchRequestEntry(indexProcessor.getMessageId(), indexProcessor.getReceiptHandle())).collect(Collectors.toList());
-        logger.info(String.format("%s ReIndex Messages Deleting (Succeeded and Non-Authorized)%n", deleteEntries.size()));
-        List<DeleteMessageBatchRequest> deleteBatchRequests = IndexerQueueService.createMultipleBatchDeleteRequest(queueUrl, deleteEntries, MAX_BATCH_REQUEST_COUNT);
-        logger.info(String.format("%s Delete Batch Request Created%n", deleteBatchRequests.size()));
-        List<DeleteMessageBatchResult> deleteMessageBatchResults = IndexerQueueService.deleteMessages(deleteBatchRequests, sqsClient);
-        logger.info(String.format("%s Requests Deleted%n", deleteMessageBatchResults.size()));
-
+    private AmazonSQS getSqsClient() {
+        AmazonSQSConfig sqsConfig = new AmazonSQSConfig(environmentVariables.getRegion());
+        return sqsConfig.AmazonSQS();
     }
 }
 

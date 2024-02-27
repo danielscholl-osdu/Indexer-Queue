@@ -1,12 +1,12 @@
 /**
 * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 *      http://www.apache.org/licenses/LICENSE-2.0
-* 
+*
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,164 +18,107 @@ package org.opengroup.osdu.indexerqueue.aws.api;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.*;
-import org.apache.commons.collections4.ListUtils;
+import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
-public class IndexerQueueService {
+public class IndexerQueueService implements AutoCloseable {
 
-    private IndexerQueueService() {
-        // Private constructor
-    }
-
-    private static <T> List<T> processIndexMessages(List<CompletableFuture<T>> indexProcesses) throws ExecutionException, InterruptedException{
-        CompletableFuture[] cfs = indexProcesses.toArray(new CompletableFuture[0]);
-        CompletableFuture<List<T>> results = CompletableFuture
-            .allOf(cfs)
-            .thenApply(ignored -> indexProcesses
-                .stream()
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList()));
-
-//        List<IndexProcessor> processed = results.get();
-//        executorPool.shutdown();
-
-        return results.get();
-    }
-
-    public static List<IndexProcessor> processIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
-        throws ExecutionException, InterruptedException {
-
-        List<CompletableFuture<IndexProcessor>> futures = createIndexCompletableFutures(messages, executorPool, url);
-
-        return processIndexMessages(futures);
-    }
-    public static List<ReIndexProcessor> processReIndexQueue(List<Message> messages, String url, ThreadPoolExecutor executorPool)
-            throws ExecutionException, InterruptedException{
-
-        List<CompletableFuture<ReIndexProcessor>> futures = createReIndexCompletableFutures(messages, executorPool, url);
-        return processIndexMessages(futures);
-    }
-    public static List<DeleteMessageBatchResult> deleteMessages(List<DeleteMessageBatchRequest> deleteBatchRequests, AmazonSQS sqsClient) {
-        return deleteBatchRequests.stream().map(deleteRequest -> sqsClient.deleteMessageBatch(deleteRequest)).collect(Collectors.toList());
-    }
-
-
-    public static List<DeleteMessageBatchRequest> createMultipleBatchDeleteRequest(String queueUrl, List<DeleteMessageBatchRequestEntry> deleteEntries, int maxBatchRequest) {
-        List<List<DeleteMessageBatchRequestEntry>> batchedEntries = ListUtils.partition(deleteEntries, maxBatchRequest);
-        return batchedEntries.stream().map(entries -> new DeleteMessageBatchRequest(queueUrl, entries)).collect(Collectors.toList());
-    }
-
-    public static List<CompletableFuture<IndexProcessor>> createIndexCompletableFutures(List<Message> messages, ThreadPoolExecutor executorPool, String url){
-        List<CompletableFuture<IndexProcessor>> futures = new ArrayList<>();
-
-        for (final Message message : messages) {
-            String indexerServiceAccountJWT = message.getMessageAttributes().get("authorization").getStringValue();
-            IndexProcessor processor = new IndexProcessor(message, url, indexerServiceAccountJWT);
-            CompletableFuture<IndexProcessor> future = CompletableFuture.supplyAsync(processor::call, executorPool);
-            futures.add(future);
+    private static final JaxRsDpsLog logger = LogProvider.getLogger();
+    private final String targetURL;
+    private final BlockingQueue<Message> receivedMessages;
+    private final BlockingQueue<Message> deleteMessages;
+    private final BlockingQueue<Message> changeVisibilityMessages;
+    private final BlockingQueue<Message> retryMessages;
+    private final ExecutorService primaryExecutor;
+    private final ExecutorService workerExecutor;
+    private final ExecutorService cleanupExecutor;
+    private final Future<?> retryFuture;
+    private final Future<?> deleteFuture;
+    private final Future<?> visibilityFuture;
+    private final List<Future<?>> workerFutures;
+    
+    public IndexerQueueService(EnvironmentVariables variables, Supplier<AmazonSQS> sqsSupplier) {
+        int maxMessages = variables.getMaxAllowedMessages();
+        int maxThreads = variables.getMaxIndexThreads();
+        int maxBatchThreads = variables.getMaxBatchRequestCount();
+        targetURL = variables.getTargetURL();
+        receivedMessages = new ArrayBlockingQueue<>(maxMessages * 2);
+        deleteMessages = new ArrayBlockingQueue<>(maxMessages);
+        retryMessages = new ArrayBlockingQueue<>(maxMessages);
+        changeVisibilityMessages = new ArrayBlockingQueue<>(maxMessages);
+        primaryExecutor = Executors.newFixedThreadPool(maxThreads);
+        workerExecutor = Executors.newFixedThreadPool(maxThreads);
+        cleanupExecutor = Executors.newFixedThreadPool(3);
+        retryFuture = cleanupExecutor.submit(new MessageRetrier(retryMessages, maxBatchThreads, sqsSupplier.get(), variables.getDeadLetterQueueUrl()));
+        deleteFuture = cleanupExecutor.submit(new MessageDeleter(deleteMessages, maxBatchThreads, sqsSupplier.get(), variables.getQueueUrl()));
+        visibilityFuture = cleanupExecutor.submit(new MessageVisibilityModifier(changeVisibilityMessages, maxBatchThreads, sqsSupplier.get(), variables.getQueueUrl()));
+        
+        workerFutures = new ArrayList<>();
+        for (int i = 0; i < maxThreads; ++i) {
+            workerFutures.add(primaryExecutor.submit(generateNewWorker()));
         }
-        return futures;
     }
-    public static List<CompletableFuture<ReIndexProcessor>> createReIndexCompletableFutures(List<Message> messages, ThreadPoolExecutor executorPool, String url){
-        List<CompletableFuture<ReIndexProcessor>> futures = new ArrayList<>();
 
-        for (final Message message : messages) {
-            String indexerServiceAccountJWT = message.getMessageAttributes().get("authorization").getStringValue();
-            ReIndexProcessor processor = new ReIndexProcessor(message, url, indexerServiceAccountJWT);
-            CompletableFuture<ReIndexProcessor> future = CompletableFuture.supplyAsync(processor::call, executorPool);
-            futures.add(future);
+    private WorkerThread generateNewWorker() {
+        return new WorkerThread(receivedMessages, retryMessages, deleteMessages, changeVisibilityMessages, workerExecutor, targetURL);
+    }
+
+    public int getNumMessages() {
+        return receivedMessages.size();
+    }
+
+    public void putMessages(List<Message> messages) {
+        receivedMessages.addAll(messages);
+    }
+
+    private boolean isWorkerDone(Future<?> future, String message) {
+        if (future.isDone()) {
+            try {
+                future.get(100, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                logger.error(message, e);
+            }
+            
+            return true;
         }
-        return futures;
+        
+        return false;
     }
 
-    public static List<Message> getMessages(AmazonSQS sqsClient, String sqsQueueUrl, int numOfmessages, int maxMessageCount){
-        int numOfMessages = numOfmessages;
-        List<Message> messages = new ArrayList<>();
-        do {
-            ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsQueueUrl);
-            receiveMessageRequest.setMaxNumberOfMessages(numOfMessages);
-            receiveMessageRequest.withMessageAttributeNames("All");
-            receiveMessageRequest.withAttributeNames("All");
-            List<Message> retrievedMessages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
-            messages.addAll(retrievedMessages);
-            numOfMessages = retrievedMessages.size();
-
-        }while (messages.size() < maxMessageCount && numOfMessages > 0);
-
-        return messages;
-    }
-
-    public static List<SendMessageResult> sendMsgsToDeadLetterQueue(String deadLetterQueueUrl, List<IndexProcessor> indexProcessors, AmazonSQS sqsClient) {
-        return indexProcessors.stream().map(indexProcessor -> sendMsgToDeadLetterQueue(deadLetterQueueUrl, indexProcessor, sqsClient)).collect(Collectors.toList());
-    }
-
-    private static SendMessageResult sendMsgToDeadLetterQueue(String deadLetterQueueUrl, IndexProcessor indexProcessor, AmazonSQS sqsClient){
-        String exceptionMessage;
-        Map<String, MessageAttributeValue> messageAttributes = indexProcessor.getMessage().getMessageAttributes();
-        MessageAttributeValue exceptionAttribute = new MessageAttributeValue()
-                .withDataType("String");
-
-        if(indexProcessor.expectionExists()){
-            exceptionMessage = indexProcessor.getException().getMessage();
-        } else {
-            exceptionMessage = "Empty";
-        }
-
-        String exceptionAsString = String.format("Exception message: %s", exceptionMessage);
-        exceptionAttribute.setStringValue(exceptionAsString);
-        messageAttributes.put("Exception", exceptionAttribute);
-        SendMessageRequest sendMsgRequest = new SendMessageRequest()
-                .withQueueUrl(deadLetterQueueUrl)
-                .withMessageBody(indexProcessor.getMessage().getBody())
-                .withMessageAttributes(messageAttributes);
-        return sqsClient.sendMessage(sendMsgRequest);
-    }
-    public static void changeMessageVisibilityTimeout(AmazonSQS sqsClient, String sqsQueueUrl,List<IndexProcessor> indexProcessors){
-
-        List<ChangeMessageVisibilityBatchRequestEntry> entries =
-                new ArrayList<>();
-        for (IndexProcessor indexProcessor : indexProcessors){
-            entries.add(
-                    new ChangeMessageVisibilityBatchRequestEntry(indexProcessor.getMessageId(), indexProcessor.getMessage().getReceiptHandle())
-                            .withVisibilityTimeout(
-                                    exponentialTimeOutWindow(parseIntOrDefault(indexProcessor.getMessage().getAttributes().get("ApproximateReceiveCount"), 0))
-                            )
-            );
-
-            if (entries.size() == 10) { //max batch size for message visibility is 10, split entries by that amount
-                sqsClient.changeMessageVisibilityBatch(sqsQueueUrl, entries);
-                entries.clear();
+    public boolean isUnhealthy() throws InterruptedException {
+        int numFailedWorkers = 0;
+        for (int i = 0; i < workerFutures.size(); i++) {
+            if (isWorkerDone(workerFutures.get(i), String.format("Worker thread %d is done", i))) {
+                workerFutures.set(i, primaryExecutor.submit(generateNewWorker()));
+                ++numFailedWorkers;
             }
         }
+        if (numFailedWorkers > 0) {
+            logger.error(String.format("There were %d failed workers that had to be restarted.", numFailedWorkers));
+        } 
+        
 
-        if (!entries.isEmpty())
-            sqsClient.changeMessageVisibilityBatch(sqsQueueUrl, entries);
-
-    }
-    private static Integer exponentialTimeOutWindow(int receiveCount){
-        // max receive count to 10 in SQS setting
-        switch (receiveCount){
-            case 0: case 1: case 2: return 5;
-            case 3: case 4: return 10;
-            case 5: case 6: return 30;
-            case 7: case 8: return 60;
-            case 9: case 10: return 90;
-            default: return 120;
-        }
+        boolean retryDone = isWorkerDone(retryFuture, "Retry thread is done");
+        boolean deleteDone = isWorkerDone(deleteFuture, "Delete thread is done");
+        boolean visibilityDone = isWorkerDone(visibilityFuture, "Visibility thread is done");
+        return retryDone || deleteDone || visibilityDone;
     }
 
-    private static Integer parseIntOrDefault(String toParse, int defaultValue) {
-        try {
-            return Integer.parseInt(toParse);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
+    @Override
+    public void close() {
+        workerExecutor.shutdownNow();
+        primaryExecutor.shutdownNow();
+        cleanupExecutor.shutdownNow();
     }
 }

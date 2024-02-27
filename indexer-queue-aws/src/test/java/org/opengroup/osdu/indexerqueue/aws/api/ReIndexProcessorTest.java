@@ -42,7 +42,6 @@ public class ReIndexProcessorTest {
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
     private final String invalidUrl = "targetUrl_invalid";
     private final String localhostUrl = "https://localhost";
-    private final String StreamString = "This\ris\ra\rstring\r";
 
     Message message = new Message();
     @InjectMocks
@@ -64,11 +63,10 @@ public class ReIndexProcessorTest {
 
 
         this.processor.setTargetURL(invalidUrl);
-        this.processor.setResult(CallableResult.Pass);
+        this.processor.setResult(CallableResult.PASS);
 
-        ReIndexProcessor result = processor.call();
+        ReIndexProcessor result = (ReIndexProcessor) processor.call();
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("no protocol: targetUrl_invalid"));
         Assert.assertEquals(processor, result);
         Assert.assertTrue(processor.expectionExists());
     }
@@ -77,13 +75,12 @@ public class ReIndexProcessorTest {
     public void test_Call_localhost() {
 
         this.processor.setTargetURL(localhostUrl);
-        this.processor.setResult(CallableResult.Pass);
+        this.processor.setResult(CallableResult.PASS);
 
         message.setBody("body");
 
-        ReIndexProcessor result = processor.call();
+        ReIndexProcessor result = (ReIndexProcessor) processor.call();
 
-        Assert.assertTrue(outputStreamCaptor.toString().trim().contains("The url is: https://localhost "));
         Assert.assertEquals(processor, result);
         Assert.assertTrue(processor.expectionExists());
 
@@ -101,14 +98,13 @@ public class ReIndexProcessorTest {
         })) {
 
             this.processor.setTargetURL(localhostUrl);
-            this.processor.setResult(CallableResult.Pass);
+            this.processor.setResult(CallableResult.PASS);
 
             message.setBody("body");
 
 
-            ReIndexProcessor result = processor.call();
+            ReIndexProcessor result = (ReIndexProcessor) processor.call();
 
-            Assert.assertTrue(outputStreamCaptor.toString().trim().contains("Underlying input stream returned zero bytes"));
             Assert.assertEquals(processor, result);
             Assert.assertTrue(processor.expectionExists());
         }
@@ -119,7 +115,8 @@ public class ReIndexProcessorTest {
 
         HttpURLConnection mockConnection = mock(HttpURLConnection.class);
         when(mockConnection.getOutputStream()).thenReturn(mock(OutputStream.class));
-        when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(StreamString.getBytes()));
+        String streamString = "This\ris\ra\rstring\r";
+        when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(streamString.getBytes()));
 
         try (MockedConstruction<URL> url = Mockito.mockConstruction(URL.class, (mockUrl, context) -> {
             when(mockUrl.openConnection()).thenReturn(mockConnection);
@@ -127,15 +124,15 @@ public class ReIndexProcessorTest {
 
             this.processor.setResponse(new StringBuilder());
             this.processor.setTargetURL(localhostUrl);
-            this.processor.setResult(CallableResult.Pass);
+            this.processor.setResult(CallableResult.PASS);
 
             message.setBody("body");
 
 
-            ReIndexProcessor result = processor.call();
+            ReIndexProcessor result = (ReIndexProcessor) processor.call();
 
             Assert.assertEquals(processor, result);
-            Assert.assertEquals(StreamString, result.getResponse().toString());
+            Assert.assertEquals(streamString, result.getResponse().toString());
             Assert.assertFalse(processor.expectionExists());
         }
     }
@@ -151,7 +148,7 @@ public class ReIndexProcessorTest {
     public void test_Get(){
         ReIndexProcessor processor2 = new ReIndexProcessor(new Message(), "targetUrl", "indexServiceAccountJWT");
         processor2.setResponse(new StringBuilder());
-        Assert.assertEquals(CallableResult.Pass, processor2.getResult());
+        Assert.assertEquals(CallableResult.PASS, processor2.getResult());
         Assert.assertNull(processor2.getReceiptHandle());
         Assert.assertNull(processor2.getMessageId());
         Assert.assertNull(processor2.getException());

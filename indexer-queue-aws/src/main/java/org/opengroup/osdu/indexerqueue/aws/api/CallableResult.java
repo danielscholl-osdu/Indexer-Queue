@@ -17,6 +17,6 @@
 package org.opengroup.osdu.indexerqueue.aws.api;
 
 public enum CallableResult {
-    Pass,
-    Fail
+    PASS,
+    FAIL
 }
