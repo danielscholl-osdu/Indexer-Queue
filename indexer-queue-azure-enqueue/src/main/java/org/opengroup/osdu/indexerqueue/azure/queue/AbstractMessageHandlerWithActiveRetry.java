@@ -30,7 +30,7 @@ import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -61,7 +61,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
     private final ThreadDpsHeaders dpsHeaders;
     private final MdcContextMap mdcContextMap;
     private final MessageAttributesExtractor messageAttributesExtractor;
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     private IMetricService metricService;
 
     /***
@@ -79,7 +79,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
                                                  final MessageAttributesExtractor messageAttributesExtractor,
                                                  final String workerServiceName,
                                                  final Integer maximumDeliveryCount,
-                                                 final SbMessageBuilder sbMessageBuilder,
+                                                 final RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder,
                                                  final IMetricService metricService) {
         super(workerServiceName, client);
         this.receiveClient = client;
@@ -90,7 +90,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
         this.dpsHeaders = dpsHeaders;
         this.mdcContextMap = mdcContextMap;
         this.messageAttributesExtractor = messageAttributesExtractor;
-        this.sbMessageBuilder = sbMessageBuilder;
+        this.recordsChangedSbMessageBuilder = recordsChangedSbMessageBuilder;
         this.metricService = metricService;
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
             messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
             setupLoggerContext(message);
             logWorkerStart(messageId, this.workerName, "Received message from service bus");
-            recordChangedMessage = sbMessageBuilder.getServiceBusMessage(messageBody, messageId);
+            recordChangedMessage = recordsChangedSbMessageBuilder.getServiceBusMessage(messageBody, messageId);
             processMessage(message);
             long stopTime = System.currentTimeMillis();
             this.captureMetrics(recordChangedMessage, this.receiveClient.getTopicName(), enqueueTime, stopTime, true);
@@ -213,7 +213,7 @@ public abstract class AbstractMessageHandlerWithActiveRetry extends AbstractMess
     }
 
     private void setupLoggerContext(IMessage message) {
-        RecordChangedAttributes recordChangedAttributes = messageAttributesExtractor.extractAttributesFromMessageBody(message);
+        RecordChangedAttributes recordChangedAttributes = messageAttributesExtractor.extracRecordChangedtAttributesFromMessageBody(message);
         String correlationId = recordChangedAttributes.getCorrelationId();
         String dataPartitionId = recordChangedAttributes.getDataPartitionId();
         MDC.setContextMap(mdcContextMap.getContextMap(correlationId, dataPartitionId));

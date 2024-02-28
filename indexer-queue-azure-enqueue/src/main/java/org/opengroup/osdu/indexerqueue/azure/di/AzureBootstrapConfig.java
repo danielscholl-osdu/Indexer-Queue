@@ -55,6 +55,9 @@ public class AzureBootstrapConfig {
     @Value("${indexer.worker.url}")
     private String indexerWorkerURL;
 
+    @Value("${schema.worker.url}")
+    private String schemaWorkerURL;
+
     @Value("#{new Integer('${sleep.duration.main.thread.seconds}')}")
     private Integer sleepDurationForMainThreadInSeconds;
 

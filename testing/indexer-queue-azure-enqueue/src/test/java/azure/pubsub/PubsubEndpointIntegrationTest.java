@@ -13,10 +13,14 @@
 // limitations under the License.
 package azure.pubsub;
 
+import azure.models.schema.SchemaIdentity;
+import azure.models.schema.SchemaInfo;
+import azure.models.schema.SchemaModel;
 import azure.utils.HeaderUtils;
 import azure.utils.LegalTagUtils;
 import azure.utils.TenantUtils;
 import azure.utils.TestUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import com.sun.jersey.api.client.ClientResponse;
 import com.google.common.base.Strings;
@@ -24,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,12 +39,20 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class PubsubEndpointIntegrationTest {
     // Generate unique record id using timestamp
-    Logger log = Logger.getLogger(PubsubEndpointIntegrationTest.class.getName());
     protected static final String RECORD_ID = TenantUtils.getTenantName() + ":inttest:" + System.currentTimeMillis();
     protected static final String KIND = TenantUtils.getTenantName() + ":wks:inttest:1.0."
             + System.currentTimeMillis();
+    protected static final String entityType = "kind"+System.currentTimeMillis();
+    protected static final String SCHEMA_UPDATE_KIND = "osdu:kindupdate:"+entityType+":1.0.0";
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
+    protected static final String STORAGE_URL = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
+    protected static final String SEARCH_URL = System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
+    protected static final String SCHEMA_URL = System.getProperty("SCHEMA_URL", System.getenv("SCHEMA_URL"));
+    protected static final String INDEXER_URL = System.getProperty("INDEXER_URL", System.getenv("INDEXER_URL"));
 
+    protected static ObjectMapper mapper = new ObjectMapper();
+    protected static Gson gson = new Gson();
+    
     /***
      * Create legal tag and create new unique record in storage service before running the test.
      * @throws Exception
@@ -50,7 +60,7 @@ public class PubsubEndpointIntegrationTest {
     @Before
     public void setup() throws Exception {
         String token = TestUtils.getToken();
-        ClientResponse resp = LegalTagUtils.create(LEGAL_TAG, token);
+        LegalTagUtils.create(LEGAL_TAG, token);
     }
 
     /***
@@ -60,7 +70,7 @@ public class PubsubEndpointIntegrationTest {
     @After
     public void tearDown() throws Exception {
         String token = TestUtils.getToken();
-        ClientResponse response = TestUtils.send("records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
+        TestUtils.send(STORAGE_URL, "records/" + RECORD_ID, "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), token), "", "");
         LegalTagUtils.delete(LEGAL_TAG, token);
     }
 
@@ -73,33 +83,133 @@ public class PubsubEndpointIntegrationTest {
         // Create record in storage service
 
         String jsonInput = createJsonBody(RECORD_ID, "tian");
-        ClientResponse storageServiceResponse = TestUtils.send("records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
-        log.info(String.format("This is the storage service response received : %s\n and the correlation-id : %s\n status code : %s",storageServiceResponse, storageServiceResponse.getHeaders().get("correlation-id"), storageServiceResponse.getStatus()));
+        ClientResponse storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
         // Sleep for one minute to wait for indexing to happen
         Thread.sleep(60000);
-        String searchUrl=System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
-        ClientResponse response = TestUtils.send(searchUrl, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
-        log.info(String.format("This is the response received : %s", response));
+        ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
         String json = response.getEntity(String.class);
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
-        log.info(String.format("This is the json object response received : %s", indentatedBody(json)));
         assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
     }
 
-    public static String indentatedBody(String responseBody) {
-        JsonParser jsonParser = new JsonParser();
-        if(responseBody==null)
-            return responseBody;
-        JsonElement jsonElement = jsonParser.parse(responseBody);
-        String indentedResponseEntity =new GsonBuilder().setPrettyPrinting().create().toJson(jsonElement);
-        return indentedResponseEntity;
+    @Test
+    public void should_beAbleToSearchRecord_whenSchemaChanges() throws Exception {
+        //create a new kind via Schema service
+        String schemaPayload = getInitialSchemaPayload();
+        TestUtils.send(SCHEMA_URL, "schema", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), schemaPayload, "");
+
+        //create a new record via Storage service using created kind
+        String jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "");
+        ClientResponse storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+        assertEquals(201, storageServiceResponse.getStatus());
+
+        //record should be searchable via Search service
+        Thread.sleep(60000);
+        ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBodyQueryWithFirstName(SCHEMA_UPDATE_KIND, "john"), "");
+        String json = response.getEntity(String.class);
+        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+        assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
+
+        //modify kind via schema service
+        String modifySchemaPayalod = getUpdatedSchemaPayload();
+        TestUtils.send(SCHEMA_URL, "schema", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), modifySchemaPayalod, "");
+
+        //create a new record via Storage service using modified kind
+        jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "doe");
+        storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+        assertEquals(201, storageServiceResponse.getStatus());
+
+        //new record should be searchable with modified query
+        Thread.sleep(60000);
+        response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBodyQueryWithLastName(SCHEMA_UPDATE_KIND, "doe"), "");
+        json = response.getEntity(String.class);
+        jsonObject = new JsonParser().parse(json).getAsJsonObject();
+        assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
+
+        //clean up index
+        String kindParam = "?kind="+SCHEMA_UPDATE_KIND;
+        TestUtils.send(INDEXER_URL, "index", "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), "", kindParam);
     }
 
+
     protected static String createJsonBody(String id, String name) {
-        return "[" + singleEntityBody(id, name, KIND, LEGAL_TAG) + "]";
+        return "[" + singleEntityBody(id, name, "", KIND, LEGAL_TAG) + "]";
+    }
+
+    protected static String createJsonBodyWithKind(String kind, String firstname, String lastname) {
+        return "[" + singleEntityBody("", firstname, lastname, kind, LEGAL_TAG) + "]";
+    }
+
+    protected static String getInitialSchemaPayload() throws Exception {
+        SchemaModel schemaModel = new SchemaModel();
+        schemaModel.setSchemaInfo(getSchemaInfo());
+        schemaModel.setSchema(mapper.readValue(getInitialSchema(), Object.class));
+        return gson.toJson(schemaModel);
+    }
+
+    protected static String getUpdatedSchemaPayload() throws Exception {
+        SchemaModel schemaModel = new SchemaModel();
+        schemaModel.setSchemaInfo(getSchemaInfo());
+        schemaModel.setSchema(mapper.readValue(getModifiedSchema(), Object.class));
+        return gson.toJson(schemaModel);
+    }
+
+    private static SchemaInfo getSchemaInfo() {
+        SchemaInfo schemaInfo = new SchemaInfo();
+        SchemaIdentity schemaIdentity = new SchemaIdentity();
+        schemaIdentity.setAuthority("osdu");
+        schemaIdentity.setSource("kindupdate");
+        schemaIdentity.setEntityType(entityType);
+        schemaIdentity.setSchemaVersionMajor("1");
+        schemaIdentity.setSchemaVersionMinor("0");
+        schemaIdentity.setSchemaVersionPatch("0");
+        schemaInfo.setSchemaIdentity(schemaIdentity);
+        schemaInfo.setStatus(SchemaInfo.SchemaStatus.DEVELOPMENT);
+        return schemaInfo;
+    }
+
+    private static String getInitialSchema() {
+        return "{\n" +
+            "        \"properties\": {\n" +
+            "            \"data\": {\n" +
+            "                \"allOf\": [\n" +
+            "                    {\n" +
+            "                        \"type\": \"object\",\n" +
+            "                        \"properties\": {\n" +
+            "                            \"firstname\": {\n" +
+            "                                \"type\": \"string\"\n" +
+            "                            }\n" +
+            "                        }\n" +
+            "                    }\n" +
+            "                ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }";
+    }
+
+    private static String getModifiedSchema() {
+        return "{\n" +
+            "        \"properties\": {\n" +
+            "            \"data\": {\n" +
+            "                \"allOf\": [\n" +
+            "                    {\n" +
+            "                        \"type\": \"object\",\n" +
+            "                        \"properties\": {\n" +
+            "                            \"firstname\": {\n" +
+            "                                \"type\": \"string\"\n" +
+            "                            },\n" +
+            "                            \"lastname\": {\n" +
+            "                                \"type\": \"string\"\n" +
+            "                            }\n" +
+            "                        }\n" +
+            "                    }\n" +
+            "                ]\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }";
     }
 
     /***
@@ -125,20 +235,23 @@ public class PubsubEndpointIntegrationTest {
      * 			]
      *        },
      * 		"data": {
-     * 			"name": "tian"
+     * 			"firstname": "tian"
      *        }
      *    }
      * ]
      * @param id record id for the record.
-     * @param name part of data field for the record.
-     * @param kind kind or schema id for the record.
+     * @param firstname part of data field for the record.
+     * @param lastname part of data field for the record.
+     * @param kind
      * @param legalTagName legal tag name for the record.
      * @return
      */
-    public static String singleEntityBody(String id, String name, String kind, String legalTagName) {
+    public static String singleEntityBody(String id, String firstname, String lastname, String kind, String legalTagName) {
 
         JsonObject data = new JsonObject();
-        data.addProperty("name", name);
+        data.addProperty("firstname", firstname);
+        if (!Strings.isNullOrEmpty(lastname))
+            data.addProperty("lastname", lastname);
 
         JsonObject acl = new JsonObject();
         JsonArray acls = new JsonArray();
@@ -179,6 +292,22 @@ public class PubsubEndpointIntegrationTest {
         JsonObject requestBody = new JsonObject();
         requestBody.addProperty("kind", KIND);
         String query = String.format("id:\"%s\"",RECORD_ID);
+        requestBody.addProperty("query",query);
+        return requestBody.toString();
+    }
+
+    public static String getSearchQueryRequestBodyQueryWithFirstName(String kind, String name) {
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("kind", kind);
+        String query = String.format("data.firstname:\"%s\"", name);
+        requestBody.addProperty("query",query);
+        return requestBody.toString();
+    }
+
+    public static String getSearchQueryRequestBodyQueryWithLastName(String kind, String name) {
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("kind", kind);
+        String query = String.format("data.lastname:\"%s\"", name);
         requestBody.addProperty("query",query);
         return requestBody.toString();
     }

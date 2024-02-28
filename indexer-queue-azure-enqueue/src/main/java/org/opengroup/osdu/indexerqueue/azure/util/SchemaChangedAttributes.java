@@ -1,4 +1,4 @@
-// Copyright © Microsoft Corporation
+// Copyright © Schlumberger
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,16 @@
 
 package org.opengroup.osdu.indexerqueue.azure.util;
 
-import com.microsoft.azure.servicebus.IMessage;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public interface MessageAttributesExtractor {
-
-    RecordChangedAttributes extracRecordChangedtAttributesFromMessageBody(IMessage message);
-
-    SchemaChangedAttributes extractSchemaChangedAttributesFromMessageBody(IMessage message);
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SchemaChangedAttributes {
+    private String correlationId;
+    private String dataPartitionId;
 }

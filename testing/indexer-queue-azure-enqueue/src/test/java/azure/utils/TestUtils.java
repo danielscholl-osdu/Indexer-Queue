@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import static azure.pubsub.PubsubEndpointIntegrationTest.indentatedBody;
-
 public class TestUtils {
     static Logger log=Logger.getLogger(TestUtils.class.getName());
     protected static String token = null;
@@ -30,8 +28,7 @@ public class TestUtils {
 
     public static final String getAclSuffix() {
         String environment = getEnvironment();
-        //build.gradle currently throws exception if a variable is set to empty or not set at all
-        //workaround by setting it to an "empty" string to construct the url
+
         if (environment.equalsIgnoreCase("empty")) environment = "";
         if (!environment.isEmpty())
             environment = "." + environment;
@@ -47,10 +44,8 @@ public class TestUtils {
         return System.getProperty("DEPLOY_ENV", System.getenv("DEPLOY_ENV"));
     }
 
-    public static String getApiPath(String api) throws Exception {
-        String baseUrl = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
+    public static String getApiPath(String baseUrl, String api) throws Exception {
         URL mergedURL = new URL(baseUrl + api);
-        System.out.println(mergedURL.toString());
         return mergedURL.toString();
     }
 
@@ -65,17 +60,16 @@ public class TestUtils {
         return "Bearer " + token;
     }
 
-    public static ClientResponse send(String path, String httpMethod, Map<String, String> headers, String requestBody,
+    public static ClientResponse send(String baseUrl, String path, String httpMethod, Map<String, String> headers, String requestBody,
                                       String query) throws Exception {
 
-        log(httpMethod, TestUtils.getApiPath(path + query), headers, requestBody);
         ClientResponse response = null;
         Client client = TestUtils.getClient();
         client.setConnectTimeout(300000);
         client.setReadTimeout(300000);
         client.setFollowRedirects(false);
 
-        WebResource webResource = client.resource(TestUtils.getApiPath(path + query));
+        WebResource webResource = client.resource(TestUtils.getApiPath(baseUrl, path + query));
         int count = 1;
         int MaxRetry = 3;
         while (count < MaxRetry) {
@@ -84,84 +78,26 @@ public class TestUtils {
                 WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON)
                   .header("Authorization", token);
                 headers.forEach((k, v) -> builder.header(k, v));
-                //removing Auth header before logging
-                headers.remove("Authorization");
-                log.info(String.format("Request method: %s\nRequest Headers: %s\nRequest Body: %s", httpMethod, headers, indentatedBody(requestBody)));
-                log.info(String.format("Attempt: #%s/%s, CorrelationId: %s", count, MaxRetry, headers.get("correlation-id")));
+                log.info("Method: "+httpMethod);
+                log.info("URI: "+webResource.getURI().toString());
                 response = builder.method(httpMethod, ClientResponse.class, requestBody);
+                log.info("Response code: "+response.getStatus()+", correlation-id: "+response.getHeaders().get("correlation-id"));
                 if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
                     count++;
                     Thread.sleep(5000);
-                    continue;
                 } else {
                     break;
                 }
             } catch (Exception ex) {
-                log.severe("Exception While Making Request: " + ex.getMessage());
+                log.severe("Exception: "+ ex.getMessage() +" while making request to endpoint: " + webResource.getURI().toString());
                 ex.printStackTrace();
                 count++;
                 if (count == MaxRetry) {
                   throw new AssertionError("Error: Send request error", ex);
                 }
-            } finally {
-                //log response
-                if (response != null)
-                  log.info(String.format("This is the response received : %s\nResponse Headers: %s\nResponse Status code: %s", response, response.getHeaders(), response.getStatus()));
             }
         }
         return response;
-    }
-
-    public static ClientResponse send(String url, String path, String httpMethod, Map<String, String> headers,
-                                      String requestBody, String query) throws Exception {
-
-      log(httpMethod, url + path, headers, requestBody);
-      Client client = TestUtils.getClient();
-      ClientResponse response = null;
-      client.setConnectTimeout(300000);
-      client.setReadTimeout(300000);
-      client.setFollowRedirects(false);
-
-      WebResource webResource = client.resource(url + path);
-      int count = 1;
-      int MaxRetry = 3;
-      while (count < MaxRetry) {
-          try {
-            headers.put("correlation-id", headers.getOrDefault("correlation-id", UUID.randomUUID().toString()));
-            WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON)
-              .header("Authorization", token);
-            headers.forEach((k, v) -> builder.header(k, v));
-            //removing Auth header before logging
-            headers.remove("Authorization");
-            log.info(String.format("Http Method: %s\nRequest URL: %s\nRequest Headers: %s\nRequest Body: %s", httpMethod, url, headers, indentatedBody(requestBody)));
-            log.info(String.format("Attempt: #%s/%s, CorrelationId: %s", count, MaxRetry, headers.get("correlation-id")));
-            response = builder.method(httpMethod, ClientResponse.class, requestBody);
-            if (response.getStatusInfo().getFamily().equals(Response.Status.Family.valueOf("SERVER_ERROR"))) {
-              count++;
-              Thread.sleep(5000);
-              continue;
-            } else {
-              break;
-            }
-          } catch (Exception ex) {
-            log.severe("Exception While Making Request: " + ex.getMessage());
-            ex.printStackTrace();
-            count++;
-            if (count == MaxRetry) {
-              throw new AssertionError("Error: Send request error", ex);
-            }
-          } finally {
-              //log response
-              if (response != null)
-                    log.info(String.format("This is the response received : %s\nResponse Headers: %s\nResponse Status code: %s", response, response.getHeaders(), response.getStatus()));
-          }
-      }
-      return response;
-    }
-
-    private static void log(String method, String url, Map<String, String> headers, String body) {
-        log.info(String.format("%s: %s", method, url));
-        log.info(body);
     }
 
     protected static Client getClient() {

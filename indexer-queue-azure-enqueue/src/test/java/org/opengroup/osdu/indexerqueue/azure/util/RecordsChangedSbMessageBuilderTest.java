@@ -12,7 +12,7 @@ import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
-public class SbMessageBuilderTest {
+public class RecordsChangedSbMessageBuilderTest {
     private final String requestBodyInvalidJson = "";
     private final String requestBodyEmpty = "{}";
     private final String requestBodyValid = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
@@ -22,7 +22,7 @@ public class SbMessageBuilderTest {
     private final String messageId = "abc-1";
 
     @InjectMocks
-    private SbMessageBuilder sut;
+    private RecordsChangedSbMessageBuilder sut;
     @Mock
     private ThreadDpsHeaders dpsHeaders;
     @Mock

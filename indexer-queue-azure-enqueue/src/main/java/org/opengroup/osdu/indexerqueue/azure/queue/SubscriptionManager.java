@@ -12,7 +12,8 @@ import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.SchemaChangedSbMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +41,11 @@ public class SubscriptionManager {
     @Autowired
     private RetryUtil retryUtil;
     @Autowired
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Autowired
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
+    @Autowired
+    private SchemaChangedSbMessageBuilder schemaChangedSbMessageBuilder;
     @Autowired
     private AzureBootstrapConfig azureBootstrapConfig;
     @Autowired
@@ -106,9 +109,9 @@ public class SubscriptionManager {
                 continue;
             }
             try {
-                subscribe(executorService, partition, azureBootstrapConfig.getServiceBusTopic(), azureBootstrapConfig.getServiceBusTopicSubscription(), publishTopicName);
-                subscribe(executorService, partition, azureBootstrapConfig.getReindexTopic(), azureBootstrapConfig.getReindexTopicSubscription(), publishTopicName);
-                subscribe(executorService, partition, azureBootstrapConfig.getSchemachangedTopic(), azureBootstrapConfig.getSchemachangedSubscription(), azureBootstrapConfig.getSchemachangedTopic());
+                subscribeRecordsChangedHandler(executorService, partition, azureBootstrapConfig.getServiceBusTopic(), azureBootstrapConfig.getServiceBusTopicSubscription(), publishTopicName);
+                subscribeRecordsChangedHandler(executorService, partition, azureBootstrapConfig.getReindexTopic(), azureBootstrapConfig.getReindexTopicSubscription(), publishTopicName);
+                subscribeSchemaChangedHandler(executorService, partition, azureBootstrapConfig.getSchemachangedTopic(), azureBootstrapConfig.getSchemachangedSubscription(), azureBootstrapConfig.getSchemachangedTopic());
                 partitions.add(partition);
             }
             catch (Exception e) {
@@ -117,11 +120,18 @@ public class SubscriptionManager {
         }
     }
 
-    private void subscribe(ExecutorService executorService, String partition, String topicName, String subscriptionName, String publishTopicName) {
+    private void subscribeRecordsChangedHandler(ExecutorService executorService, String partition, String topicName, String subscriptionName, String publishTopicName) {
         SubscriptionClient subscriptionClient = this.clientFactory.getSubscriptionClient(partition, topicName, subscriptionName);
         MessagePublisher messagePublisher = new TopicMessagePublisher(this.topicClientFactory, retryTemplate,
           partition, publishTopicName);
-        registerMessageHandler(subscriptionClient, messagePublisher, executorService);
+        registerRecordsChangedMessageHandler(subscriptionClient, messagePublisher, executorService);
+    }
+
+    private void subscribeSchemaChangedHandler(ExecutorService executorService, String partition, String topicName, String subscriptionName, String publishTopicName) {
+        SubscriptionClient subscriptionClient = this.clientFactory.getSubscriptionClient(partition, topicName, subscriptionName);
+        MessagePublisher messagePublisher = new TopicMessagePublisher(this.topicClientFactory, retryTemplate,
+            partition, publishTopicName);
+        registerSchemaChangedMessageHandler(subscriptionClient, messagePublisher, executorService);
     }
 
     /*
@@ -131,21 +141,39 @@ public class SubscriptionManager {
      * messageWaitDuration  --> duration to wait for receiving the message.
      * maxConcurrentCalls   --> maximum number of concurrent calls to the onMessage handler. (maximum messages that can be handled at any given point.)
      */
-    private void registerMessageHandler(SubscriptionClient subscriptionClient, MessagePublisher messageSender, ExecutorService executorService) {
+    private void registerRecordsChangedMessageHandler(SubscriptionClient subscriptionClient, MessagePublisher messageSender, ExecutorService executorService) {
         try {
             Integer maxDeliveryCount = Integer.valueOf(azureBootstrapConfig.getMaxDeliveryCount());
             String appName = azureBootstrapConfig.getAppName();
-            MessageHandler messageHandler = new MessageHandler(subscriptionClient,
-                    messageSender, indexUpdateMessageHandler, sbMessageBuilder,
+            RecordChangedMessageHandler recordChangedMessageHandler = new RecordChangedMessageHandler(subscriptionClient,
+                    messageSender, indexUpdateMessageHandler, recordsChangedSbMessageBuilder,
                     metricService, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, maxDeliveryCount, appName);
             subscriptionClient.registerMessageHandler(
-                    messageHandler,
+                recordChangedMessageHandler,
                     new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),
                             false,
                             Duration.ofSeconds(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxLockRenewDurationInSeconds())),
                             Duration.ofSeconds(1)
                     ),
                     executorService);
+
+        } catch (InterruptedException | ServiceBusException e) {
+            logger.debug("Error registering message handler for subscription named - {}\n error - {}", subscriptionClient.getSubscriptionName() ,e);
+        }
+    }
+
+    private void registerSchemaChangedMessageHandler(SubscriptionClient subscriptionClient, MessagePublisher messageSender, ExecutorService executorService) {
+        try {
+            String appName = azureBootstrapConfig.getAppName();
+            SchemaChangedMessageHandler schemaChangedMessageHandler = new SchemaChangedMessageHandler(appName, subscriptionClient, dpsHeaders, mdcContextMap, messageAttributesExtractor, schemaChangedSbMessageBuilder, indexUpdateMessageHandler);
+            subscriptionClient.registerMessageHandler(
+                schemaChangedMessageHandler,
+                new MessageHandlerOptions(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxConcurrentCalls()),
+                    false,
+                    Duration.ofSeconds(Integer.parseUnsignedInt(azureBootstrapConfig.getMaxLockRenewDurationInSeconds())),
+                    Duration.ofSeconds(1)
+                ),
+                executorService);
 
         } catch (InterruptedException | ServiceBusException e) {
             logger.debug("Error registering message handler for subscription named - {}\n error - {}", subscriptionClient.getSubscriptionName() ,e);

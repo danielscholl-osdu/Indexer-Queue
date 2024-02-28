@@ -33,7 +33,7 @@ public class ServiceBusMessageAttributesExtractor implements MessageAttributesEx
 
     private static final String MESSAGE_NODE = "message";
 
-    public RecordChangedAttributes extractAttributesFromMessageBody(IMessage message) {
+    public RecordChangedAttributes extracRecordChangedtAttributesFromMessageBody(IMessage message) {
       String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
       JsonElement messageBodyJsonElement =  JsonParser.parseString(messageBody);
       return ofNullable(getElementAsJsonObject(messageBodyJsonElement))
@@ -47,6 +47,23 @@ public class ServiceBusMessageAttributesExtractor implements MessageAttributesEx
             log.warning("Unable to parse body of message " + messageBody);
             return new RecordChangedAttributes();
         });
+    }
+
+    @Override
+    public SchemaChangedAttributes extractSchemaChangedAttributesFromMessageBody(IMessage message) {
+        String messageBody = new String(message.getMessageBody().getBinaryData().get(0), UTF_8);
+        JsonElement messageBodyJsonElement =  JsonParser.parseString(messageBody);
+        return ofNullable(getElementAsJsonObject(messageBodyJsonElement))
+            .map(jsonObject -> getElementAsJsonObject(jsonObject.get(MESSAGE_NODE)))
+            .map(jsonObject ->
+                SchemaChangedAttributes.builder()
+                    .correlationId(jsonObject.get(CORRELATION_ID).getAsString())
+                    .dataPartitionId(jsonObject.get(DATA_PARTITION_ID).getAsString())
+                    .build()
+            ).orElseGet(() -> {
+                log.warning("Unable to parse body of message " + messageBody);
+                return new SchemaChangedAttributes();
+            });
     }
 
     private JsonObject getElementAsJsonObject(JsonElement jsonElement) {

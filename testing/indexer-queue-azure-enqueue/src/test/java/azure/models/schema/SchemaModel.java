@@ -1,4 +1,4 @@
-// Copyright © Microsoft Corporation
+// Copyright © Schlumberger
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.opengroup.osdu.indexerqueue.azure.util;
+package azure.models.schema;
 
-import com.microsoft.azure.servicebus.IMessage;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface MessageAttributesExtractor {
+import java.util.StringJoiner;
 
-    RecordChangedAttributes extracRecordChangedtAttributesFromMessageBody(IMessage message);
+@Getter
+@Setter
+public class SchemaModel {
 
-    SchemaChangedAttributes extractSchemaChangedAttributesFromMessageBody(IMessage message);
+    private SchemaInfo schemaInfo;
+    private Object schema;
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SchemaModel.class.getSimpleName() + "[", "]")
+            .add("schemaInfo=" + schemaInfo)
+            .add("schema=" + schema)
+            .toString();
+    }
 }

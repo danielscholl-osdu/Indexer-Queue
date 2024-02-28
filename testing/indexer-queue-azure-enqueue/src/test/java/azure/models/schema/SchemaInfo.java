@@ -12,14 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.opengroup.osdu.indexerqueue.azure.queue;
+package azure.models.schema;
 
-import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
-import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface IIndexUpdateMessageHandler {
+import java.util.StringJoiner;
 
-    void sendRecordChangedMessagesToIndexer(RecordChangedMessages recordChangedMessage);
+@Getter
+@Setter
+public class SchemaInfo {
 
-    void sendSchemaChangedMessagesToIndexer(SchemaChangedMessages schemaChangedMessages);
+    private SchemaIdentity schemaIdentity;
+    private SchemaStatus status;
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SchemaInfo.class.getSimpleName() + "[", "]")
+            .add("schemaIdentity=" + schemaIdentity)
+            .add("status=" + status)
+            .toString();
+    }
+
+    public enum SchemaStatus {
+        PUBLISHED, OBSOLETE, DEVELOPMENT
+    }
 }

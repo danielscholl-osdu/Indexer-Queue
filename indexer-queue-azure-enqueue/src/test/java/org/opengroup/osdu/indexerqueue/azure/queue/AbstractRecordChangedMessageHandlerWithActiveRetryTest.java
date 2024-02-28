@@ -31,7 +31,7 @@ import org.opengroup.osdu.indexerqueue.azure.util.RecordChangedAttributes;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AbstractMessageHandlerWithActiveRetryTest {
+public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
 
     private static final String PROPERTY_RETRY = "RETRY";
     private static final String WORKER_NAME = "worker_name";
@@ -79,7 +79,7 @@ public class AbstractMessageHandlerWithActiveRetryTest {
     @Mock
     private MessageAttributesExtractor messageAttributesExtractor;
     @Mock
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Mock
     private IMetricService metricService;
 
@@ -90,14 +90,14 @@ public class AbstractMessageHandlerWithActiveRetryTest {
         messageProperties = new HashMap<>();
         messageHandler = new AbstractMessageHandlerWithActiveRetry(receiveClient,
                 messagePublisher, retryUtil, dpsHeaders, mdcContextMap,
-                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT, sbMessageBuilder, metricService) {
+                messageAttributesExtractor, WORKER_NAME, MAX_DELIVERY_COUNT, recordsChangedSbMessageBuilder, metricService) {
             @Override
             public void processMessage(IMessage message) {
                 testMessageProcessor.doTheProcessing(message);
             }
         };
         when(message.getEnqueuedTimeUtc()).thenReturn(INSTANT);
-        when(messageAttributesExtractor.extractAttributesFromMessageBody(any())).thenReturn(new RecordChangedAttributes());
+        when(messageAttributesExtractor.extracRecordChangedtAttributesFromMessageBody(any())).thenReturn(new RecordChangedAttributes());
     }
 
     @Test

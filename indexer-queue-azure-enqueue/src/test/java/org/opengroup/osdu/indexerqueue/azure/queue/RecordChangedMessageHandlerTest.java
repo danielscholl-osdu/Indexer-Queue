@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -21,16 +21,16 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MessageHandlerTest {
+public class RecordChangedMessageHandlerTest {
 
     private static final String RECORD_INFO_PAYLOAD = "[{\"id\":\"testId\", \"kind\":\"testKind\", \"op\": \"testOp\"}]";
 
     @InjectMocks
-    private MessageHandler sut;
+    private RecordChangedMessageHandler sut;
     @Mock
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
     @Mock
-    private SbMessageBuilder sbMessageBuilder;
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Mock
     private Message message;
 
@@ -40,7 +40,7 @@ public class MessageHandlerTest {
     @BeforeEach
     public void init() throws IOException {
         recordChangedMessages.setData(RECORD_INFO_PAYLOAD);
-        when(sbMessageBuilder.getServiceBusMessage(anyString(), anyString())).thenReturn(recordChangedMessages);
+        when(recordsChangedSbMessageBuilder.getServiceBusMessage(anyString(), anyString())).thenReturn(recordChangedMessages);
         when(message.getEnqueuedTimeUtc()).thenReturn(Instant.now());
         when(message.getMessageId()).thenReturn(EMPTY);
         when(message.getMessageBody()).thenReturn(messageBody);
@@ -52,7 +52,7 @@ public class MessageHandlerTest {
         sut.processMessage(message);
 
         // Verify
-        verify(indexUpdateMessageHandler, times(1)).sendMessagesToIndexer(recordChangedMessages);
+        verify(indexUpdateMessageHandler, times(1)).sendRecordChangedMessagesToIndexer(recordChangedMessages);
         verify(message, times(1)).getMessageId();
         verify(message, times(1)).getMessageBody();
         verify(message, times(1)).getEnqueuedTimeUtc();
@@ -62,7 +62,7 @@ public class MessageHandlerTest {
     public void shouldThrow_whenSendMessagesToIndexerThrows() throws Exception{
         //Setup
         RuntimeException exp = new RuntimeException("httpClientBuilder build failed");
-        doThrow(exp).when(indexUpdateMessageHandler).sendMessagesToIndexer(recordChangedMessages);
+        doThrow(exp).when(indexUpdateMessageHandler).sendRecordChangedMessagesToIndexer(recordChangedMessages);
 
         // Execute
         try {

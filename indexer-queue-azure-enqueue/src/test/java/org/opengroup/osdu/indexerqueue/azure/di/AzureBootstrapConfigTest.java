@@ -52,6 +52,10 @@ class AzureBootstrapConfigTest {
     private String indexerWorkerURL;
 
     @Mock
+    @Value("schema.worker.url")
+    private String schemaWorkerURL;
+
+    @Mock
     @Value("100")
     private Integer sleepDurationForMainThreadInSeconds;
 
@@ -110,6 +114,11 @@ class AzureBootstrapConfigTest {
     @Test
     void shouldReturnSetValue_when_getIndexerWorkerURL_isCalled() {
         assertEquals(sut.getIndexerWorkerURL(), indexerWorkerURL);
+    }
+
+    @Test
+    void shouldReturnSetValue_when_getSchemaWorkerURL_isCalled() {
+        assertEquals(sut.getSchemaWorkerURL(), schemaWorkerURL);
     }
 
     @Test

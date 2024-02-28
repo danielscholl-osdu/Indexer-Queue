@@ -20,7 +20,7 @@ import org.opengroup.osdu.indexerqueue.azure.scope.thread.ThreadScopeContextHold
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
 import org.opengroup.osdu.indexerqueue.azure.util.MessageAttributesExtractor;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
-import org.opengroup.osdu.indexerqueue.azure.util.SbMessageBuilder;
+import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -30,27 +30,27 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /***
  * Defines callback for receiving messages from Azure Service Bus.
  */
-public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
+public class RecordChangedMessageHandler extends AbstractMessageHandlerWithActiveRetry {
 
     private IndexUpdateMessageHandler indexUpdateMessageHandler;
-    private SbMessageBuilder sbMessageBuilder;
-    private Logger logger = LoggerFactory.getLogger(MessageHandler.class.getName());
+    private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
+    private Logger logger = LoggerFactory.getLogger(RecordChangedMessageHandler.class.getName());
     private IMetricService metricService;
 
-    MessageHandler(SubscriptionClient client,
-                   MessagePublisher messagePublisher,
-                   IndexUpdateMessageHandler indexUpdateMessageHandler,
-                   SbMessageBuilder sbMessageBuilder,
-                   IMetricService metricService,
-                   RetryUtil retryUtil,
-                   ThreadDpsHeaders dpsHeaders,
-                   MdcContextMap mdcContextMap,
-                   MessageAttributesExtractor messageAttributesExtractor,
-                   Integer maxDeliveryCount,
-                   String appName) {
-        super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount, sbMessageBuilder, metricService);
+    RecordChangedMessageHandler(SubscriptionClient client,
+                                MessagePublisher messagePublisher,
+                                IndexUpdateMessageHandler indexUpdateMessageHandler,
+                                RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder,
+                                IMetricService metricService,
+                                RetryUtil retryUtil,
+                                ThreadDpsHeaders dpsHeaders,
+                                MdcContextMap mdcContextMap,
+                                MessageAttributesExtractor messageAttributesExtractor,
+                                Integer maxDeliveryCount,
+                                String appName) {
+        super(client, messagePublisher, retryUtil, dpsHeaders, mdcContextMap, messageAttributesExtractor, appName, maxDeliveryCount, recordsChangedSbMessageBuilder, metricService);
         this.indexUpdateMessageHandler = indexUpdateMessageHandler;
-        this.sbMessageBuilder = sbMessageBuilder;
+        this.recordsChangedSbMessageBuilder = recordsChangedSbMessageBuilder;
         this.metricService = metricService;
     }
 
@@ -63,11 +63,11 @@ public class MessageHandler extends AbstractMessageHandlerWithActiveRetry {
         String messageId = message.getMessageId();
 
         try {
-            RecordChangedMessages recordChangedMessage = sbMessageBuilder.getServiceBusMessage(messageBody, messageId);
+            RecordChangedMessages recordChangedMessage = recordsChangedSbMessageBuilder.getServiceBusMessage(messageBody, messageId);
             recordChangedMessage.setPublishTime(message.getEnqueuedTimeUtc().toString());
             recordChangedMessage.setMessageId(messageId);
 
-            indexUpdateMessageHandler.sendMessagesToIndexer(recordChangedMessage);
+            indexUpdateMessageHandler.sendRecordChangedMessagesToIndexer(recordChangedMessage);
         } finally {
             MDC.clear();
             ThreadScopeContextHolder.getContext().clear();
