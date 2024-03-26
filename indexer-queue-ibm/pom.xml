@@ -45,7 +45,7 @@
 	</profiles>
 
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
 		<os-core-lib-ibm.version>0.25.0</os-core-lib-ibm.version>
 		<spring-security-core.version>5.7.11</spring-security-core.version>
 		<jackson-databind.version>2.13.4.2</jackson-databind.version>
