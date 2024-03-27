@@ -28,7 +28,13 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <log4j.version>2.21.0</log4j.version>
         <json-smart.version>2.5.0</json-smart.version>
-        <jackson-databind.version>2.15.2</jackson-databind.version>
+        <jackson.version>2.16.1</jackson.version>
+        <spring-boot.version>3.2.3</spring-boot.version>
+        <spring.version>6.2.2</spring.version>
+        <spring-webmvc.version>6.1.4</spring-webmvc.version>
+        <guava.version>32.1.2-jre</guava.version>
+        <snakeyaml.version>2.0</snakeyaml.version>
+        <os-core-common-spring6.version>0.26.0-rc2</os-core-common-spring6.version>
     </properties>
 
     <licenses>
@@ -87,7 +93,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-dependencies</artifactId>
-            <version>2.1.16.RELEASE</version>
+            <version>${spring-boot.version}</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -115,12 +121,12 @@
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson-databind.version}</version>
+        <version>${jackson.version}</version>
     </dependency>
     <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>6.0.0</version>
     </dependency>
     <dependency>
         <groupId>org.jboss.resteasy</groupId>
@@ -157,7 +163,7 @@
     <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>27.1-jre</version>
+        <version>${guava.version}</version>
     </dependency>
 
 
@@ -225,14 +231,14 @@
         <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>javax.el</groupId>
-        <artifactId>javax.el-api</artifactId>
-        <version>2.2.4</version>
+        <groupId>jakarta.el</groupId>
+        <artifactId>jakarta.el-api</artifactId>
+        <version>5.0.1</version>
     </dependency>
     <dependency>
         <groupId>org.glassfish</groupId>
-        <artifactId>javax.json</artifactId>
-        <version>1.1.4</version>
+        <artifactId>jakarta.json</artifactId>
+        <version>2.0.1</version>
     </dependency>
     <dependency>
         <groupId>com.sun.jersey</groupId>

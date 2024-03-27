@@ -17,7 +17,7 @@ package org.opengroup.osdu.indexerqueue.ibm.subscribe;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -55,13 +55,13 @@ public class Subscriber {
 
 	@Value("${RETRY_COUNT}")
 	private int RETRY_COUNT;
-	
+
 	@Value("${INDEXER_API_KEY}")
 	private String INDEXER_API_KEY;
-	
+
 	/*
-	 * false : Messages will be indexed from Queue 
-	 * true : Messages will be indexed  from TOPIC
+	 * false : Messages will be indexed from Queue
+	 * true : Messages will be indexed from TOPIC
 	 */
 	@Value("${ibm.topic.enable:false}")
 	private String topicFlag;
@@ -75,16 +75,17 @@ public class Subscriber {
 	private Map<String, String> attributes;
 
 	final String INDEXER_API_KEY_HEADER = "x-api-key";
-	 
+
 	@JmsListener(destination = "${ibm.env.prefix}" + "-" + IMessageFactory.DEFAULT_QUEUE_NAME)
 	public void recievedMessage(String msg) throws Exception {
 
 		logger.info("Recieved Message: " + msg);
-		
-		if(topicFlag.equalsIgnoreCase("true")) {
-        	logger.info("Indexing api will not be called or disable flag 'ibm.topic.enable'. Indexing will be happen on messages from Topic");
-        	return;
-        }
+
+		if (topicFlag.equalsIgnoreCase("true")) {
+			logger.info(
+					"Indexing api will not be called or disable flag 'ibm.topic.enable'. Indexing will be happen on messages from Topic");
+			return;
+		}
 
 		RecordChangedMessages recordMessage;
 
@@ -124,7 +125,8 @@ public class Subscriber {
 		HttpRequest rq = HttpRequest.post(recordMessage).url(url).headers(this.dpsHeaders.getHeaders()).build();
 		HttpResponse result = httpClient.send(rq);
 		if (result.hasException()) {
-			// extract exception info from result body and add attribute in recodchangedMessage
+			// extract exception info from result body and add attribute in
+			// recodchangedMessage
 			logger.error(result.getException().getLocalizedMessage(), result.getException());
 			int retryCount = getRetryCount(recordMessage);
 			String responseCode = String.valueOf(result.getResponseCode());
@@ -137,7 +139,8 @@ public class Subscriber {
 			mq.sendMessage(msg);
 			return;
 		} else if (result.getResponseCode() != 200) {
-			// if AppException thrown from os-indexer module then add errorcode and errormessage into attributes
+			// if AppException thrown from os-indexer module then add errorcode and
+			// errormessage into attributes
 			int retryCount = getRetryCount(recordMessage);
 			String responseCode = String.valueOf(result.getResponseCode());
 			logger.error(String.format("Error ResponseCode: %s", responseCode));
