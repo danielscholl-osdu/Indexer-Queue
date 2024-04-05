@@ -38,14 +38,17 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <osdu.corelibazure.version>0.26.0-rc6</osdu.corelibazure.version>
+    <spring-boot.version>3.2.4</spring-boot.version>
+    <spring.version>6.2.3</spring.version>
+    <spring-webmvc.version>6.1.5</spring-webmvc.version>
+    <osdu.corelibazure.version>0.26.0-rc7</osdu.corelibazure.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
     <org-hibernate-validator.version>5.3.6.Final</org-hibernate-validator.version>
     <common-codec.version>1.14</common-codec.version>
     <resteasy.version>3.12.0.Final</resteasy.version>
     <resteasy-validator-provider-11.version>3.6.3.Final</resteasy-validator-provider-11.version>
-    <netty.version>4.1.101.Final</netty.version>
+    <netty.version>4.1.107.Final</netty.version>
   </properties>
 
   <pluginRepositories>
@@ -97,6 +100,11 @@
         <artifactId>hibernate-validator</artifactId>
         <version>${org-hibernate-validator.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.36</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -105,6 +113,12 @@
       <groupId>org.opengroup.osdu</groupId>
       <artifactId>core-lib-azure-spring6</artifactId>
       <version>${osdu.corelibazure.version}</version>
+        <exclusions>
+            <exclusion>
+                <artifactId>commons-logging</artifactId>
+                <groupId>commons-logging</groupId>
+            </exclusion>
+        </exclusions>
     </dependency>
 
     <dependency>

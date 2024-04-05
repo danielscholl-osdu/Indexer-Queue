@@ -45,7 +45,7 @@
         <azure.functions.topicname />
         <azure.functions.subscriptionname />
         <azure.functions.indexerqueuekey />
-        <netty.version>4.1.101.Final</netty.version>
+        <netty.version>4.1.107.Final</netty.version>
         <logback.version>1.4.14</logback.version>
     </properties>
 
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>6.1.4</version>
+            <version>${spring-webmvc.version}</version>
         </dependency>
         <dependency>
           <groupId>org.yaml</groupId>
