@@ -439,7 +439,6 @@ The following software have components provided under the terms of this license:
 - JAX-RS 2.1: The Java(TM) API for RESTful Web Services (from https://repo1.maven.org/maven2/org/jboss/spec/javax/ws/rs/jboss-jaxrs-api_2.1_spec)
 - JBoss Jakarta Annotations API (from <https://github.com/jboss/jboss-jakarta-annotations-api_spec>, https://github.com/jboss/jboss-jakarta-annotations-api_spec)
 - JSR 374 (JSON Processing) Default Provider (from https://javaee.github.io/jsonp)
-- Jakarta Expression Language API (from https://projects.eclipse.org/projects/ee4j.el)
 - JavaMail API (compat) (from https://repo1.maven.org/maven2/javax/mail/mail)
 - tomcat-embed-core (from http://tomcat.apache.org/)
 
@@ -468,7 +467,6 @@ GPL-3.0-only
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- Jakarta Expression Language API (from https://projects.eclipse.org/projects/ee4j.el)
 - json-patch (from https://github.com/fge/json-patch)
 - null (from https://github.com/fge/jackson-coreutils)
 
@@ -582,7 +580,7 @@ The following software have components provided under the terms of this license:
 - mockito-inline (from http://mockito.org, https://github.com/mockito/mockito)
 - mockito-junit-jupiter (from https://github.com/mockito/mockito)
 - msal4j (from https://github.com/AzureAD/microsoft-authentication-library-for-java)
-- msal4j-persistence-extension (from https://github.com/AzureAD/microsoft-authentication-extensions-for-java)
+- msal4j-persistence-extension (from https://github.com/AzureAD/microsoft-authentication-extensions-for-java, https://github.com/AzureAD/microsoft-authentication-library-for-java)
 - qpid-proton-j-extensions (from https://github.com/Azure/qpid-proton-j-extensions)
 
 ========================================================================
