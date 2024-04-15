@@ -42,9 +42,7 @@ phases:
       - mvn -version
       - echo $JAVA_HOME #WHY
       - mkdir -p /root/.m2
-      - cp ./indexer-queue-aws/maven/settings.xml /root/.m2/settings.xml # copy the AWS-specific settings.xml to the CodeBuild instance's .m2 folder
-      - export AWS_ACCOUNT_ID=`aws sts get-caller-identity | grep Account | cut -d':' -f 2 | cut -d'"' -f 2`
-      - export AWS_OSDU_DEV_MAVEN_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_OSDU_DEV_MAVEN_DOMAIN --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text`
+      - cp ./.mvn/community-maven.settings.xml /root/.m2/settings.xml
       # Install git secrets
        #TODO temporarily adding hotfix, due to https://github.com/awslabs/git-secrets/issues/220
       - export SAY_LOCATION=`ln -s "$(which echo)" say`
@@ -75,7 +73,7 @@ phases:
       - if [ "$GIT_SECRETS_SCAN_RESULT" = "FAILED" ]; then echo "Secrets detected!" && exit 1; fi
 
       - echo "Building primary service assemblies..."
-      - mvn -ntp -B test install sonar:sonar -pl .,indexer-queue-aws -Ddeployment.environment=prod -Dsonar.login=${SONAR_USERNAME} -Dsonar.password=${SONAR_PASSWORD} -Dsonar.branch.name=${BRANCH_NAME} 
+      - mvn -ntp -B test install sonar:sonar -pl .,indexer-queue-aws -Ddeployment.environment=prod -Dsonar.login=${SONAR_USERNAME} -Dsonar.password=${SONAR_PASSWORD} -Dsonar.branch.name=${BRANCH_NAME} -Dsonar.host.url=${SONAR_URL}
 
       - sed -i "s|__CONTAINER__|$ECR_IMAGE|"  devops/aws/chart/values.yaml
       - echo "--Copying Helm Charts to ${OUTPUT_DIR:-dist}--"
