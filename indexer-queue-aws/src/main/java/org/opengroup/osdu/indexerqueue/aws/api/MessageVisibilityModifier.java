@@ -47,11 +47,11 @@ public class MessageVisibilityModifier extends MessageHandler<ChangeMessageVisib
         }
         // max receive count to 10 in SQS setting
         switch (receiveCount) {
-            case 0: case 1: case 2: return 5;
-            case 3: case 4: return 10;
-            case 5: case 6: return 30;
-            case 7: case 8: return 60;
-            case 9: case 10: return 90;
+            case 0, 1, 2: return 5;
+            case 3, 4: return 10;
+            case 5, 6: return 30;
+            case 7, 8: return 60;
+            case 9, 10: return 90;
             default: return 120;
         }
     }

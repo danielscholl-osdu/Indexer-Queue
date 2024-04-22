@@ -24,18 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
 public class IndexerQueueService implements AutoCloseable {
 
     private static final JaxRsDpsLog logger = LogProvider.getLogger();
-    private final String targetURL;
     private final BlockingQueue<Message> receivedMessages;
     private final BlockingQueue<Message> deleteMessages;
     private final BlockingQueue<Message> changeVisibilityMessages;
@@ -47,12 +44,13 @@ public class IndexerQueueService implements AutoCloseable {
     private final Future<?> deleteFuture;
     private final Future<?> visibilityFuture;
     private final List<Future<?>> workerFutures;
-    
+    private final EnvironmentVariables variables;
+
     public IndexerQueueService(EnvironmentVariables variables, Supplier<AmazonSQS> sqsSupplier) {
         int maxMessages = variables.getMaxAllowedMessages();
         int maxThreads = variables.getMaxIndexThreads();
         int maxBatchThreads = variables.getMaxBatchRequestCount();
-        targetURL = variables.getTargetURL();
+        this.variables = variables;
         receivedMessages = new ArrayBlockingQueue<>(maxMessages * 2);
         deleteMessages = new ArrayBlockingQueue<>(maxMessages);
         retryMessages = new ArrayBlockingQueue<>(maxMessages);
@@ -71,7 +69,7 @@ public class IndexerQueueService implements AutoCloseable {
     }
 
     private WorkerThread generateNewWorker() {
-        return new WorkerThread(receivedMessages, retryMessages, deleteMessages, changeVisibilityMessages, workerExecutor, targetURL);
+        return new WorkerThread(receivedMessages, retryMessages, deleteMessages, changeVisibilityMessages, workerExecutor, variables);
     }
 
     public int getNumMessages() {
@@ -96,7 +94,7 @@ public class IndexerQueueService implements AutoCloseable {
         return false;
     }
 
-    public boolean isUnhealthy() throws InterruptedException {
+    public boolean isUnhealthy() {
         int numFailedWorkers = 0;
         for (int i = 0; i < workerFutures.size(); i++) {
             if (isWorkerDone(workerFutures.get(i), String.format("Worker thread %d is done", i))) {

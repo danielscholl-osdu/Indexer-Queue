@@ -80,7 +80,7 @@ public class IndexerQueueServiceTest {
         });
 
         workerThreadMockedConstruction = Mockito.mockConstruction(WorkerThread.class, (mock, context) -> {
-            assertEquals(TARGET_URL, context.arguments().get(5));
+            assertEquals(environmentVariables, context.arguments().get(5));
         });
 
         when(environmentVariables.getDeadLetterQueueUrl()).thenReturn(DEAD_LETTER_QUEUE_URL);

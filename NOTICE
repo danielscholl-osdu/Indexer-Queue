@@ -16,7 +16,7 @@ The following software have components provided under the terms of this license:
 - Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Java SDK Web Module (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
+- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Proton-J (from https://repo1.maven.org/maven2/org/apache/qpid/proton-j)
 
 ========================================================================
@@ -176,7 +176,7 @@ The following software have components provided under the terms of this license:
 - OpenTelemetry Java (from https://github.com/open-telemetry/opentelemetry-java)
 - OpenTelemetry Semantic Conventions Java (from https://github.com/open-telemetry/semantic-conventions-java)
 - Plexus :: Component Annotations (deprecated) (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-component-annotations)
-- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
+- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Plexus Compiler Api (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-api)
 - Plexus Javac Component (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-compiler-javac)
 - Plexus Languages :: Java (from https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-java)
@@ -273,7 +273,7 @@ The following software have components provided under the terms of this license:
 - Jodd BeanUtil (from http://jodd.org)
 - Jodd Core (from http://jodd.org)
 - LatencyUtils (from http://latencyutils.github.io/LatencyUtils/)
-- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
+- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Stax2 API (from http://github.com/FasterXML/stax2-api)
 
 ========================================================================
@@ -302,7 +302,7 @@ The following software have components provided under the terms of this license:
 - Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
 - Netty/Codec/HTTP (from https://repo1.maven.org/maven2/io/netty/netty-codec-http)
-- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
+- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Redisson (from http://redisson.org)
 - Spring Core (from http://www.springframework.org, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-core)
 
@@ -649,4 +649,4 @@ xpp
 ========================================================================
 The following software have components provided under the terms of this license:
 
-- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
+- Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)

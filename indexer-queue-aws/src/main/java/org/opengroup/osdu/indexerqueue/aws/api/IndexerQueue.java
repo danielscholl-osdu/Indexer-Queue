@@ -72,7 +72,7 @@ public class IndexerQueue {
                         List<Message> retrievedMessages = sqsClient.receiveMessage(receiveMessageRequest).getMessages();
                         service.putMessages(retrievedMessages);
                     } else {
-                        Thread.sleep(10000);
+                        Thread.sleep(environmentVariables.getFullWorkerWaitTime());
                     }
                     
                     if (service.isUnhealthy()) {
