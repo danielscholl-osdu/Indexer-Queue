@@ -44,6 +44,9 @@ public class EnvironmentVariablesTest {
             assertNotEquals(0, instance.getMaxWaitTime());
             assertNotEquals(0, instance.getMaxIndexThreads());
             assertNotEquals(0, instance.getMaxBatchRequestCount());
+            assertNotEquals(0, instance.getFullWorkerWaitTime());
+            assertNotEquals(0, instance.getMaxIndexTime());
+            assertNotEquals(0, instance.getMaxWorkerThreadWaitTime());
         } catch (Exception error) {
             e = error;
         }

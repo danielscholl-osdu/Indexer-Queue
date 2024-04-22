@@ -22,7 +22,6 @@ import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
 public class EnvironmentVariables {
     private final String region;
     private final String queueUrl;
@@ -31,7 +30,10 @@ public class EnvironmentVariables {
     private final int maxAllowedMessages;
     private final int maxIndexThreads;
     private final int maxWaitTime;
+    private final int fullWorkerWaitTime;
     private final int maxBatchRequestCount;
+    private final int maxIndexTime;
+    private final int maxWorkerThreadWaitTime;
     private final Properties appProperties;
     private static final JaxRsDpsLog logger = LogProvider.getLogger();
 
@@ -50,9 +52,19 @@ public class EnvironmentVariables {
             logger.error("Could not load properties file.", e);
         }
         this.maxAllowedMessages = getPropertyOrDefault("MAX_RETRIEVED_MESSAGES", 10);
-        this.maxIndexThreads = getPropertyOrDefault("MAX_INDEX_THREADS", 50);
+        this.maxIndexThreads = getPropertyOrDefault("MAX_INDEX_THREADS", 1000);
         this.maxWaitTime = getPropertyOrDefault("MAX_WAIT_TIME", 10);
         this.maxBatchRequestCount = getPropertyOrDefault("MAX_DELETED_MESSAGES", 10);
+        this.fullWorkerWaitTime = getPropertyOrDefault("FULL_WORKER_WAIT_TIME", 10);
+        this.maxIndexTime = getPropertyOrDefault("MAX_INDEX_TIME", 60);
+        this.maxWorkerThreadWaitTime = getPropertyOrDefault("MAX_WORKER_WAIT_TIME", 10);
+        logger.info(String.format("Max retrieved messages: %s", this.maxAllowedMessages));
+        logger.info(String.format("Max indexing threads: %s", this.maxIndexThreads));
+        logger.info(String.format("Max time to wait when polling the SQS queue: %s", this.maxWaitTime));
+        logger.info(String.format("Max deleted messages: %s", this.maxBatchRequestCount));
+        logger.info(String.format("Wait time (in milliseconds) when internal buffer is full: %s", this.fullWorkerWaitTime));
+        logger.info(String.format("Max indexing time allowed: %s", this.maxIndexTime));
+        logger.info(String.format("Max worker thread waiting time: %s", this.maxWorkerThreadWaitTime));
     }
 
     private int getPropertyOrDefault(String property, int defaultValue) {
@@ -103,5 +115,17 @@ public class EnvironmentVariables {
 
     public int getMaxWaitTime() {
         return this.maxWaitTime;
+    }
+
+    public int getFullWorkerWaitTime() {
+        return this.fullWorkerWaitTime;
+    }
+
+    public int getMaxIndexTime() {
+        return this.maxIndexTime;
+    }
+
+    public int getMaxWorkerThreadWaitTime() {
+        return this.maxWorkerThreadWaitTime;
     }
 }

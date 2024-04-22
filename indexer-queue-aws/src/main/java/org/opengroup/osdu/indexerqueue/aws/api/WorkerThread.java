@@ -20,6 +20,7 @@ import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -39,13 +40,11 @@ public class WorkerThread implements Runnable {
     private final int maxWaitForMessage;
     private final int maxWaitForProcessing;
     private static final JaxRsDpsLog logger = LogProvider.getLogger();
-    private static final int MAX_WAIT_FOR_MESSAGE_MILLIS = 10000;
-    private static final int MAX_WAIT_FOR_PROCESSING = 30000;
     static final String REINDEX_URL_PATH = "api/indexer/v2/reindex?force_clean=false";
     static final String NEWINDEX_URL_PATH = "api/indexer/v2/_dps/task-handlers/index-worker";
     public WorkerThread(BlockingQueue<Message> incomingMessages, BlockingQueue<Message> retryMessages, BlockingQueue<Message> deleteMessage, BlockingQueue<Message> changeVisibilityMessage,
-                        ExecutorService workerPool, String targetURL) {
-        this(incomingMessages, retryMessages, deleteMessage, changeVisibilityMessage, workerPool, targetURL, MAX_WAIT_FOR_MESSAGE_MILLIS, MAX_WAIT_FOR_PROCESSING);
+                        ExecutorService workerPool, EnvironmentVariables environmentVariables) {
+        this(incomingMessages, retryMessages, deleteMessage, changeVisibilityMessage, workerPool, environmentVariables.getTargetURL(), environmentVariables.getMaxWorkerThreadWaitTime(), environmentVariables.getMaxIndexTime());
     }
     public WorkerThread(BlockingQueue<Message> incomingMessages, BlockingQueue<Message> retryMessages, BlockingQueue<Message> deleteMessage, BlockingQueue<Message> changeVisibilityMessage,
                         ExecutorService workerPool, String targetURL, int maxWaitForMessage, int maxWaitForProcessing) {
@@ -61,6 +60,7 @@ public class WorkerThread implements Runnable {
     }
 
     private void processMessage(Message incomingMessage) throws InterruptedException {
+        long startTime = Instant.now().toEpochMilli();
         Map<String, MessageAttributeValue> attributes = incomingMessage.getMessageAttributes();
         MessageAttributeValue authorization = attributes.get("authorization");
         if (authorization == null) {
@@ -81,17 +81,18 @@ public class WorkerThread implements Runnable {
         CallableResult result;
         try {
             Future<IndexProcessor> future = workerPool.submit(processor);
-            processor = future.get(this.maxWaitForProcessing, TimeUnit.MILLISECONDS);
+            processor = future.get(this.maxWaitForProcessing, TimeUnit.SECONDS);
             result = processor.getResult();
         } catch (TimeoutException | ExecutionException e) {
             result = CallableResult.FAIL;
         }
 
+        double timeDelta = (Instant.now().toEpochMilli() - startTime) / 1000.0;
         if (result == CallableResult.PASS) {
-            logger.info(String.format("Message %s processed successfully.", processor.getMessageId()));
+            logger.info(String.format("Message %s processed successfully after %.3f seconds.", processor.getMessageId(), timeDelta));
             deleteMessage.put(incomingMessage);
         } else {
-            logger.info(String.format("Message %s could not be processed. Setting timeout and waiting.", processor.getMessageId()));
+            logger.info(String.format("Message %s could not be processed after %.3f seconds. Setting timeout and waiting.", processor.getMessageId(), timeDelta));
             changeVisibilityMessage.put(incomingMessage);
         }
     }
@@ -101,9 +102,14 @@ public class WorkerThread implements Runnable {
         boolean shouldLoop = true;
         while (shouldLoop) {
             try {
-                Message message = incomingMessages.poll(this.maxWaitForMessage, TimeUnit.MILLISECONDS);
+                long waitStart = Instant.now().toEpochMilli();
+                Message message = incomingMessages.poll(this.maxWaitForMessage, TimeUnit.SECONDS);
+                double timeDelta = (Instant.now().toEpochMilli() - waitStart) / 1000.0;
                 if (message != null) {
+                    logger.debug(String.format("Waited %.3f seconds to get the message.", timeDelta));
                     processMessage(message);
+                } else {
+                    logger.debug(String.format("Timed out waiting for message. Timed out after %.3f seconds.", timeDelta));
                 }
             } catch (InterruptedException e) {
                 logger.error("Unknown error occured when trying to delete messages.", e);
