@@ -38,17 +38,8 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <spring-boot.version>3.2.4</spring-boot.version>
-    <spring.version>6.2.3</spring.version>
-    <spring-webmvc.version>6.1.5</spring-webmvc.version>
-    <osdu.corelibazure.version>0.26.0</osdu.corelibazure.version>
+    <core-lib-azure-spring6.version>0.27.0-rc2</core-lib-azure-spring6.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
-    <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
-    <org-hibernate-validator.version>5.3.6.Final</org-hibernate-validator.version>
-    <common-codec.version>1.14</common-codec.version>
-    <resteasy.version>3.12.0.Final</resteasy.version>
-    <resteasy-validator-provider-11.version>3.6.3.Final</resteasy-validator-provider-11.version>
-    <netty.version>4.1.107.Final</netty.version>
   </properties>
 
   <pluginRepositories>
@@ -67,39 +58,20 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- netty-bom dependency to be declared before spring-boot-dependencies,
-      to pull all netty-transitive dependencies with same version -->
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-bom</artifactId>
-        <version>${netty.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.opengroup.osdu</groupId>
-        <artifactId>core-lib-azure-spring6</artifactId>
-        <version>${osdu.corelibazure.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
       <dependency>
         <groupId>org.opengroup.osdu</groupId>
         <artifactId>os-core-common-spring6</artifactId>
         <version>${os-core-common-spring6.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-validator</artifactId>
-        <version>${org-hibernate-validator.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>org.opengroup.osdu</groupId>
+            <artifactId>core-lib-azure-spring6</artifactId>
+            <version>${core-lib-azure-spring6.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
@@ -112,15 +84,8 @@
     <dependency>
       <groupId>org.opengroup.osdu</groupId>
       <artifactId>core-lib-azure-spring6</artifactId>
-      <version>${osdu.corelibazure.version}</version>
-        <exclusions>
-            <exclusion>
-                <artifactId>commons-logging</artifactId>
-                <groupId>commons-logging</groupId>
-            </exclusion>
-        </exclusions>
+      <version>${core-lib-azure-spring6.version}</version>
     </dependency>
-
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>azure-active-directory-spring-boot-starter</artifactId>
@@ -129,10 +94,6 @@
         <exclusion>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
         </exclusion>
           <exclusion>
               <artifactId>msal4j</artifactId>
@@ -150,12 +111,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${spring-webmvc.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
@@ -166,24 +121,6 @@
       <groupId>org.springframework.retry</groupId>
       <artifactId>spring-retry</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-codec</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hibernate.validator</groupId>
-      <artifactId>hibernate-validator</artifactId>
-      <version>${hibernate-validator.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jboss.logging</groupId>
-          <artifactId>jboss-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
@@ -195,13 +132,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>${common-codec.version}</version>
-    </dependency>
-
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
