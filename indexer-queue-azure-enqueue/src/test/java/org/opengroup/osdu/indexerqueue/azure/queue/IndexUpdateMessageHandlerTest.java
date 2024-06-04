@@ -34,7 +34,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockConstruction;
@@ -96,15 +95,13 @@ public class IndexUpdateMessageHandlerTest {
         when(httpClientBuilder.build()).thenThrow(exp);
         try {
             sut.sendRecordChangedMessagesToIndexer(recordChangedMessages);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             assertEquals("httpClientBuilder build failed", e.getMessage());
         }
 
         try {
             sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             assertEquals("httpClientBuilder build failed", e.getMessage());
         }
     }
@@ -141,14 +138,14 @@ public class IndexUpdateMessageHandlerTest {
         when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
         when(azureBootstrapConfig.getSchemaWorkerURL()).thenReturn(schemaWorkerUrl);
         when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
-        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),200,"success");
+        StatusLine status = new BasicStatusLine(new ProtocolVersion("http", 1, 1), 200, "success");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
         sut.sendRecordChangedMessagesToIndexer(recordChangedMessages);
         sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
 
-        assertEquals(httpMock.constructed().size(),2);
-        verify(httpClient,times(2)).execute(any());
+        assertEquals(httpMock.constructed().size(), 2);
+        verify(httpClient, times(2)).execute(any());
         verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
         verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
         verify(serviceAccountJwtClient, times(2)).getIdToken(any());
@@ -175,8 +172,8 @@ public class IndexUpdateMessageHandlerTest {
         try {
             sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
         } catch (IndexerRetryException e) {
-            assertEquals(httpMock.constructed().size(),2);
-            verify(httpClient,times(2)).execute(any());
+            assertEquals(httpMock.constructed().size(), 2);
+            verify(httpClient, times(2)).execute(any());
             verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
         } catch (Exception e) {
             fail("Should only throw IndexerRetryException");
@@ -188,7 +185,7 @@ public class IndexUpdateMessageHandlerTest {
         when(httpClientBuilder.build()).thenReturn(httpClient);
         when(azureBootstrapConfig.getIndexerWorkerURL()).thenReturn(indexerWorkerUrl);
         when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
-        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1), RequestStatus.NO_RETRY,"error");
+        StatusLine status = new BasicStatusLine(new ProtocolVersion("http", 1, 1), RequestStatus.NO_RETRY, "error");
         when(httpResponse.getStatusLine()).thenReturn(status);
 
         assertThrows(IndexerNoRetryException.class, () -> sut.sendRecordChangedMessagesToIndexer(recordChangedMessages));
@@ -200,13 +197,13 @@ public class IndexUpdateMessageHandlerTest {
         when(httpClientBuilder.build()).thenReturn(httpClient);
         when(azureBootstrapConfig.getSchemaWorkerURL()).thenReturn(schemaWorkerUrl);
         when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
-        StatusLine status = new BasicStatusLine(new ProtocolVersion("http",1,1),500,"error");
+        StatusLine status = new BasicStatusLine(new ProtocolVersion("http", 1, 1), 500, "error");
         when(httpResponse.getStatusLine()).thenReturn(status);
         try {
             sut.sendSchemaChangedMessagesToIndexer(schemaChangedMessages);
         } catch (IndexerNoRetryException e) {
-            assertEquals(httpMock.constructed().size(),1);
-            verify(httpClient,times(1)).execute(any());
+            assertEquals(httpMock.constructed().size(), 1);
+            verify(httpClient, times(1)).execute(any());
             verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
             verify(serviceAccountJwtClient, times(1)).getIdToken(any());
         } catch (Exception e) {
