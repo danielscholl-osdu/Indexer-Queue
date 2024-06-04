@@ -208,6 +208,7 @@ public class IndexUpdateMessageHandlerTest {
             assertEquals(httpMock.constructed().size(),1);
             verify(httpClient,times(1)).execute(any());
             verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
+            verify(serviceAccountJwtClient, times(1)).getIdToken(any());
         } catch (Exception e) {
             fail("Should only throw IndexerNoRetryException");
         }

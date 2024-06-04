@@ -107,6 +107,7 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
 
           Map<String, String> att = schemaChangedMessages.getAttributes();
 
+          schemaWorkerRequest.setHeader(DpsHeaders.AUTHORIZATION, this.serviceAccountJwtClient.getIdToken(att.get(DpsHeaders.DATA_PARTITION_ID)));
           schemaWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
           schemaWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
 
