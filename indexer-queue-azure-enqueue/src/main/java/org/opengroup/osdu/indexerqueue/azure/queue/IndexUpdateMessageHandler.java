@@ -24,6 +24,7 @@ import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.RequestStatus;
 import org.opengroup.osdu.core.common.model.indexer.SchemaChangedMessages;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
+import org.opengroup.osdu.core.common.util.IServiceAccountJwtClient;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerRetryException;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static org.opengroup.osdu.core.common.model.http.DpsHeaders.AUTHORIZATION;
 
 /***
  * A class to send recordChangedMessages to indexer-service.
@@ -47,6 +49,8 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
 
   @Autowired
   private AzureBootstrapConfig azureBootstrapConfig;
+  @Autowired
+  private IServiceAccountJwtClient serviceAccountJwtClient;
 
   private final Gson gson = new Gson();
   private HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
@@ -68,6 +72,7 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
 
       Map<String, String> att = recordChangedMessage.getAttributes();
 
+      indexWorkerRequest.setHeader(DpsHeaders.AUTHORIZATION, this.serviceAccountJwtClient.getIdToken(att.get(DpsHeaders.DATA_PARTITION_ID)));
       indexWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
       indexWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
 
@@ -102,6 +107,7 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
 
           Map<String, String> att = schemaChangedMessages.getAttributes();
 
+          schemaWorkerRequest.setHeader(DpsHeaders.AUTHORIZATION, this.serviceAccountJwtClient.getIdToken(att.get(DpsHeaders.DATA_PARTITION_ID)));
           schemaWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
           schemaWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
 
