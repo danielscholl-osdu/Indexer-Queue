@@ -14,23 +14,23 @@
 
 package org.opengroup.osdu.indexerqueue.azure.util;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opengroup.osdu.azure.util.AzureServicePrincipleTokenService;
-
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ServiceAccountJwtClientImplTest {
 
     private String partitionId = "opendes";
     private static String authorizationToken = "Bearer authorizationToken";
+    private static String token = "token";
 
     @Mock
     private AzureServicePrincipleTokenService tokenService;
@@ -47,4 +47,15 @@ public class ServiceAccountJwtClientImplTest {
         verify(tokenService, times(1)).getAuthorizationToken();
         assertEquals(authorizationToken, authToken);
     }
+
+    @Test
+    public void should_prefixBearer_whenTokenDoesNotStartWithBearer() {
+        when(tokenService.getAuthorizationToken()).thenReturn(token);
+
+        String authToken = sut.getIdToken(partitionId);
+
+        verify(tokenService, times(1)).getAuthorizationToken();
+        assertEquals("Bearer " + token, authToken);
+    }
+
 }

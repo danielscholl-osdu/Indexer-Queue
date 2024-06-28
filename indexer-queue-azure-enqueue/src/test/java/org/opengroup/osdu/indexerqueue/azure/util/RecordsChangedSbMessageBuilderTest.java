@@ -10,6 +10,7 @@ import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import java.io.IOException;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class RecordsChangedSbMessageBuilderTest {
@@ -20,6 +21,8 @@ public class RecordsChangedSbMessageBuilderTest {
     private final String requestBodyMissingCorrelationId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\"}}";
     private final String requestBodyMissingTenantId = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}}";
     private final String messageId = "abc-1";
+    private final String requestBodyValidWithAncestryKinds = "{\"message\":{\"data\":[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\",\"ancestry_kinds\":\"ancestry_kind\"}}";
+    private final String ancestry_kind = "ancestry_kind";
 
     @InjectMocks
     private RecordsChangedSbMessageBuilder sut;
@@ -81,4 +84,23 @@ public class RecordsChangedSbMessageBuilderTest {
         Assertions.assertNotNull(recordChangedMessages.getData());
         Assertions.assertEquals(expectedData, recordChangedMessages.getData());
     }
+
+    @Test
+    public void shouldIncludeAncestryKindsInAttributes_WhenPresent() throws IOException {
+        String expectedCorrelationId = "ee85038e-4510-49d9-b2ec-3651315a4d00";
+        String expectedDataPartitionId = "common";
+        String expectedData = "[{\"id\":\"common:welldb:raj21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}]";
+
+        RecordChangedMessages recordChangedMessages = sut.getServiceBusMessage(requestBodyValidWithAncestryKinds, messageId);
+
+        Assertions.assertEquals(expectedCorrelationId, recordChangedMessages.getCorrelationId());
+        Assertions.assertEquals(expectedDataPartitionId, recordChangedMessages.getDataPartitionId());
+        Assertions.assertNotNull(recordChangedMessages.getData());
+        Assertions.assertEquals(expectedData, recordChangedMessages.getData());
+
+        Map<String, String> attributesMap = recordChangedMessages.getAttributes();
+        Assertions.assertTrue(attributesMap.containsKey("ancestry_kinds"));
+        Assertions.assertEquals(ancestry_kind, attributesMap.get("ancestry_kinds"));
+    }
+
 }

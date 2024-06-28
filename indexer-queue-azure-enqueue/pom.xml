@@ -240,7 +240,15 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.10</version>
+        <version>0.8.11</version>
+          <configuration>
+              <excludes>
+                  <exclude>org/opengroup/osdu/indexerqueue/azure/security/**</exclude>
+                  <exclude>org/opengroup/osdu/indexerqueue/azure/config/AzureConfig**</exclude>
+                  <exclude>org/opengroup/osdu/indexerqueue/azure/config/RetryConfig**</exclude>
+                  <exclude>org/opengroup/osdu/indexerqueue/azure/IndexerQueueAzureApplication.class</exclude>
+              </excludes>
+          </configuration>
         <executions>
           <execution>
             <goals>
