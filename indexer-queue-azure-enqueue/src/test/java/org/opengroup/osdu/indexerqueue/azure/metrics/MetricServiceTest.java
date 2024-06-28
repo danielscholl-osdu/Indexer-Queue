@@ -16,25 +16,26 @@ package org.opengroup.osdu.indexerqueue.azure.metrics;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.telemetry.MetricTelemetry;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MetricServiceTest {
 
     @Mock
     private TelemetryClient telemetryClient;
+
     @InjectMocks
     private MetricServiceImpl sut;
+
+    private static final String metricName = "[Indexer service] Record indexing latency";
 
     @Test
     public void shouldSendHitsMetricSuccessfully() {
@@ -50,5 +51,11 @@ public class MetricServiceTest {
         assertEquals("opendes", metricCaptor.getValue().getProperties().get("data-partition-id"));
         assertEquals("records-changed", metricCaptor.getValue().getProperties().get("topic"));
         verify(telemetryClient, times(1)).flush();
+    }
+
+    @Test
+    public void shouldReturnCorrectLatencyMetricName() {
+        String latencyMetricName = sut.getLatencyMetricName();
+        assertEquals(metricName, latencyMetricName);
     }
 }

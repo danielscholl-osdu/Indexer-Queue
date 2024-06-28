@@ -17,12 +17,14 @@ package org.opengroup.osdu.indexerqueue.azure.queue;
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.MessageBody;
 import com.microsoft.azure.servicebus.SubscriptionClient;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.indexerqueue.azure.config.ThreadDpsHeaders;
 import org.opengroup.osdu.indexerqueue.azure.metrics.IMetricService;
 import org.opengroup.osdu.indexerqueue.azure.util.MdcContextMap;
@@ -32,12 +34,11 @@ import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFou
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.util.RetryUtil;
 import org.opengroup.osdu.indexerqueue.azure.util.RecordsChangedSbMessageBuilder;
-
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNull;
@@ -45,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
 
     private static final String PROPERTY_RETRY = "RETRY";
@@ -54,6 +56,9 @@ public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
     private static final Instant INSTANT = Instant.now();
     private static final String TEST_MESSAGE_BODY = "testMessageBody";
     private Map<String, Object> messageProperties;
+    private static final String data_partition_id = "test-data-partition-id";
+    private static final String correlation_id = "test_correlation_id";
+    private static final String topic_name = "test-topic-name";
 
     @Mock
     private SubscriptionClient receiveClient;
@@ -82,6 +87,8 @@ public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
     private RecordsChangedSbMessageBuilder recordsChangedSbMessageBuilder;
     @Mock
     private IMetricService metricService;
+    @Mock
+    private RecordChangedMessages recordChangedMessages;
 
     private AbstractMessageHandlerWithActiveRetry messageHandler;
 
@@ -205,6 +212,32 @@ public class AbstractRecordChangedMessageHandlerWithActiveRetryTest {
     verifyNoInteractions(messagePublisher);
 
   }
+
+    @Test
+    public void shouldNot_captureMetrics_forNullRecordChangedMessage() throws Exception {
+        Method captureMetrics = AbstractMessageHandlerWithActiveRetry.class.getDeclaredMethod("captureMetrics", RecordChangedMessages.class, String.class, long.class, long.class, boolean.class);
+        captureMetrics.setAccessible(true);
+
+        captureMetrics.invoke(messageHandler, null, topic_name, INSTANT.toEpochMilli(), INSTANT.plusSeconds(1).toEpochMilli(), true);
+
+        verifyNoInteractions(metricService);
+    }
+
+    @Test
+    public void should_handleException_duringCaptureMetrics() throws Exception {
+        Method captureMetrics = AbstractMessageHandlerWithActiveRetry.class.getDeclaredMethod("captureMetrics", RecordChangedMessages.class, String.class, long.class, long.class, boolean.class);
+        captureMetrics.setAccessible(true);
+        when(recordChangedMessages.getData()).thenReturn("[{\"recordId\": \"123\"}]");
+        when(recordChangedMessages.getDataPartitionId()).thenReturn(data_partition_id);
+        when(recordChangedMessages.getCorrelationId()).thenReturn(correlation_id);
+        doThrow(new RuntimeException("test exception"))
+            .when(metricService)
+            .sendIndexLatencyMetric(anyDouble(), anyString(), anyString(), anyString(), anyBoolean());
+
+        captureMetrics.invoke(messageHandler, recordChangedMessages, topic_name, INSTANT.toEpochMilli(), INSTANT.plusSeconds(1).toEpochMilli(), true);
+
+        verify(metricService, times(1)).sendIndexLatencyMetric(anyDouble(), eq(topic_name), eq(data_partition_id), eq(correlation_id), eq(true));
+    }
 
     private void setupMessagesStubsForFailureCases() {
         when(messageBody.getBinaryData()).thenReturn(singletonList(TEST_MESSAGE_BODY.getBytes(UTF_8)));

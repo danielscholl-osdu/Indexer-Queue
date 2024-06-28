@@ -1,11 +1,8 @@
 package org.opengroup.osdu.indexerqueue.azure.di;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,11 +60,28 @@ class AzureBootstrapConfigTest {
     @Value("IndexerQueue")
     private String appName;
 
+    @Mock
+    @Value("azure.reindex.topic-name")
+    private String reindexTopic;
+
+    @Mock
+    @Value("azure.reindex.topic-subscription")
+    private String reindexTopicSubscription;
+
+    @Mock
+    @Value("azure.schemachanged.topic-name")
+    private String schemachangedTopic;
+
+    @Mock
+    @Value("azure.schemachanged.topic-subscription")
+    private String schemachangedSubscription;
+
     @InjectMocks
     AzureBootstrapConfig sut = new AzureBootstrapConfig();
 
     @Test
     void shouldReturnSetValue_when_getKeyVaultURL_isCalled() {
+        assertEquals(keyVaultURL, sut.getKeyVaultURL());
         assertEquals(keyVaultURL, sut.keyVaultURL());
     }
 
@@ -130,4 +144,25 @@ class AzureBootstrapConfigTest {
     void shouldReturnSetValue_when_getAppName_isCalled() {
         assertEquals(sut.getAppName(), appName);
     }
+
+    @Test
+    void shouldReturnSetValue_when_getReindexTopic_isCalled() {
+        assertEquals(sut.getReindexTopic(), reindexTopic);
+    }
+
+    @Test
+    void shouldReturnSetValue_when_getReindexTopicSubscription_isCalled() {
+        assertEquals(sut.getReindexTopicSubscription(), reindexTopicSubscription);
+    }
+
+    @Test
+    void shouldReturnSetValue_when_getSchemachangedTopic_isCalled() {
+        assertEquals(sut.getSchemachangedTopic(), schemachangedTopic);
+    }
+
+    @Test
+    void shouldReturnSetValue_when_getSchemachangedSubscription_isCalled() {
+        assertEquals(sut.getSchemachangedSubscription(), schemachangedSubscription);
+    }
+
 }
