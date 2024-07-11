@@ -28,8 +28,9 @@
         <log4j.version>2.21.0</log4j.version>
         <json-smart.version>2.5.0</json-smart.version>
         <jackson.version>2.16.1</jackson.version>
-        <spring-boot.version>3.2.5</spring-boot.version>
-        <spring.version>6.2.2</spring.version>
+        <spring-boot.version>3.3.1</spring-boot.version>
+        <spring-security.version>6.3.1</spring-security.version>
+        <spring-framework.version>6.1.10</spring-framework.version>
         <guava.version>32.1.2-jre</guava.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <os-core-common-spring6.version>0.27.0-rc1</os-core-common-spring6.version>
@@ -74,6 +75,25 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring-framework.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-bom</artifactId>
+                <version>${spring-security.version}</version>
+                <type>pom</type>
+            </dependency>
             <dependency>
 	            <groupId>org.apache.logging.log4j</groupId>
 	            <artifactId>log4j-api</artifactId>
