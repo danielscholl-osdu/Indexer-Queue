@@ -38,8 +38,9 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <core-lib-azure-spring6.version>0.27.0-rc2</core-lib-azure-spring6.version>
+    <core-lib-azure-spring6.version>0.27.0-rc3</core-lib-azure-spring6.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
+      <log4j.version>2.23.1</log4j.version>
   </properties>
 
   <pluginRepositories>
@@ -55,30 +56,6 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.opengroup.osdu</groupId>
-        <artifactId>os-core-common-spring6</artifactId>
-        <version>${os-core-common-spring6.version}</version>
-          <type>pom</type>
-          <scope>import</scope>
-      </dependency>
-        <dependency>
-            <groupId>org.opengroup.osdu</groupId>
-            <artifactId>core-lib-azure-spring6</artifactId>
-            <version>${core-lib-azure-spring6.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.7.36</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -148,16 +125,6 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${snakeyaml.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guava.version}</version>
-    </dependency>
 
     <!-- Testing related dependencies-->
     <dependency>
@@ -180,6 +147,27 @@
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
+      <!-- Log settings dependencies -->
+      <dependency>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-slf4j-impl</artifactId>
+          <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-api</artifactId>
+          <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-core</artifactId>
+          <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.36</version>
+      </dependency>
   </dependencies>
 
   <build>
