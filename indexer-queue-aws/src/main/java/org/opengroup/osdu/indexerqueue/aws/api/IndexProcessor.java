@@ -75,6 +75,9 @@ public abstract class IndexProcessor implements Callable<IndexProcessor> {
         connection.setRequestProperty("Authorization", this.indexerServiceAccountJWT);
         connection.setRequestProperty("user", attributes.get("user"));
         connection.setRequestProperty("x-user-id", attributes.get("user"));
+        if (attributes.containsKey("x-collaboration")) {
+            connection.setRequestProperty("x-collaboration", attributes.get("x-collaboration"));
+        }
         connection.setUseCaches(false);
         connection.setDoOutput(true);
         connection.setConnectTimeout(10000);

@@ -84,7 +84,6 @@ public class IndexerQueueServiceTest {
         });
 
         when(environmentVariables.getDeadLetterQueueUrl()).thenReturn(DEAD_LETTER_QUEUE_URL);
-        when(environmentVariables.getQueueUrl()).thenReturn(QUEUE_URL);
         when(environmentVariables.getMaxAllowedMessages()).thenReturn(MAX_ALLOWED_MESSAGES);
         when(environmentVariables.getTargetURL()).thenReturn(TARGET_URL);
         when(environmentVariables.getMaxWaitTime()).thenReturn(MAX_WAIT_TIME);
@@ -110,7 +109,7 @@ public class IndexerQueueServiceTest {
             messages.add(msg);
         }
 
-        IndexerQueueService service = new IndexerQueueService(environmentVariables, this::sqsSupplier);
+        IndexerQueueService service = new IndexerQueueService(QUEUE_URL, environmentVariables, this::sqsSupplier);
 
         service.putMessages(messages);
 

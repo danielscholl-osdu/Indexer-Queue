@@ -46,7 +46,7 @@ public class IndexerQueueService implements AutoCloseable {
     private final List<Future<?>> workerFutures;
     private final EnvironmentVariables variables;
 
-    public IndexerQueueService(EnvironmentVariables variables, Supplier<AmazonSQS> sqsSupplier) {
+    public IndexerQueueService(String queueUrl, EnvironmentVariables variables, Supplier<AmazonSQS> sqsSupplier) {
         int maxMessages = variables.getMaxAllowedMessages();
         int maxThreads = variables.getMaxIndexThreads();
         int maxBatchThreads = variables.getMaxBatchRequestCount();
@@ -59,8 +59,8 @@ public class IndexerQueueService implements AutoCloseable {
         workerExecutor = Executors.newFixedThreadPool(maxThreads);
         cleanupExecutor = Executors.newFixedThreadPool(3);
         retryFuture = cleanupExecutor.submit(new MessageRetrier(retryMessages, maxBatchThreads, sqsSupplier.get(), variables.getDeadLetterQueueUrl()));
-        deleteFuture = cleanupExecutor.submit(new MessageDeleter(deleteMessages, maxBatchThreads, sqsSupplier.get(), variables.getQueueUrl()));
-        visibilityFuture = cleanupExecutor.submit(new MessageVisibilityModifier(changeVisibilityMessages, maxBatchThreads, sqsSupplier.get(), variables.getQueueUrl()));
+        deleteFuture = cleanupExecutor.submit(new MessageDeleter(deleteMessages, maxBatchThreads, sqsSupplier.get(), queueUrl));
+        visibilityFuture = cleanupExecutor.submit(new MessageVisibilityModifier(changeVisibilityMessages, maxBatchThreads, sqsSupplier.get(), queueUrl));
         
         workerFutures = new ArrayList<>();
         for (int i = 0; i < maxThreads; ++i) {
