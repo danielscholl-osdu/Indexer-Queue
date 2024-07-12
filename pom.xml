@@ -33,7 +33,7 @@
         <spring-framework.version>6.1.10</spring-framework.version>
         <guava.version>32.1.2-jre</guava.version>
         <snakeyaml.version>2.0</snakeyaml.version>
-        <os-core-common-spring6.version>0.27.0-rc1</os-core-common-spring6.version>
+        <os-core-common-spring6.version>0.27.0-SNAPSHOT</os-core-common-spring6.version>
     </properties>
 
     <licenses>

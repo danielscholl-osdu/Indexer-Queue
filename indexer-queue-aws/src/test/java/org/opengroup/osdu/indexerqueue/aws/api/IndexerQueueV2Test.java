@@ -1,18 +1,18 @@
 /**
-* Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-*      http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.opengroup.osdu.indexerqueue.aws.api;
 
@@ -20,7 +20,9 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -30,26 +32,21 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.opengroup.osdu.core.aws.sqs.AmazonSQSConfig;
+import uk.org.webcompere.systemstubs.rules.SystemExitRule;
+import uk.org.webcompere.systemstubs.security.AbortExecutionException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.webcompere.systemstubs.rules.SystemExitRule;
-import uk.org.webcompere.systemstubs.security.AbortExecutionException;
 
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class IndexerQueueTest {
+public class IndexerQueueV2Test {
 
     private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
@@ -65,7 +62,7 @@ public class IndexerQueueTest {
     }
 
     @Test
-    public void test_usesQueueUrl() throws InterruptedException {
+    public void test_usesQueueUrlV2() throws InterruptedException {
         AmazonSQS mockedSqs = Mockito.mock(AmazonSQS.class);
         ReceiveMessageResult receiveResult = Mockito.mock(ReceiveMessageResult.class);
         List<Message> messages = new ArrayList<Message>();
@@ -77,7 +74,7 @@ public class IndexerQueueTest {
             when(mock.getMaxWaitTime()).thenReturn(maxWaitTime);
             when(mock.getRegion()).thenReturn(queueRegion);
             when(mock.getMaxAllowedMessages()).thenReturn(maxMessages);
-            when(mock.getQueueUrl()).thenReturn(queueUrl);
+            when(mock.getQueueUrlV2()).thenReturn(queueUrl);
         })) {
             try (MockedConstruction<AmazonSQSConfig> queueMock = Mockito.mockConstruction(AmazonSQSConfig.class, (mock, context) -> {
                 when(mock.AmazonSQS()).thenReturn(mockedSqs);
@@ -101,8 +98,8 @@ public class IndexerQueueTest {
                         }
                     });
                     when(receiveResult.getMessages()).thenReturn(messages);
-                    assertThrows(AbortExecutionException.class, () -> new IndexerQueue().run());
-                    assertNotEquals(0, (long)exitRule.getExitCode());
+                    assertThrows(AbortExecutionException.class, () -> new IndexerQueueV2().run());
+                    assertNotEquals(0, (long) exitRule.getExitCode());
 
                     verify(mockedSqs, times(1)).receiveMessage(receiveRequest.capture());
                     ReceiveMessageRequest request = receiveRequest.getValue();
@@ -112,10 +109,11 @@ public class IndexerQueueTest {
                     assertTrue(request.getMessageAttributeNames().contains("All"));
                     assertTrue(request.getAttributeNames().contains("All"));
                     envMock.constructed().forEach(envMockConstructed ->
-                        verify(envMockConstructed, never()).getQueueUrlV2()
+                        verify(envMockConstructed, never()).getQueueUrl()
                     );
                 }
             }
+
         }
     }
 }

@@ -98,11 +98,6 @@
             <artifactId>snakeyaml</artifactId>
             <version>2.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <version>3.4.2</version>
-        </dependency>
         <!-- Internal packages -->
         <dependency>
             <groupId>org.opengroup.osdu.core.aws</groupId>
@@ -113,7 +108,17 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-config</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- AWS managed packages -->
@@ -208,7 +213,7 @@
                         <configuration>
                             <classifier>spring-boot</classifier>
                             <mainClass>
-                                org.opengroup.osdu.indexerqueue.aws.api.IndexerQueue
+                                org.opengroup.osdu.indexerqueue.aws.api.Main
                             </mainClass>
                         </configuration>
                     </execution>

@@ -1,18 +1,18 @@
 /**
-* Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-*      http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.opengroup.osdu.indexerqueue.aws.api;
 
@@ -22,9 +22,11 @@ import org.opengroup.osdu.core.common.logging.JaxRsDpsLog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 public class EnvironmentVariables {
     private final String region;
     private final String queueUrl;
+    private final String queueUrlV2;
     private final String targetURL;
     private final String deadLetterQueueUrl;
     private final int maxAllowedMessages;
@@ -41,11 +43,12 @@ public class EnvironmentVariables {
         this.region = System.getenv("AWS_REGION") != null ? System.getenv("AWS_REGION") : "us-east-1";
         this.targetURL = System.getenv("AWS_INDEXER_INDEX_API");
         K8sLocalParameterProvider provider = new K8sLocalParameterProvider();
-        this.queueUrl = provider.getParameterAsStringOrDefault("storage-sqs-url",System.getenv("AWS_STORAGE_QUEUE_URL") );
+        this.queueUrl = provider.getParameterAsStringOrDefault("storage-sqs-url", System.getenv("AWS_STORAGE_QUEUE_URL"));
+        this.queueUrlV2 = provider.getParameterAsStringOrDefault("storage-v2-sqs-url", System.getenv("AWS_STORAGE_V2_QUEUE_URL"));
         this.deadLetterQueueUrl = provider.getParameterAsStringOrDefault("indexer-deadletter-queue-sqs-url", System.getenv("AWS_DEADLETTER_QUEUE_URL"));
         appProperties = new Properties();
         try {
-            try (InputStream inputStream = EnvironmentVariables.class.getResourceAsStream("BOOT-INF/classes/org/application.properties")) {
+            try (InputStream inputStream = EnvironmentVariables.class.getClassLoader().getResourceAsStream("application.properties")) {
                 appProperties.load(inputStream);
             }
         } catch (IOException | NullPointerException e) {
@@ -91,6 +94,10 @@ public class EnvironmentVariables {
 
     public String getQueueUrl() {
         return this.queueUrl;
+    }
+
+    public String getQueueUrlV2() {
+        return this.queueUrlV2;
     }
 
     public String getTargetURL() {
