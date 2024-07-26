@@ -10,9 +10,6 @@ The following software have components provided under the terms of this license:
 
 - AspectJ Weaver (from http://www.aspectj.org, https://www.eclipse.org/aspectj/)
 - Google Guice - Extensions - MultiBindings (from https://repo1.maven.org/maven2/com/google/inject/extensions/guice-multibindings)
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Proton-J (from https://repo1.maven.org/maven2/org/apache/qpid/proton-j)
 
@@ -128,9 +125,6 @@ The following software have components provided under the terms of this license:
 - Maven Incremental Build support utilities (from https://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-incremental)
 - Metrics Core (from https://repo1.maven.org/maven2/io/dropwizard/metrics/metrics-core)
 - MicroProfile Config API (from https://repo1.maven.org/maven2/org/eclipse/microprofile/config/microprofile-config-api)
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Azure Java Core Library (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure Netty HTTP Client Library (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure SDK for SQL API of Azure Cosmos DB Service (from https://github.com/Azure/azure-sdk-for-java)
@@ -303,23 +297,11 @@ The following software have components provided under the terms of this license:
 - Jakarta Messaging API (from https://projects.eclipse.org/projects/ee4j.jms)
 - Jakarta XML Binding API (from https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api, https://repo1.maven.org/maven2/org/jboss/spec/javax/xml/bind/jboss-jaxb-api_2.3_spec)
 - Lucene Core (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-core)
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Mockito (from http://mockito.org, http://www.mockito.org, https://github.com/mockito/mockito)
 - Netty/Codec/HTTP (from https://repo1.maven.org/maven2/io/netty/netty-codec-http)
 - Plexus Common Utilities (from http://plexus.codehaus.org/plexus-utils, https://codehaus-plexus.github.io/plexus-utils/, https://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils)
 - Redisson (from http://redisson.org)
 - Spring Core (from http://www.springframework.org, https://github.com/spring-projects/spring-framework, https://repo1.maven.org/maven2/org/springframework/spring-core)
-
-========================================================================
-Beerware
-========================================================================
-The following software have components provided under the terms of this license:
-
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 
 ========================================================================
 BouncyCastle
@@ -336,15 +318,6 @@ The following software have components provided under the terms of this license:
 - "Java Concurrency in Practice" book annotations (from http://jcip.net/)
 - FindBugs-jsr305 (from http://findbugs.sourceforge.net/)
 - MongoDB Java Driver (from http://mongodb.org/, http://www.mongodb.org, https://www.mongodb.com/)
-
-========================================================================
-CC-BY-4.0
-========================================================================
-The following software have components provided under the terms of this license:
-
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 
 ========================================================================
 CC0-1.0
@@ -406,9 +379,6 @@ The following software have components provided under the terms of this license:
 
 - Jakarta JSON Processing API (from https://github.com/eclipse-ee4j/jsonp, https://javaee.github.io/jsonp)
 - Logback Core Module (from http://logback.qos.ch, https://repo1.maven.org/maven2/ch/qos/logback/logback-core)
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 
 ========================================================================
 EPL-2.0
@@ -489,9 +459,6 @@ The following software have components provided under the terms of this license:
 - Javassist (from http://www.javassist.org/, https://www.javassist.org/)
 - Logback Classic Module (from http://logback.qos.ch, https://repo1.maven.org/maven2/ch/qos/logback/logback-classic)
 - Logback Core Module (from http://logback.qos.ch, https://repo1.maven.org/maven2/ch/qos/logback/logback-core)
-- Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 
 ========================================================================
 LGPL-2.1-or-later
@@ -538,8 +505,6 @@ The following software have components provided under the terms of this license:
 - Java JWT (from http://www.jwt.io, https://github.com/auth0/java-jwt)
 - Lucene Core (from https://repo1.maven.org/maven2/org/apache/lucene/lucene-core)
 - Microsoft Application Insights Java Agent (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Java SDK Spring Boot starter (from https://github.com/Microsoft/ApplicationInsights-Java)
-- Microsoft Application Insights Log4j 2 Appender (from https://github.com/Microsoft/ApplicationInsights-Java)
 - Microsoft Azure Functions Java Core Types (from https://azure.microsoft.com/en-us/services/functions)
 - Microsoft Azure Java Core Library (from https://github.com/Azure/azure-sdk-for-java)
 - Microsoft Azure Java JSON Library (from https://github.com/Azure/azure-sdk-for-java)
