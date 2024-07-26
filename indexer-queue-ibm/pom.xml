@@ -35,6 +35,7 @@
 				</property>
 			</activation>
 			<properties>
+                <spring-security.version>6.2.3</spring-security.version>
 				<repo.releases.id>community-maven-repo</repo.releases.id>
 				<publish.snapshots.id>community-maven-via-job-token</publish.snapshots.id>
 				<publish.releases.id>community-maven-via-job-token</publish.releases.id>
@@ -232,10 +233,19 @@
 			<artifactId>lucene-core</artifactId>
 			<version>8.10.0</version>
 		</dependency>
+        <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.25</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-core</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-web</artifactId>
