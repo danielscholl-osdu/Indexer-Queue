@@ -143,9 +143,10 @@ public abstract class IndexProcessor implements Callable<IndexProcessor> {
 
             getResponse(connection);
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            StringBuilder errorMessage = new StringBuilder(e.getMessage());
+            errorMessage.append(String.format("%nCould not send %s message%nThis message had body: %s%n", this.getType(), message.getBody()));
             result = CallableResult.FAIL;
-            logger.error(String.format("Could not send %s message", this.getType()), e);
+            logger.error(errorMessage.toString(), e);
             exception = e;
         }
         logger.info(result.toString());
