@@ -38,7 +38,7 @@ public abstract class MessageHandler<T> implements Runnable {
     private Instant oldestCurrentMessage = null;
     protected static final JaxRsDpsLog logger = LogProvider.getLogger();
     static final int MAX_WAIT_FOR_MESSAGE_MILLIS = 10000;
-    static final int MAX_WAIT_FOR_MESSAGE_BATCH = 60000;
+    static final int MAX_WAIT_FOR_MESSAGE_BATCH = 10000;
 
     protected MessageHandler(BlockingQueue<Message> messagesToHandle, int maxBatchRequests, AmazonSQS sqsClient) {
         this(messagesToHandle, maxBatchRequests, sqsClient, MAX_WAIT_FOR_MESSAGE_MILLIS, MAX_WAIT_FOR_MESSAGE_BATCH);
