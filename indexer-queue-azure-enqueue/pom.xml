@@ -38,7 +38,7 @@
     <azure.appservice.plan />
     <azure.appservice.appname />
     <azure.appservice.subscription />
-    <core-lib-azure-spring6.version>0.27.0-rc4</core-lib-azure-spring6.version>
+    <core-lib-azure-spring6.version>0.27.0-rc7</core-lib-azure-spring6.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
       <log4j.version>2.23.1</log4j.version>
   </properties>
@@ -77,6 +77,10 @@
               <groupId>com.microsoft.azure</groupId>
           </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
