@@ -66,6 +66,7 @@ public abstract class IndexProcessor implements Callable<IndexProcessor> {
     protected HttpURLConnection getConnection(String body, Map<String, String> attributes) throws IOException {
         URL url = new URL(this.targetURL);
         logger.info(String.format("The url is: %s", url));
+        final String X_COLLABORATION = "x-collaboration";
 
         HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -75,8 +76,8 @@ public abstract class IndexProcessor implements Callable<IndexProcessor> {
         connection.setRequestProperty("Authorization", this.indexerServiceAccountJWT);
         connection.setRequestProperty("user", attributes.get("user"));
         connection.setRequestProperty("x-user-id", attributes.get("user"));
-        if (attributes.containsKey("x-collaboration")) {
-            connection.setRequestProperty("x-collaboration", attributes.get("x-collaboration"));
+        if (attributes.containsKey(X_COLLABORATION)) {
+            connection.setRequestProperty(X_COLLABORATION, attributes.get(X_COLLABORATION));
         }
         connection.setUseCaches(false);
         connection.setDoOutput(true);

@@ -56,16 +56,20 @@ public abstract class AbstractIndexerQueue {
         logger.info(String.format("Connecting to the SQS Queue: %s", queueUrl));
     }
 
+    public class RuntimeInterruptException extends RuntimeException {
+        public RuntimeInterruptException(InterruptedException e) {
+            super(e);
+        }
+    }
+
     @PostConstruct
     public void init() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    AbstractIndexerQueue.this.run();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        Thread thread = new Thread(() -> {
+            try {
+                AbstractIndexerQueue.this.run();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeInterruptException(e);
             }
         });
         thread.start();
@@ -99,6 +103,8 @@ public abstract class AbstractIndexerQueue {
                 } catch (Exception e) {
                     shouldLoop = false;
                     logger.error("Interrupted while waiting.", e);
+                    if (e instanceof InterruptedException)
+                        Thread.currentThread().interrupt();
                 }
             }
         } finally {

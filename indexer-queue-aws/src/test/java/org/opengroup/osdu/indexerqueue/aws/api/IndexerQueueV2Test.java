@@ -93,12 +93,12 @@ public class IndexerQueueV2Test {
                     when(mockedSqs.receiveMessage(any(ReceiveMessageRequest.class))).thenAnswer(new Answer<ReceiveMessageResult>() {
                         @Override
                         public ReceiveMessageResult answer(InvocationOnMock invocationOnMock) throws Throwable {
-                            Thread.sleep((maxWaitTime - 1) * 1000);
                             return receiveResult;
                         }
                     });
                     when(receiveResult.getMessages()).thenReturn(messages);
-                    assertThrows(AbortExecutionException.class, () -> new IndexerQueueV2().run());
+                    IndexerQueueV2 indexerQueueV2 = new IndexerQueueV2();
+                    assertThrows(AbortExecutionException.class, indexerQueueV2::run);
                     assertNotEquals(0, (long) exitRule.getExitCode());
 
                     verify(mockedSqs, times(1)).receiveMessage(receiveRequest.capture());
