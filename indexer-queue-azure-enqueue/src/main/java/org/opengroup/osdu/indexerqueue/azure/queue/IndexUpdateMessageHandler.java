@@ -110,6 +110,7 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
           schemaWorkerRequest.setHeader(DpsHeaders.AUTHORIZATION, this.serviceAccountJwtClient.getIdToken(att.get(DpsHeaders.DATA_PARTITION_ID)));
           schemaWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
           schemaWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
+          schemaWorkerRequest.setHeader(DpsHeaders.USER_EMAIL, att.get(DpsHeaders.USER_EMAIL));
 
           CloseableHttpResponse response = schemaWorkerClient.execute(schemaWorkerRequest);
 
