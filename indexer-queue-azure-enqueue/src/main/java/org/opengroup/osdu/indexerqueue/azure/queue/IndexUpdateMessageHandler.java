@@ -18,7 +18,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-
 import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.http.RequestStatus;
@@ -28,9 +27,9 @@ import org.opengroup.osdu.core.common.util.IServiceAccountJwtClient;
 import org.opengroup.osdu.indexerqueue.azure.di.AzureBootstrapConfig;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerNoRetryException;
 import org.opengroup.osdu.indexerqueue.azure.exceptions.IndexerRetryException;
+import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opengroup.osdu.indexerqueue.azure.exceptions.ValidStorageRecordNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static org.opengroup.osdu.core.common.model.http.DpsHeaders.AUTHORIZATION;
 
 /***
  * A class to send recordChangedMessages to indexer-service.
@@ -110,7 +108,6 @@ public class IndexUpdateMessageHandler implements IIndexUpdateMessageHandler {
           schemaWorkerRequest.setHeader(DpsHeaders.AUTHORIZATION, this.serviceAccountJwtClient.getIdToken(att.get(DpsHeaders.DATA_PARTITION_ID)));
           schemaWorkerRequest.setHeader(DpsHeaders.DATA_PARTITION_ID, att.get(DpsHeaders.DATA_PARTITION_ID));
           schemaWorkerRequest.setHeader(DpsHeaders.CORRELATION_ID, att.get(DpsHeaders.CORRELATION_ID));
-          schemaWorkerRequest.setHeader(DpsHeaders.USER_EMAIL, att.get(DpsHeaders.USER_EMAIL));
 
           CloseableHttpResponse response = schemaWorkerClient.execute(schemaWorkerRequest);
 
