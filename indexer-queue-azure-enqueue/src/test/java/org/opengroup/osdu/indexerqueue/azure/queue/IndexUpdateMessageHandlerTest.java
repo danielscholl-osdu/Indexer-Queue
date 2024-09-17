@@ -72,7 +72,7 @@ public class IndexUpdateMessageHandlerTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(DpsHeaders.DATA_PARTITION_ID, "test-tenant");
         headers.put(DpsHeaders.CORRELATION_ID, "xxxxxx");
-        headers.put(DpsHeaders.USER_EMAIL, "user-email");
+        headers.put(DpsHeaders.AUTHORIZATION, "Authorization");
         recordChangedMessages = RecordChangedMessages.builder()
                 .attributes(headers).build();
 
@@ -146,6 +146,7 @@ public class IndexUpdateMessageHandlerTest {
         assertEquals(httpMock.constructed().size(), 2);
         verify(httpClient, times(2)).execute(any());
         verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
+        verify(serviceAccountJwtClient, times(2)).getIdToken(any());
         verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
         verify(serviceAccountJwtClient, times(2)).getIdToken(any());
     }
