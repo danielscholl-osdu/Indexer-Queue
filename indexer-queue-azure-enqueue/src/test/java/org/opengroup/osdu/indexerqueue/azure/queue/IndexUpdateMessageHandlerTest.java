@@ -46,8 +46,6 @@ public class IndexUpdateMessageHandlerTest {
     private static final String indexerWorkerUrl = "indexer-worker-url";
     private static final String schemaWorkerUrl = "schema-worker-url";
     private static final int maxTry = 5;
-    private final String DATA_PARTITION_ID = "test-tenant";
-    private final String CORRELATION_ID = "xxxxxx";
     private static MockedConstruction<HttpPost> httpMock;
 
     @Mock
@@ -72,8 +70,9 @@ public class IndexUpdateMessageHandlerTest {
     @BeforeEach
     public void setup() {
         Map<String, String> headers = new HashMap<>();
-        headers.put(DpsHeaders.DATA_PARTITION_ID, DATA_PARTITION_ID);
-        headers.put(DpsHeaders.CORRELATION_ID, CORRELATION_ID);
+        headers.put(DpsHeaders.DATA_PARTITION_ID, "test-tenant");
+        headers.put(DpsHeaders.CORRELATION_ID, "xxxxxx");
+        headers.put(DpsHeaders.AUTHORIZATION, "Authorization");
         recordChangedMessages = RecordChangedMessages.builder()
                 .attributes(headers).build();
 
@@ -147,6 +146,7 @@ public class IndexUpdateMessageHandlerTest {
         assertEquals(httpMock.constructed().size(), 2);
         verify(httpClient, times(2)).execute(any());
         verify(azureBootstrapConfig, times(1)).getIndexerWorkerURL();
+        verify(serviceAccountJwtClient, times(2)).getIdToken(any());
         verify(azureBootstrapConfig, times(1)).getSchemaWorkerURL();
         verify(serviceAccountJwtClient, times(2)).getIdToken(any());
     }
