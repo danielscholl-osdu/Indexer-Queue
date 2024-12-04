@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version>
+		<version>3.3.5</version>
         <relativePath/>
 	</parent>
 
@@ -35,7 +35,7 @@
 				</property>
 			</activation>
 			<properties>
-                <spring-security.version>6.2.3</spring-security.version>
+                <spring-security.version>6.3.4</spring-security.version>
 				<repo.releases.id>community-maven-repo</repo.releases.id>
 				<publish.snapshots.id>community-maven-via-job-token</publish.snapshots.id>
 				<publish.releases.id>community-maven-via-job-token</publish.releases.id>
@@ -53,7 +53,7 @@
 		<os-core-lib-ibm.version>0.26.0</os-core-lib-ibm.version>
 		<spring.version>6.2.2</spring.version>
 		<jackson.version>2.16.1</jackson.version>
-        <spring-boot.version>3.2.3</spring-boot.version>
+        <spring-boot.version>3.3.5</spring-boot.version>
 		<json-smart.version>2.4.9</json-smart.version>
 	</properties>
 
