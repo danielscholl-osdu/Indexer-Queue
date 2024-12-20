@@ -98,20 +98,20 @@ include:
       from xml.dom.minidom import parse
       import os
       import sys
-      
+
       allPomFiles = set()
       submoduleFiles = set()
-      
+
       for root, dirnames, filenames in os.walk(os.environ['CI_PROJECT_DIR']):
           if 'pom.xml' in filenames:
               pomFile = os.path.join(root, 'pom.xml')
               allPomFiles.add(pomFile)
-      
+
               dom = parse(pomFile)
               for modules in dom.getElementsByTagName('modules'):
                   for module in modules.getElementsByTagName('module'):
                       submoduleFiles.add(os.path.join(root, module.firstChild.nodeValue, "pom.xml"))
-      
+
       for pomFile in allPomFiles:
           if pomFile not in submoduleFiles:
               dir = os.path.dirname(pomFile)
@@ -130,11 +130,11 @@ include:
       id=maven_build_\$(echo "\$@" | sha1sum | head -c 7)
       cd "\$1"; shift
       outputFile="\$1"; shift
-      
+
       echo "********************************************************************************"
       echo -e "\e[0Ksection_start:\$(date +%s):\${id}\r\e[0K\e[1m\$(pwd)\e[0m"
       echo -e "\e[32;1m\$MAVEN" "\$@" "\e[0m"
-      
+
       if \$MAVEN "\$@" > "\$outputFile" 2>&1; then
           tail -n 25 "\$outputFile";
           echo -e "\e[36m**** Showing the last 25 lines of the passed build (above). See Job artifacts for full log details *****\e[0m";
@@ -158,7 +158,7 @@ gemnasium-maven-dependency_scanning:
 
 azure_containerize:
   variables:
-    AZURE_CONTAINERIZE_REPOSITORY: "-b jdk-17 https://gitlab-ci-token:${CI_JOB_TOKEN}@community.opengroup.org/osdu/platform/deployment-and-operations/base-containers-azure/service-base-image"
+    AZURE_CONTAINERIZE_REPOSITORY: "https://gitlab-ci-token:${CI_JOB_TOKEN}@community.opengroup.org/osdu/platform/deployment-and-operations/base-containers-azure/service-base-image"
 
 azure_test:
   image: community.opengroup.org:5555/osdu/platform/deployment-and-operations/base-containers-azure/azure-maven17:v0.0.1
