@@ -75,13 +75,6 @@ phases:
       - echo "Building primary service assemblies..."
       - mvn -ntp -B test install sonar:sonar -pl .,indexer-queue-aws -Ddeployment.environment=prod -Dsonar.login=${SONAR_USERNAME} -Dsonar.password=${SONAR_PASSWORD} -Dsonar.branch.name=${BRANCH_NAME} -Dsonar.host.url=${SONAR_URL}
 
-      - sed -i "s|__CONTAINER__|$ECR_IMAGE|"  devops/aws/chart/values.yaml
-      - echo "--Copying Helm Charts to ${OUTPUT_DIR:-dist}--"
-      - rsync -r devops/aws/* "${OUTPUT_DIR:-dist}"
-
-      - echo "--Copying Helm Charts to ${OUTPUT_DIR:-dist}--"
-      - rsync -r devops/aws/* "${OUTPUT_DIR:-dist}"
-
       - echo "Logging into Docker Hub..."
       - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
 
