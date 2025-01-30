@@ -253,7 +253,6 @@ The following software have components provided under the terms of this license:
 - swagger-core (from https://repo1.maven.org/maven2/io/swagger/core/v3/swagger-core, https://repo1.maven.org/maven2/io/swagger/swagger-core)
 - swagger-jaxrs (from https://repo1.maven.org/maven2/io/swagger/swagger-jaxrs)
 - swagger-models (from https://repo1.maven.org/maven2/io/swagger/core/v3/swagger-models, https://repo1.maven.org/maven2/io/swagger/swagger-models)
-- tomcat-annotations-api (from http://tomcat.apache.org/, https://tomcat.apache.org/)
 - tomcat-embed-core (from http://tomcat.apache.org/)
 - tomcat-embed-el (from http://tomcat.apache.org/, https://tomcat.apache.org/)
 - tomcat-embed-websocket (from http://tomcat.apache.org/, https://tomcat.apache.org/)
