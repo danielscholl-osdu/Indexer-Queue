@@ -19,6 +19,7 @@ import java.util.Map;
 
 import jakarta.inject.Inject;
 
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.opengroup.osdu.core.common.Constants;
@@ -30,8 +31,10 @@ import org.opengroup.osdu.core.common.model.http.AppException;
 import org.opengroup.osdu.core.common.model.http.DpsHeaders;
 import org.opengroup.osdu.core.common.model.search.RecordChangedMessages;
 import org.opengroup.osdu.core.ibm.messagebus.IMessageFactory;
+import org.opengroup.osdu.indexerqueue.ibm.scope.ThreadDpsHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -47,186 +50,204 @@ import com.google.gson.JsonSyntaxException;
 @Component
 public class Subscriber {
 
-	@Inject
-	IMessageFactory mq;
+    @Inject
+    IMessageFactory mq;
 
-	@Value("${INDEXER_URL}")
-	private String INDEXER_URL;
+    @Value("${INDEXER_URL}")
+    private String INDEXER_URL;
 
-	@Value("${RETRY_COUNT}")
-	private int RETRY_COUNT;
+    @Value("${RETRY_COUNT}")
+    private int RETRY_COUNT;
 
-	@Value("${INDEXER_API_KEY}")
-	private String INDEXER_API_KEY;
+    @Value("${INDEXER_API_KEY}")
+    private String INDEXER_API_KEY;
 
-	/*
-	 * false : Messages will be indexed from Queue
-	 * true : Messages will be indexed from TOPIC
-	 */
-	@Value("${ibm.topic.enable:false}")
-	private String topicFlag;
+    @Autowired
+    ThreadDpsHeaders threadDpsHeaders;
 
-	private final Gson gson = new Gson();
-	private static final Logger logger = LoggerFactory.getLogger(Subscriber.class);
-	private final DpsHeaders dpsHeaders = new DpsHeaders();
-	private final static String RETRY_STRING = "retry";
-	private final static String ERROR_CODE = "errorCode";
-	private final static String ERROR_MESSAGE = "errorMessage";
-	private Map<String, String> attributes;
+    /*
+     * false : Messages will be indexed from Queue
+     * true : Messages will be indexed from TOPIC
+     */
+    @Value("${ibm.topic.enable:false}")
+    private String topicFlag;
 
-	final String INDEXER_API_KEY_HEADER = "x-api-key";
+    private final Gson gson = new Gson();
+    private static final Logger logger = LoggerFactory.getLogger(Subscriber.class);
+    private DpsHeaders dpsHeaders = null;
+    private final static String RETRY_STRING = "retry";
+    private final static String ERROR_CODE = "errorCode";
+    private final static String ERROR_MESSAGE = "errorMessage";
+    private Map<String, String> attributes;
 
-	@JmsListener(destination = "${ibm.env.prefix}" + "-" + IMessageFactory.DEFAULT_QUEUE_NAME)
-	public void recievedMessage(String msg) throws Exception {
+    final String INDEXER_API_KEY_HEADER = "x-api-key";
 
-		logger.info("Recieved Message: " + msg);
+    @JmsListener(destination = "${ibm.env.prefix}" + "-" + IMessageFactory.DEFAULT_QUEUE_NAME)
+    public void recievedMessage(String msg) throws Exception {
 
-		if (topicFlag.equalsIgnoreCase("true")) {
-			logger.info(
-					"Indexing api will not be called or disable flag 'ibm.topic.enable'. Indexing will be happen on messages from Topic");
-			return;
-		}
+        logger.info("Recieved Message: " + msg);
 
-		RecordChangedMessages recordMessage;
+        if (topicFlag.equalsIgnoreCase("true")) {
+            logger.info(
+                "Indexing api will not be called or disable flag 'ibm.topic.enable'. Indexing will be happen on messages from Topic");
+            return;
+        }
 
-		if (msg.contains(RETRY_STRING)) {
-			// handle failed records ibm-prefix-record queue
-			recordMessage = this.gson.fromJson(msg, RecordChangedMessages.class);
-			logger.info(String.format("message headers: %s", this.dpsHeaders.toString()));
-			logger.info(String.format("message body: %s", this.gson.toJson(recordMessage)));
+        RecordChangedMessages recordMessage;
+        recordMessage = this.gson.fromJson(msg, RecordChangedMessages.class);
 
-			if (!recordMessage.getAttributes().get(RETRY_STRING).isEmpty()
-					&& Integer.parseInt(recordMessage.getAttributes().get(RETRY_STRING)) >= RETRY_COUNT) {
-				recordMessage.getAttributes().put(RETRY_STRING, "0");
-				msg = gson.toJson(recordMessage);
-				logger.info("sending to dlq. Resetting retry count to 0");
-				mq.sendMessageDLQ(msg);
-				return;
-			}
-		}
 
-		else {
-			// handles fresh messages from os-storage service - ibm-prefix-record queue
-			recordMessage = this.getTaskQueueMessage(msg);
-			logger.info(String.format("recordMessage: %s", recordMessage.toString()));
+        logger.info(String.format("message body: %s", this.gson.toJson(recordMessage)));
 
-			this.dpsHeaders.getHeaders().put(DpsHeaders.ACCOUNT_ID, recordMessage.getDataPartitionId());
-			this.dpsHeaders.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, recordMessage.getDataPartitionId());
-			if (recordMessage.hasCorrelationId()) {
-				this.dpsHeaders.getHeaders().put(DpsHeaders.CORRELATION_ID, recordMessage.getCorrelationId());
-			}
-			logger.info(String.format("message headers: %s", this.dpsHeaders.toString()));
-			logger.info(String.format("message body: %s", this.gson.toJson(recordMessage)));
-		}
+        if (msg.contains(RETRY_STRING)) {
+            // handle failed records ibm-prefix-record queue
+            dpsHeaders = getThreadDpsHeader(recordMessage);
+            threadDpsHeaders.setThreadContext(dpsHeaders.getHeaders());
+            logger.info(String.format("message headers: %s", dpsHeaders.toString()));
+            if (!recordMessage.getAttributes().get(RETRY_STRING).isEmpty()
+                && Integer.parseInt(recordMessage.getAttributes().get(RETRY_STRING)) >= RETRY_COUNT) {
+                recordMessage.getAttributes().put(RETRY_STRING, "0");
+                msg = gson.toJson(recordMessage);
+                logger.info("sending to dlq. Resetting retry count to 0");
+                mq.sendMessageDLQ(msg);
+                return;
+            }
+        } else {
+            // handles fresh messages from os-storage service - ibm-prefix-record queue
+            recordMessage = this.getTaskQueueMessage(msg);
+            logger.info(String.format("recordMessage: %s", recordMessage.toString()));
+            dpsHeaders = getThreadDpsHeader(recordMessage);
+            threadDpsHeaders.setThreadContext(dpsHeaders.getHeaders());
+            dpsHeaders.getHeaders().put(DpsHeaders.ACCOUNT_ID, recordMessage.getDataPartitionId());
+            if (recordMessage.hasCorrelationId()) {
+                dpsHeaders.getHeaders().put(DpsHeaders.CORRELATION_ID, recordMessage.getCorrelationId());
+            }
+            logger.info(String.format("message headers: %s", dpsHeaders.toString()));
+            logger.info(String.format("message body: %s", this.gson.toJson(recordMessage)));
+        }
 
-		String url = StringUtils.join(INDEXER_URL, Constants.WORKER_RELATIVE_URL);
-		HttpClient httpClient = new HttpClient();
-		this.dpsHeaders.put(INDEXER_API_KEY_HEADER, INDEXER_API_KEY);
-		HttpRequest rq = HttpRequest.post(recordMessage).url(url).headers(this.dpsHeaders.getHeaders()).build();
-		HttpResponse result = httpClient.send(rq);
-		if (result.hasException()) {
-			// extract exception info from result body and add attribute in
-			// recodchangedMessage
-			logger.error(result.getException().getLocalizedMessage(), result.getException());
-			int retryCount = getRetryCount(recordMessage);
-			String responseCode = String.valueOf(result.getResponseCode());
-			attributes = recordMessage.getAttributes();
-			attributes.put(ERROR_CODE, responseCode);
-			attributes.put(ERROR_MESSAGE, result.getException().getMessage());
-			attributes.put(RETRY_STRING, String.valueOf(retryCount));
-			recordMessage.setAttributes(attributes);
-			msg = gson.toJson(recordMessage);
-			mq.sendMessage(msg);
-			return;
-		} else if (result.getResponseCode() != 200) {
-			// if AppException thrown from os-indexer module then add errorcode and
-			// errormessage into attributes
-			int retryCount = getRetryCount(recordMessage);
-			String responseCode = String.valueOf(result.getResponseCode());
-			logger.error(String.format("Error ResponseCode: %s", responseCode));
-			String errMsg = "";
-			try {
-				AppError error = gson.fromJson(result.getBody(), AppError.class);
-				logger.error(String.format("Error Response: %s", error.toString()));
-				errMsg = error.getMessage();
-			} catch (JsonSyntaxException e) {
-				logger.error(String.format("Failed to parse the error response body: %s encountered %s",
-						result.getBody(), e.getMessage()));
-			}
-			attributes = recordMessage.getAttributes();
-			attributes.put(ERROR_MESSAGE, errMsg);
-			attributes.put(ERROR_CODE, responseCode);
-			attributes.put(RETRY_STRING, String.valueOf(retryCount));
-			recordMessage.setAttributes(attributes);
-			msg = gson.toJson(recordMessage);
-			mq.sendMessage(msg);
-		}
+        String url = StringUtils.join(INDEXER_URL, Constants.WORKER_RELATIVE_URL);
+        HttpClient httpClient = new HttpClient();
+        dpsHeaders.put(INDEXER_API_KEY_HEADER, INDEXER_API_KEY);
+//        dpsHeaders.getHeaders().put(DpsHeaders.DATA_PARTITION_ID, recordMessage.getDataPartitionId());
+        HttpRequest rq = HttpRequest.post(recordMessage).url(url).headers(dpsHeaders.getHeaders()).build();
+        HttpResponse result = httpClient.send(rq);
+        if (result.hasException()) {
+            // extract exception info from result body and add attribute in
+            // recodchangedMessage
+            logger.error(result.getException().getLocalizedMessage(), result.getException());
+            int retryCount = getRetryCount(recordMessage);
+            String responseCode = String.valueOf(result.getResponseCode());
+            attributes = recordMessage.getAttributes();
+            attributes.put(ERROR_CODE, responseCode);
+            attributes.put(ERROR_MESSAGE, result.getException().getMessage());
+            attributes.put(RETRY_STRING, String.valueOf(retryCount));
+            recordMessage.setAttributes(attributes);
+            msg = gson.toJson(recordMessage);
+            mq.sendMessage(msg);
+            return;
+        } else if (result.getResponseCode() != 200) {
+            // if AppException thrown from os-indexer module then add errorcode and
+            // errormessage into attributes
+            int retryCount = getRetryCount(recordMessage);
+            String responseCode = String.valueOf(result.getResponseCode());
+            logger.error(String.format("Error ResponseCode: %s", responseCode));
+            String errMsg = "";
+            try {
+                AppError error = gson.fromJson(result.getBody(), AppError.class);
+                logger.error(String.format("Error Response: %s", error.toString()));
+                errMsg = error.getMessage();
+            } catch (JsonSyntaxException e) {
+                logger.error(String.format("Failed to parse the error response body: %s encountered %s",
+                    result.getBody(), e.getMessage()));
+            }
+            attributes = recordMessage.getAttributes();
+            attributes.put(ERROR_MESSAGE, errMsg);
+            attributes.put(ERROR_CODE, responseCode);
+            attributes.put(RETRY_STRING, String.valueOf(retryCount));
+            recordMessage.setAttributes(attributes);
+            msg = gson.toJson(recordMessage);
+            mq.sendMessage(msg);
+        }
 
-	}
+    }
 
-	/**
-	 * @param recordMessage
-	 * @return
-	 */
-	private int getRetryCount(RecordChangedMessages recordMessage) {
-		int retryCount = 0;
-		if (recordMessage.getAttributes().containsKey(RETRY_STRING)) {
-			retryCount = Integer.parseInt(recordMessage.getAttributes().get(RETRY_STRING));
-			retryCount++;
-		} else {
-			retryCount = 1;
-		}
-		return retryCount;
-	}
+    private DpsHeaders getThreadDpsHeader(RecordChangedMessages recordMessage) {
+        DpsHeaders headers = getHeaders(recordMessage);
+        threadDpsHeaders.setThreadContext(headers.getHeaders());
+        return headers;
+    }
 
-	private RecordChangedMessages getTaskQueueMessage(String msg) {
-		try {
-			JsonParser jsonParser = new JsonParser();
-			JsonElement jsonMessage = jsonParser.parse(msg);
+    /**
+     * @param recordMessage
+     * @return
+     */
+    private int getRetryCount(RecordChangedMessages recordMessage) {
+        int retryCount = 0;
+        if (recordMessage.getAttributes().containsKey(RETRY_STRING)) {
+            retryCount = Integer.parseInt(recordMessage.getAttributes().get(RETRY_STRING));
+            retryCount++;
+        } else {
+            retryCount = 1;
+        }
+        return retryCount;
+    }
 
-			RecordChangedMessages recordChangedMessages = this.gson.fromJson(jsonMessage.toString(),
-					RecordChangedMessages.class);
-			String payload = recordChangedMessages.getData();
-			if (Strings.isNullOrEmpty(payload)) {
-				logger.error("message data not found");
-				throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message",
-						"message data not found", "'message.data' not found in PubSub message");
-			}
+    private RecordChangedMessages getTaskQueueMessage(String msg) {
+        try {
+            JsonParser jsonParser = new JsonParser();
+            JsonElement jsonMessage = jsonParser.parse(msg);
 
-			// TODO alanbraz our messages are not encoded
-			// String decodedPayload = new String(Base64.getDecoder().decode(payload));
-			// recordChangedMessages.setData(decodedPayload);
+            RecordChangedMessages recordChangedMessages = this.gson.fromJson(jsonMessage.toString(),
+                RecordChangedMessages.class);
+            String payload = recordChangedMessages.getData();
+            if (Strings.isNullOrEmpty(payload)) {
+                logger.error("message data not found");
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change message",
+                    "message data not found", "'message.data' not found in PubSub message");
+            }
 
-			Map<String, String> attributes = recordChangedMessages.getAttributes();
-			if (attributes == null || attributes.size() == 0) {
-				// logger.warn("attribute map not found");
-				// throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change
-				// message", "attribute map not found", String.format("PubSub message: %s",
-				// recordChangedMessages));
-				attributes = new HashMap<String, String>();
-				JsonObject jsonObjectMessage = jsonMessage.getAsJsonObject();
-				attributes.put(DpsHeaders.DATA_PARTITION_ID,
-						jsonObjectMessage.get(DpsHeaders.DATA_PARTITION_ID).getAsString());
-				attributes.put(DpsHeaders.CORRELATION_ID,
-						jsonObjectMessage.get(DpsHeaders.CORRELATION_ID).getAsString());
-				recordChangedMessages.setAttributes(attributes);
-			}
-			Map<String, String> lowerCase = new HashMap<>();
-			attributes.forEach((key, value) -> lowerCase.put(key.toLowerCase(), value));
-			recordChangedMessages.setAttributes(lowerCase);
-			if (recordChangedMessages.missingAccountId()) {
-				logger.warn("tenant-id missing");
-				throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid tenant", "tenant-id missing",
-						String.format("PubSub message: %s", recordChangedMessages));
-			}
+            // TODO alanbraz our messages are not encoded
+            // String decodedPayload = new String(Base64.getDecoder().decode(payload));
+            // recordChangedMessages.setData(decodedPayload);
 
-			return recordChangedMessages;
+            Map<String, String> attributes = recordChangedMessages.getAttributes();
+            if (attributes == null || attributes.size() == 0) {
+                // logger.warn("attribute map not found");
+                // throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid record change
+                // message", "attribute map not found", String.format("PubSub message: %s",
+                // recordChangedMessages));
+                attributes = new HashMap<String, String>();
+                JsonObject jsonObjectMessage = jsonMessage.getAsJsonObject();
+                attributes.put(DpsHeaders.DATA_PARTITION_ID,
+                    jsonObjectMessage.get(DpsHeaders.DATA_PARTITION_ID).getAsString());
+                attributes.put(DpsHeaders.CORRELATION_ID,
+                    jsonObjectMessage.get(DpsHeaders.CORRELATION_ID).getAsString());
+                recordChangedMessages.setAttributes(attributes);
+            }
+            Map<String, String> lowerCase = new HashMap<>();
+            attributes.forEach((key, value) -> lowerCase.put(key.toLowerCase(), value));
+            recordChangedMessages.setAttributes(lowerCase);
+            if (recordChangedMessages.missingAccountId()) {
+                logger.warn("tenant-id missing");
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid tenant", "tenant-id missing",
+                    String.format("PubSub message: %s", recordChangedMessages));
+            }
 
-		} catch (JsonParseException e) {
-			logger.warn("Unable to parse request payload.", e);
-			throw new AppException(HttpStatus.SC_BAD_REQUEST, "Request payload parsing error",
-					"Unable to parse request payload.", e);
-		}
-	}
+            return recordChangedMessages;
+
+        } catch (JsonParseException e) {
+            logger.warn("Unable to parse request payload.", e);
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Request payload parsing error",
+                "Unable to parse request payload.", e);
+        }
+    }
+
+    @NotNull
+    private DpsHeaders getHeaders(RecordChangedMessages recordMessage) {
+        DpsHeaders headers = DpsHeaders.createFromMap(recordMessage.getAttributes());
+        return headers;
+    }
+
 
 }
