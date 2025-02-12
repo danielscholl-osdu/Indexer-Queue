@@ -33,33 +33,28 @@ phases:
     runtime-versions:
       java: corretto17
     commands:
-      # fix error noted here: https://github.com/yarnpkg/yarn/issues/7866
-      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-      - if [ $(echo $CODEBUILD_SOURCE_VERSION | grep -c  ^refs/heads.*) -eq 1 ]; then echo "Branch name found"; else echo "This build only supports branch builds" && exit 1; fi
-      - apt-get update -y -qq > /dev/null
-      - apt-get install -y maven -qq > /dev/null
+      - apt-get update -y
+      - apt-get install -y maven
       - java -version
       - mvn -version
       - echo $JAVA_HOME #WHY
       - mkdir -p /root/.m2
       - cp ./.mvn/community-maven.settings.xml /root/.m2/settings.xml
       # Install git secrets
-       #TODO temporarily adding hotfix, due to https://github.com/awslabs/git-secrets/issues/220
-      - export SAY_LOCATION=`ln -s "$(which echo)" say`
-      - export PATH="$PATH:$SAY_LOCATION"
       - git clone https://github.com/awslabs/git-secrets.git
       - cd git-secrets && make install && cd ..
       - git secrets --install && git secrets --register-aws
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY} # authenticate with ECR via the AWS CLI
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+      - echo "Logging into Docker Hub..."
+      - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
   build:
     commands:
-      - export REPO_NAME=${PWD##*/}
       - export OUTPUT_DIR="dist"
-      - export BRANCH_NAME=`echo ${CODEBUILD_SOURCE_VERSION} | awk '{gsub("refs/heads/","");gsub("\\.","-");gsub("[[:space:]]","-")}1' | sed 's/\//-/g' | awk '{print tolower($0)}'`
-      - export ECR_TAG=`echo build.${BRANCH_NAME}.${CODEBUILD_BUILD_NUMBER}.${CODEBUILD_RESOLVED_SOURCE_VERSION} | cut -c 1-120`
+      - export BRANCH_NAME=`echo ${BRANCH_NAME} | awk '{gsub("refs/heads/","");gsub("\\.","-");gsub("[[:space:]]","-")}1' | sed 's/\//-/g' | awk '{print tolower($0)}'`
+      - export ECR_TAG=`echo build.${BRANCH_NAME}.${CODEBUILD_BUILD_NUMBER}.${COMMIT_ID} | cut -c 1-120`
       - export ECR_IMAGE=${ECR_REGISTRY}:${ECR_TAG}
       - export ECR_IMAGE_BRANCH_LATEST=${ECR_REGISTRY}:${BRANCH_NAME}
       - mkdir -p ${OUTPUT_DIR}/bin
@@ -85,7 +80,8 @@ phases:
 
       - echo "Generate build-info.json"
       - |
-        python indexer-queue-aws/build-aws/build-info.py --branch ${CODEBUILD_SOURCE_VERSION} --commit ${CODEBUILD_RESOLVED_SOURCE_VERSION} \
+          python indexer-queue-aws/build-aws/build-info.py --branch ${BRANCH_NAME} --commitId ${COMMIT_ID} \
+          --commitMessage "\"${COMMIT_MESSAGE}\"" --commitAuthor "\"${COMMIT_AUTHOR}\"" --commitDate "\"${COMMIT_DATE}\"" \
           --buildid ${CODEBUILD_BUILD_ID} --buildnumber ${CODEBUILD_BUILD_NUMBER} --reponame ${REPO_NAME} --outdir ${OUTPUT_DIR} \
           --artifact ${ECR_IMAGE}
 
@@ -98,7 +94,7 @@ artifacts:
   files:
     - "**/*"
   base-directory: "dist"
-  name: ${REPO_NAME}_${BRANCH_NAME}_$(date +%F)_${CODEBUILD_BUILD_NUMBER}.zip
+  name: ${BRANCH_NAME}/${PACKAGE_NAME}.zip
 cache:
   paths:
     - "/root/.m2/**/*"
