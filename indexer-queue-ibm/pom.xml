@@ -70,6 +70,13 @@
                 <version>10.1.34</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.118.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -139,6 +146,10 @@
 					<groupId>io.netty</groupId>
 					<artifactId>netty-codec</artifactId>
 				</exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-common</artifactId>
+                </exclusion>
 				<exclusion>
 					<groupId>io.netty</groupId>
 					<artifactId>netty-codec-http</artifactId>
@@ -179,12 +190,12 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec</artifactId>
-			<version>4.1.86.Final</version>
+			<version>4.1.118.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec-http</artifactId>
-			<version>4.1.86.Final</version>
+			<version>4.1.118.Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>io.netty</groupId>
@@ -212,6 +223,10 @@
 					<groupId>io.netty</groupId>
 					<artifactId>netty-codec</artifactId>
 				</exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-common</artifactId>
+                </exclusion>
 				<exclusion>
 					<groupId>org.apache.lucene</groupId>
 					<artifactId>lucene-core</artifactId>
