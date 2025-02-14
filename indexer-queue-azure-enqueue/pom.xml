@@ -32,7 +32,7 @@
 
   <properties>
     <!-- Core Dependencies -->
-    <core-lib-azure.version>2.0.2</core-lib-azure.version>
+    <core-lib-azure.version>2.0.4</core-lib-azure.version>
     <!-- Project Versions -->
     <azure-ad-starter.version>3.0.0</azure-ad-starter.version>
     <msal4j.version>1.17.3</msal4j.version>
