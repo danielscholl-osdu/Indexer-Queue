@@ -55,7 +55,7 @@ public class EnvironmentVariables {
             logger.error("Could not load properties file.", e);
         }
         this.maxAllowedMessages = getPropertyOrDefault("MAX_RETRIEVED_MESSAGES", 10);
-        this.maxIndexThreads = getPropertyOrDefault("MAX_INDEX_THREADS", 1000);
+        this.maxIndexThreads = getPropertyOrDefault("MAX_INDEX_THREADS", 200);
         this.maxWaitTime = getPropertyOrDefault("MAX_WAIT_TIME", 10);
         this.maxBatchRequestCount = getPropertyOrDefault("MAX_DELETED_MESSAGES", 10);
         this.fullWorkerWaitTime = getPropertyOrDefault("FULL_WORKER_WAIT_TIME", 10);
