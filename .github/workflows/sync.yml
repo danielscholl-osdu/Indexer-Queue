@@ -1,0 +1,162 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  Sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add upstream remote using stored secret
+          git remote add upstream "${{ secrets.UPSTREAM_REPO_URL }}"
+
+      - name: Fetch latest from upstream
+        run: |
+          # Fetch latest from upstream
+          git fetch upstream --prune
+
+          # Determine default branch
+          if git rev-parse --verify upstream/main >/dev/null 2>&1; then
+            DEFAULT_BRANCH="main"
+          elif git rev-parse --verify upstream/master >/dev/null 2>&1; then
+            DEFAULT_BRANCH="master"
+          else
+            echo "::error::Could not find main or master branch in upstream"
+            exit 1
+          fi
+          echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+
+      - name: Create sync branch and PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Fetch and checkout fork_upstream branch
+          git fetch origin fork_upstream
+          git checkout -b fork_upstream origin/fork_upstream
+
+          # Create a new branch for the sync
+          SYNC_BRANCH="sync/upstream-$(date +%Y%m%d)"
+          git checkout -b $SYNC_BRANCH
+
+          # Merge upstream changes
+          if ! git merge upstream/$DEFAULT_BRANCH --no-edit; then
+            echo "::error::Merge conflicts detected. Manual intervention required."
+            
+            # Get conflict details
+            CONFLICTS=$(git diff --name-only --diff-filter=U)
+            STATUS=$(git status -s)
+            
+            # Create conflict resolution PR
+            BODY="Conflicts detected while syncing with upstream.
+
+            ### Conflicts
+            \`\`\`
+            $STATUS
+            \`\`\`
+
+            Please resolve these conflicts manually."
+
+            gh pr create \
+              --base fork_upstream \
+              --head $SYNC_BRANCH \
+              --title "⚠️ Upstream Sync Conflicts - Manual Resolution Required" \
+              --body "$BODY"
+            
+            # Create conflict resolution issue
+            ISSUE_BODY="Merge conflicts were detected while syncing from upstream.
+
+            ### Affected Files
+            \`\`\`
+            $CONFLICTS
+            \`\`\`
+
+            ### Resolution Steps
+            1. Check out the conflict resolution PR: ${{ github.server_url }}/${{ github.repository }}/pulls
+            2. Review and resolve conflicts in the affected files
+            3. Test the changes thoroughly
+            4. Update the PR for review
+
+            ### Additional Details
+            - Branch with conflicts: \`$SYNC_BRANCH\`
+            - Target branch: \`fork_upstream\`
+            - Upstream branch: \`$DEFAULT_BRANCH\`
+
+            @${{ github.repository_owner }}"
+
+            gh issue create \
+              --title "🔄 Upstream Sync Conflicts Detected $(date +%Y-%m-%d)" \
+              --body "$ISSUE_BODY" \
+              --label sync-failed \
+              --label needs-resolution
+            
+            exit 1
+          fi
+
+          # Check if there are any changes to commit
+          if git diff --quiet fork_upstream; then
+            echo "No changes to sync from upstream"
+            exit 0
+          fi
+
+          # Push changes
+          git push origin $SYNC_BRANCH
+
+          # Get upstream version for PR description
+          UPSTREAM_VERSION=$(git describe --tags --abbrev=0 upstream/$DEFAULT_BRANCH 2>/dev/null || echo "latest")
+
+          # Create PR
+          gh pr create \
+            --base fork_upstream \
+            --head $SYNC_BRANCH \
+            --title "⬆️ Sync with upstream $UPSTREAM_VERSION" \
+            --body "Automated PR to sync with upstream repository changes."
+
+      - name: Create sync-failed label if it doesn't exist
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          gh label create sync-failed \
+            --description "Issues related to sync failures" \
+            --color "d73a4a" || true
+
+      - name: Create issue on failure
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          ISSUE_BODY="The automated upstream sync workflow failed.
+
+          ### Error Details
+          Please check the workflow logs for more information:
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ### Manual Steps Required
+          1. Review the error logs
+          2. Resolve any conflicts
+          3. Re-run the sync workflow
+
+          @${{ github.repository_owner }}"
+
+          gh issue create \
+            --title "🔄 Upstream Sync Failed $(date +%Y-%m-%d)" \
+            --body "$ISSUE_BODY" \
+            --label sync-failed

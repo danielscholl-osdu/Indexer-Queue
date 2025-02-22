@@ -1,0 +1,2108 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+================================================================
+File Summary
+================================================================
+
+Purpose:
+--------
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+
+File Format:
+------------
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Multiple file entries, each consisting of:
+  a. A separator line (================)
+  b. The file path (File: path/to/file)
+  c. Another separator line
+  d. The full contents of the file
+  e. A blank line
+
+Usage Guidelines:
+-----------------
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+
+Notes:
+------
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+
+Additional Info:
+----------------
+
+================================================================
+Directory Structure
+================================================================
+.cursor/
+  rules/
+    default.mdc
+.github/
+  ISSUE_TEMPLATE/
+    branch-protection-reminder.md
+    init-error.md
+    init-request.md
+    init-started.md
+  PULL_REQUEST_TEMPLATE/
+    cleanup-pr.md
+    init-pr.md
+    sync-pr.md
+  workflows/
+    init.yml
+    release.yml
+    sync.yml
+    validate.yml
+  dependabot.yml
+doc/
+  init-workflow.md
+  prd.md
+  release-workflow.md
+  sync-workflow.md
+  validate-workflow.md
+.gitignore
+.release-please-config.json
+README.md
+
+================================================================
+Files
+================================================================
+
+================
+File: .cursor/rules/default.mdc
+================
+---
+description: General Cursor Rule
+globs: 
+---
+You are a senior software engineer specialized in building highly-scalable and maintainable systems.
+
+# Guidelines
+When a file becomes too long, split it into smaller files. When a function becomes too long, split it into smaller functions.
+
+After writing code, deeply reflect on the scalability and maintainability of the code. Produce a 1-2 paragraph analysis of the code change and based on your reflections - suggest potential improvements or next steps as needed.
+
+# Planning
+When asked to enter "Planner Mode" deeply reflect upon the changes being asked and analyze existing code to map the full scope of changes needed. Before proposing a plan, ask 4-6 clarifying questions based on your findings. Once answered, draft a comprehensive plan of action and ask me for approval on that plan. Once approved, implement all steps in that plan. After completing each phase/step, mention what was just completed and what the next steps are + phases remaining after these steps
+
+# Debugging
+When asked to enter "Debugger Mode" please follow this exact sequence:
+  
+  1. Reflect on 5-7 different possible sources of the problem
+  2. Distill those down to 1-2 most likely sources
+  3. Add additional logs to validate your assumptions and track the transformation of data structures throughout the application control flow before we move onto implementing the actual code fix
+  4. Use the "getConsoleLogs", "getConsoleErrors", "getNetworkLogs" & "getNetworkErrors" tools to obtain any newly added web browser logs
+  5. Obtain the server logs as well if accessible - otherwise, ask me to copy/paste them into the chat
+  6. Deeply reflect on what could be wrong + produce a comprehensive analysis of the issue
+  7. Suggest additional logs if the issue persists or if the source is not yet clear
+  8. Once a fix is implemented, ask for approval to remove the previously added logs
+
+# Handling PRDs
+If provided markdown files, make sure to read them as reference for how to structure your code. Do not update the markdown files at all unless otherwise asked to do so. Only use them for reference and examples of how to structure your code.
+
+# Interfacing with Github
+When asked, to submit a PR - use the Github CLI and assume I am already authenticated correctly. When asked to create a PR follow this process:
+
+1. git status - to check if there are any changes to commit
+2. git add . - to add all the changes to the staging area (IF NEEDED)
+3. git commit -m "your commit message" - to commit the changes (IF NEEDED)
+4. git push - to push the changes to the remote repository (IF NEEDED)
+5. git branch - to check the current branch
+6. git log main..[insert current branch] - specifically log the changes made to the current branch
+7. git diff --name-status main - check to see what files have been changed
+8. gh pr create --title "Title goes here..." --body "Example body..."
+
+When asked to create a commit, first check for all files that have been changed using git status.Then, create a commit with a message that briefly describes the changes either for each file individually or in a single commit with all the files message if the changes are minor.
+
+When writing a message for the PR, do not include new lines in the message. Just write a single long message.
+
+================
+File: .github/ISSUE_TEMPLATE/branch-protection-reminder.md
+================
+### 🔔 Action Required: Branch Protection Setup
+
+The initialization process is almost complete, but there's one final manual step needed:
+
+1. Keep this issue open
+2. Follow the branch protection setup instructions above
+3. Close this issue only after you have configured the branch protection rules
+
+This issue will serve as a reminder until branch protection is properly configured.
+
+================
+File: .github/ISSUE_TEMPLATE/init-error.md
+================
+### ❌ Invalid Repository Format
+
+The comment `{{comment}}` doesn't match the required format.
+
+Please provide the repository name as `owner/repo`, for example:
+```
+microsoft/vscode
+```
+
+Common mistakes to avoid:
+- Don't include the full URL
+- Use the exact repository name (case-sensitive)
+- Include both the owner and repository name
+- No spaces or special characters
+
+Try commenting again with the correct format.
+
+================
+File: .github/ISSUE_TEMPLATE/init-request.md
+================
+### 👋 Welcome to Repository Setup!
+
+To initialize your fork management repository, I need to know which repository you want to sync with.
+
+#### 🔑 Required Setup - Personal Access Token (PAT)
+
+1. Create a Personal Access Token (PAT) with the following permissions:
+   - `repo` (Full control of private repositories)
+   - `workflow` (Update GitHub Action workflows)
+   - `admin:repo_hook` (Full control of repository hooks)
+2. Add the token as a repository secret named `PAT_TOKEN`
+3. Comment on this issue with the upstream repository to sync with, using either:
+   - GitHub format: `owner/repo`
+   - GitLab URL: `https://gitlab.com/owner/repo`
+
+Example responses:
+```kubernetes/kubernetes
+microsoft/vscode
+apache/spark
+```
+or
+```
+https://gitlab.com/gitlab-org/gitlab
+```
+
+The initialization process will begin automatically after you comment. 
+
+⚠️ **The initialization process will fail without this token properly configured.**
+
+#### Invalid Formats to Avoid
+```
+❌ https://github.com/owner/repo         (GitHub URL - use owner/repo instead)
+❌ github.com/owner/repo                 (don't include domain for GitHub)
+❌ just-repo-name                        (must include owner/group)
+❌ Owner/Repo                            (case sensitive)
+❌ gitlab.com/group/project              (GitLab needs complete https:// URL)
+```
+
+================
+File: .github/ISSUE_TEMPLATE/init-started.md
+================
+🚀 Initialization Started
+
+I'm setting up your repository to sync with {{upstream_repo}}.
+
+🔄 Process Steps
+
+This process will:
+
+⚙️ Configure repository settings
+🌳 Create branch structure:
+   - `fork_upstream`: Pure upstream code
+   - `fork_integration`: Integration branch with workflows
+   - `main`: Working branch
+🔒 Set up protection rules
+🔄 Install sync workflows
+📦 Configure release management
+
+Please wait while I complete these steps...
+
+================
+File: .github/PULL_REQUEST_TEMPLATE/cleanup-pr.md
+================
+### Cleanup Initialization Files
+
+This PR performs the final cleanup step of the initialization process by removing files that are no longer needed:
+
+#### Files to be Removed
+- `.github/ISSUE_TEMPLATE/*` - Initialization issue templates
+- `.github/PULL_REQUEST_TEMPLATE/init-pr.md` - Initial PR template
+- `.github/workflows/init.yml` - Initialization workflow
+- `.cursor/` - Editor-specific files
+
+#### Verification
+- [x] Initialization process is complete
+- [x] Required files are preserved (completion template)
+- [x] Branch protection rules are in place
+- [x] Repository is ready for normal operation
+
+This is an automated cleanup PR created by the initialization workflow.
+
+================
+File: .github/PULL_REQUEST_TEMPLATE/init-pr.md
+================
+Complete initialization of the fork management system.
+
+### BREAKING CHANGE: Repository Structure
+This sets up the initial repository structure and workflows for fork management:
+
+- Created branch structure:
+  - fork_upstream: Tracks upstream changes
+  - fork_integration: Integration and conflict resolution
+  - main: Stable branch with local modifications
+- Configured upstream remote tracking
+- Initialized GitHub Actions workflows
+- Set up release management
+
+### Next Steps
+1. First merge the "Initial Sync" PR into fork_integration
+2. Then review and merge this PR
+3. Test sync workflow by triggering it manually
+4. Create a test commit following conventional commits format
+5. Monitor CI workflow for validation
+
+### Common Issues
+- If sync fails, check UPSTREAM_REPO_URL configuration
+- For release issues, verify the .release-please-config.json
+- If CI fails, check the validation errors
+
+Please review and merge to complete initialization.
+
+================
+File: .github/PULL_REQUEST_TEMPLATE/sync-pr.md
+================
+Initial synchronization with upstream repository.
+
+### BREAKING CHANGE: Initial Content
+This brings in the complete upstream codebase which will become our new baseline.
+
+### Changes Included
+- Initial sync from upstream's {{default_branch}} branch
+- All upstream files and history
+
+### Next Steps
+1. Review the changes
+2. Merge this PR to populate fork_integration
+3. The initialization PR to main can be merged after this one
+
+This ensures fork_integration has the latest upstream content before completing initialization.
+
+================
+File: .github/workflows/init.yml
+================
+name: Initialize Fork
+
+on:
+  create:
+    branches: [main]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number || github.ref }}
+  cancel-in-progress: false
+
+# Prevent workflow from running if workflow.env exists
+jobs:
+  check_env_file:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Check initialization status
+        id: check
+        run: |
+          # Check for workflow.env first
+          if [ -f ".github/workflow.env" ]; then
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # If no workflow.env, check if all branches exist
+          if git rev-parse --verify origin/main >/dev/null 2>&1 && \
+             git rev-parse --verify origin/fork_upstream >/dev/null 2>&1 && \
+             git rev-parse --verify origin/fork_integration >/dev/null 2>&1; then
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
+
+  create_init_issue:
+    needs: check_env_file
+    if: needs.check_env_file.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    outputs:
+      is_initialized: ${{ steps.check_init.outputs.is_initialized }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Check Initialization Status
+        id: check_init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Comprehensive initialization check
+          IS_INITIALIZED=false
+          
+          # Check for workflow.env first
+          if [ -f ".github/workflow.env" ]; then
+            IS_INITIALIZED=true
+          else
+            # If no workflow.env, check if all branches exist and are protected
+            if git rev-parse --verify origin/main >/dev/null 2>&1 && \
+               git rev-parse --verify origin/fork_upstream >/dev/null 2>&1 && \
+               git rev-parse --verify origin/fork_integration >/dev/null 2>&1; then
+              # Check for branch protection
+              if gh api "/repos/${{ github.repository }}/branches/main/protection" --silent; then
+                IS_INITIALIZED=true
+              fi
+            fi
+          fi
+          
+          echo "is_initialized=$IS_INITIALIZED" >> $GITHUB_OUTPUT
+          
+          # Only proceed with issue creation if not initialized
+          if [ "$IS_INITIALIZED" = "true" ]; then
+            echo "Repository is already initialized"
+            exit 0
+          fi
+          
+          # Check if initialization issue already exists
+          ISSUE_COUNT=$(gh issue list --label "initialization" --json number --jq 'length')
+          if [ "$ISSUE_COUNT" != "0" ]; then
+            echo "Initialization issue already exists"
+            exit 0
+          fi
+          
+          echo "proceed=true" >> $GITHUB_OUTPUT
+
+      - name: Create Label
+        if: steps.check_init.outputs.proceed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create initialization \
+            --description "Issues related to repository initialization" \
+            --color "0366d6" || true
+          
+      - name: Create Initialization Issue
+        if: steps.check_init.outputs.proceed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "🚀 Repository Initialization Required" \
+            --body-file .github/ISSUE_TEMPLATE/init-request.md \
+            --label "initialization"
+
+  check_comment:
+    needs: [create_init_issue]
+    if: github.event_name == 'issue_comment' && needs.create_init_issue.outputs.is_initialized != 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      upstream_repo: ${{ steps.get_repo.outputs.repo }}
+    permissions:
+      issues: write
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Process Comment
+        id: get_repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only process comments on initialization issues
+          if ! gh issue view ${{ github.event.issue.number }} --json labels -q '.labels[].name' | grep -q "initialization"; then
+            echo "Not an initialization issue, skipping"
+            exit 0
+          fi
+          
+          # Get the comment body
+          COMMENT="${{ github.event.comment.body }}"
+          
+          # Trim whitespace
+          REPO=$(echo "$COMMENT" | tr -d '[:space:]')
+          
+          # Validate repository format
+          if [[ "$REPO" == http* ]]; then
+            # GitLab URL format validation
+            if ! [[ "$REPO" =~ ^https?://[^/]+/[^/]+/[^/]+(/[^/]+)*$ ]]; then
+              echo "Invalid GitLab URL format"
+              cat .github/ISSUE_TEMPLATE/init-error.md | \
+                sed "s|{{comment}}|$REPO|g" | \
+                gh issue comment "${{ github.event.issue.number }}" --body-file -
+              exit 1
+            fi
+          else
+            # GitHub owner/repo format validation
+            if ! [[ "$REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+              echo "Invalid GitHub repository format"
+              cat .github/ISSUE_TEMPLATE/init-error.md | \
+                sed "s|{{comment}}|$REPO|g" | \
+                gh issue comment "${{ github.event.issue.number }}" --body-file -
+              exit 1
+            fi
+          fi
+          
+          echo "repo=$REPO" >> $GITHUB_OUTPUT
+          
+          # Post confirmation comment
+          cat .github/ISSUE_TEMPLATE/init-started.md | \
+            sed "s|{{upstream_repo}}|$REPO|g" | \
+            gh issue comment "${{ github.event.issue.number }}" --body-file -
+
+  setup:
+    runs-on: ubuntu-latest
+    needs: [check_comment]
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+      issues: write
+      actions: write
+    continue-on-error: true
+      
+    steps:
+      - name: Check if setup should proceed
+        id: check_setup
+        run: |
+          if [[ "${{ github.event_name }}" == "issue_comment" ]] && [[ -n "${{ needs.check_comment.outputs.upstream_repo }}" ]]; then
+            echo "should_proceed=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_proceed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repository
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+          
+      - name: Configure Git
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config pull.rebase false  # Use merge strategy
+          
+      - name: Configure Upstream
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        id: upstream_config
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Get upstream repo from comment
+          UPSTREAM_REPO="${{ needs.check_comment.outputs.upstream_repo }}"
+          
+          # Convert to URL format
+          if [[ "$UPSTREAM_REPO" == http* ]]; then
+            REPO_URL="$UPSTREAM_REPO.git"
+          else
+            REPO_URL="https://github.com/$UPSTREAM_REPO.git"
+          fi
+          
+          # Add upstream remote
+          git remote add upstream $REPO_URL
+          
+          # Fetch everything from upstream
+          git fetch upstream --prune --tags
+          
+          # Try to determine the default branch
+          if git rev-parse --verify upstream/main >/dev/null 2>&1; then
+            DEFAULT_BRANCH="main"
+          elif git rev-parse --verify upstream/master >/dev/null 2>&1; then
+            DEFAULT_BRANCH="master"
+          else
+            echo "::error::Could not find main or master branch in upstream repository"
+            exit 1
+          fi
+          
+          echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+          echo "::notice::Using upstream branch: $DEFAULT_BRANCH"
+
+      - name: Setup Branches
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # 1. Create fork_upstream from upstream's default branch
+          git checkout -b fork_upstream upstream/$DEFAULT_BRANCH
+          git push -f origin fork_upstream
+          
+          # 2. Create fork_integration and setup
+          git checkout -b fork_integration fork_upstream
+          
+          # Add workflow env file
+          mkdir -p .github
+          echo "INITIALIZATION_COMPLETE=true" > .github/workflow.env
+          
+          # Copy cleaned-up workflows and dependabot config from main
+          git checkout main -- .github/workflows/validate.yml \
+                              .github/workflows/release.yml \
+                              .github/workflows/sync.yml \
+                              .github/dependabot.yml
+          
+          # Commit and push changes to fork_integration
+          git add .github
+          git commit -m "chore: add workflow environment file, dependabot config, and cleaned-up workflows"
+          git push origin fork_integration
+          
+          # 3. Merge fork_integration into main
+          git checkout main
+          if ! git merge origin/fork_integration --allow-unrelated-histories; then
+            # If there are conflicts, take integration branch version
+            git status --porcelain | grep -E '^(DD|AU|UD|UA|DU|AA|UU)' | cut -c4- | while read -r file; do
+              git checkout --theirs "$file"
+              git add "$file"
+            done
+            git commit -m "chore: merge fork_integration into main, resolving conflicts with integration changes"
+          fi
+          git push origin main
+
+      - name: Store Upstream URL
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Get upstream repo from comment
+          UPSTREAM_REPO="${{ needs.check_comment.outputs.upstream_repo }}"
+          
+          # Convert to URL format
+          if [[ "$UPSTREAM_REPO" == http* ]]; then
+            REPO_URL="$UPSTREAM_REPO.git"
+          else
+            REPO_URL="https://github.com/$UPSTREAM_REPO.git"
+          fi
+          
+          # Store using gh secret set command
+          echo "$REPO_URL" | gh secret set UPSTREAM_REPO_URL
+
+      - name: Create Labels
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Create initialization label if it doesn't exist
+          gh label create initialization \
+            --description "Issues related to repository initialization" \
+            --color "0366d6" || true
+
+      - name: Configure Branch Protection
+        if: steps.check_setup.outputs.should_proceed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Configure branch protection rules
+          PROTECTION_RULES='{
+            "required_status_checks": {
+              "strict": true,
+              "contexts": ["validation"]
+            },
+            "enforce_admins": true,
+            "required_pull_request_reviews": {
+              "dismissal_restrictions": {},
+              "dismiss_stale_reviews": false,
+              "require_code_owner_reviews": false,
+              "required_approving_review_count": 1,
+              "require_last_push_approval": false,
+              "bypass_pull_request_allowances": {}
+            },
+            "restrictions": null,
+            "allow_force_pushes": false,
+            "allow_deletions": false,
+            "required_linear_history": true,
+            "allow_fork_syncing": true,
+            "block_creations": false,
+            "required_conversation_resolution": true,
+            "lock_branch": false
+          }'
+
+          # Configure branch protection for main
+          gh api \
+            --method PUT \
+            "/repos/${{ github.repository }}/branches/main/protection" \
+            --input <(echo "$PROTECTION_RULES")
+
+          # Configure branch protection for fork_upstream
+          gh api \
+            --method PUT \
+            "/repos/${{ github.repository }}/branches/fork_upstream/protection" \
+            --input <(echo "$PROTECTION_RULES")
+
+          # Configure branch protection for fork_integration
+          gh api \
+            --method PUT \
+            "/repos/${{ github.repository }}/branches/fork_integration/protection" \
+            --input <(echo "$PROTECTION_RULES")
+
+      - name: Cleanup Templates
+        if: steps.check_setup.outputs.should_proceed == 'true' && success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Temporarily disable branch protection
+          gh api \
+            --method DELETE \
+            "/repos/${{ github.repository }}/branches/main/protection"
+            
+          # Make sure we have latest main
+          git fetch origin main
+          git checkout main
+          git pull origin main
+          
+          # Create a cleanup branch from latest main
+          git checkout -b chore/cleanup-init
+          
+          # Remove initialization-related files and directories
+          rm -rf .github/ISSUE_TEMPLATE/
+          rm -f .github/PULL_REQUEST_TEMPLATE/init-pr.md
+          rm -f .github/PULL_REQUEST_TEMPLATE/cleanup-pr.md
+          rm -f .github/workflows/init.yml
+          rm -f .github/workflows/init-complete.yml
+          rm -rf .cursor/
+          
+          # Commit and push changes
+          git add -A
+          git commit -m "chore: cleanup initialization files and templates"
+          git push -u origin chore/cleanup-init
+          
+          # Create PR using the cleanup template
+          PR_URL=$(gh pr create \
+          --title "chore: cleanup initialization files and templates" \
+          --body "$(printf "Closes #${{ github.event.issue.number }}\n\n%s" "$(cat .github/PULL_REQUEST_TEMPLATE/cleanup-pr.md)")" \
+          --base main \
+          --head chore/cleanup-init)
+          
+          # Extract PR number for later use
+          PR_NUMBER=$(echo $PR_URL | grep -o '[0-9]*$')
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+          
+          # Re-enable branch protection with updated settings
+          gh api \
+            --method PUT \
+            "/repos/${{ github.repository }}/branches/main/protection" \
+            --raw-field '{"required_status_checks":{"strict":true,"contexts":["validation"]},"enforce_admins":true,"required_pull_request_reviews":null,"restrictions":null,"allow_force_pushes":false,"allow_deletions":false,"required_linear_history":true,"allow_fork_syncing":true,"block_creations":false,"required_conversation_resolution":true,"lock_branch":false}'
+          
+          # Add PR review request comment
+          (
+            echo "### Required Action: Review Cleanup PR"
+            echo "A pull request has been created to remove initialization files: #$PR_NUMBER"
+            echo -e "\nPlease:"
+            echo "1. Review the changes in the PR"
+            echo "2. Approve the PR if the changes look correct"
+            echo "3. Merge the PR once approved"
+            echo -e "\nThis will complete the initialization process."
+          ) | gh issue comment "${{ github.event.issue.number }}" --body-file -
+
+================
+File: .github/workflows/release.yml
+================
+name: Release Management
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check-initialization:
+    runs-on: ubuntu-latest
+    outputs:
+      initialized: ${{ steps.check.outputs.initialized }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check initialization
+        id: check
+        run: |
+          if [ -f ".github/workflow.env" ]; then
+            source .github/workflow.env
+            if [ "$INITIALIZATION_COMPLETE" = "true" ]; then
+              echo "initialized=true" >> $GITHUB_OUTPUT
+            else
+              echo "initialized=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "initialized=false" >> $GITHUB_OUTPUT
+          fi
+          
+  release-please:
+    needs: check-initialization
+    if: needs.check-initialization.outputs.initialized == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        with:
+          release-type: simple
+          package-name: repo-sync
+          changelog-types: |
+            [
+              {"type":"feat","section":"Features","hidden":false},
+              {"type":"fix","section":"Bug Fixes","hidden":false},
+              {"type":"chore","section":"Miscellaneous","hidden":false},
+              {"type":"docs","section":"Documentation","hidden":false},
+              {"type":"perf","section":"Performance Improvements","hidden":false},
+              {"type":"upstream","section":"Upstream Changes","hidden":false}
+            ]
+          
+  tag-with-upstream:
+    needs: [check-initialization, release-please]
+    if: needs.check-initialization.outputs.initialized == 'true' && needs.release-please.outputs.release_created
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get Upstream Version
+        run: |
+          git remote add upstream ${{ secrets.UPSTREAM_REPO_URL }}
+          git fetch upstream --tags
+          UPSTREAM_VERSION=$(git describe --tags --abbrev=0 upstream/main 2>/dev/null || echo "v0.0.0")
+          echo "UPSTREAM_VERSION=$UPSTREAM_VERSION" >> $GITHUB_ENV
+          
+      - name: Update Release Tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the latest release tag
+          RELEASE_TAG=$(gh release list -L 1 | cut -f 3)
+          
+          # Create new tag with upstream reference
+          NEW_TAG="${RELEASE_TAG}-upstream-${UPSTREAM_VERSION}"
+          git tag -d $RELEASE_TAG
+          git push --delete origin $RELEASE_TAG
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+          
+          # Update release
+          gh release edit $RELEASE_TAG \
+            --tag $NEW_TAG \
+            --notes "$(gh release view $RELEASE_TAG --json body -q .body)
+
+            Upstream Version: ${UPSTREAM_VERSION}"
+
+================
+File: .github/workflows/sync.yml
+================
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday at midnight
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  Sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add upstream remote using stored secret
+          git remote add upstream "${{ secrets.UPSTREAM_REPO_URL }}"
+
+      - name: Fetch latest from upstream
+        run: |
+          # Fetch latest from upstream
+          git fetch upstream --prune
+
+          # Determine default branch
+          if git rev-parse --verify upstream/main >/dev/null 2>&1; then
+            DEFAULT_BRANCH="main"
+          elif git rev-parse --verify upstream/master >/dev/null 2>&1; then
+            DEFAULT_BRANCH="master"
+          else
+            echo "::error::Could not find main or master branch in upstream"
+            exit 1
+          fi
+          echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+
+      - name: Create sync branch and PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Fetch and checkout fork_upstream branch
+          git fetch origin fork_upstream
+          git checkout -b fork_upstream origin/fork_upstream
+
+          # Create a new branch for the sync
+          SYNC_BRANCH="sync/upstream-$(date +%Y%m%d)"
+          git checkout -b $SYNC_BRANCH
+
+          # Merge upstream changes
+          if ! git merge upstream/$DEFAULT_BRANCH --no-edit; then
+            echo "::error::Merge conflicts detected. Manual intervention required."
+            
+            # Get conflict details
+            CONFLICTS=$(git diff --name-only --diff-filter=U)
+            STATUS=$(git status -s)
+            
+            # Create conflict resolution PR
+            BODY="Conflicts detected while syncing with upstream.
+
+            ### Conflicts
+            \`\`\`
+            $STATUS
+            \`\`\`
+
+            Please resolve these conflicts manually."
+
+            gh pr create \
+              --base fork_upstream \
+              --head $SYNC_BRANCH \
+              --title "⚠️ Upstream Sync Conflicts - Manual Resolution Required" \
+              --body "$BODY"
+            
+            # Create conflict resolution issue
+            ISSUE_BODY="Merge conflicts were detected while syncing from upstream.
+
+            ### Affected Files
+            \`\`\`
+            $CONFLICTS
+            \`\`\`
+
+            ### Resolution Steps
+            1. Check out the conflict resolution PR: ${{ github.server_url }}/${{ github.repository }}/pulls
+            2. Review and resolve conflicts in the affected files
+            3. Test the changes thoroughly
+            4. Update the PR for review
+
+            ### Additional Details
+            - Branch with conflicts: \`$SYNC_BRANCH\`
+            - Target branch: \`fork_upstream\`
+            - Upstream branch: \`$DEFAULT_BRANCH\`
+
+            @${{ github.repository_owner }}"
+
+            gh issue create \
+              --title "🔄 Upstream Sync Conflicts Detected $(date +%Y-%m-%d)" \
+              --body "$ISSUE_BODY" \
+              --label sync-failed \
+              --label needs-resolution
+            
+            exit 1
+          fi
+
+          # Check if there are any changes to commit
+          if git diff --quiet fork_upstream; then
+            echo "No changes to sync from upstream"
+            exit 0
+          fi
+
+          # Push changes
+          git push origin $SYNC_BRANCH
+
+          # Get upstream version for PR description
+          UPSTREAM_VERSION=$(git describe --tags --abbrev=0 upstream/$DEFAULT_BRANCH 2>/dev/null || echo "latest")
+
+          # Create PR
+          gh pr create \
+            --base fork_upstream \
+            --head $SYNC_BRANCH \
+            --title "⬆️ Sync with upstream $UPSTREAM_VERSION" \
+            --body "Automated PR to sync with upstream repository changes."
+
+      - name: Create sync-failed label if it doesn't exist
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          gh label create sync-failed \
+            --description "Issues related to sync failures" \
+            --color "d73a4a" || true
+
+      - name: Create issue on failure
+        if: failure()
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          ISSUE_BODY="The automated upstream sync workflow failed.
+
+          ### Error Details
+          Please check the workflow logs for more information:
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ### Manual Steps Required
+          1. Review the error logs
+          2. Resolve any conflicts
+          3. Re-run the sync workflow
+
+          @${{ github.repository_owner }}"
+
+          gh issue create \
+            --title "🔄 Upstream Sync Failed $(date +%Y-%m-%d)" \
+            --body "$ISSUE_BODY" \
+            --label sync-failed
+
+================
+File: .github/workflows/validate.yml
+================
+name: Validation
+
+on:
+  pull_request:
+    branches: [main, fork_integration, fork_upstream]
+  push:
+    branches: [main, fork_integration, fork_upstream]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Conventional Commits
+        if: steps.check_init.outputs.initialized == 'true'
+        uses: webiny/action-conventional-commits@v1.1.0
+        
+      - name: Check for merge conflicts
+        run: |
+          # Check if there are any conflict markers in files
+          if git diff --check; then
+            echo "No conflict markers found"
+          else
+            echo "::error::Conflict markers found in files"
+            exit 1
+          fi
+          
+      - name: Validate branch is up to date
+        if: github.event_name == 'pull_request'
+        run: |
+          # Fetch all branches
+          git fetch origin
+          
+          # Check if PR branch is behind its target
+          BASE_BRANCH="origin/${{ github.base_ref }}"
+          CURRENT_BRANCH="origin/${{ github.head_ref }}"
+          
+          # Make sure we have both branches
+          git fetch origin ${{ github.base_ref }}
+          git fetch origin ${{ github.head_ref }}
+          
+          # Check if branches exist
+          if ! git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            echo "::error::Base branch $BASE_BRANCH not found"
+            exit 1
+          fi
+          
+          if ! git rev-parse --verify $CURRENT_BRANCH >/dev/null 2>&1; then
+            echo "::error::Current branch $CURRENT_BRANCH not found"
+            exit 1
+          fi
+          
+          # Compare branches
+          BEHIND_BY=$(git rev-list --count $CURRENT_BRANCH..$BASE_BRANCH)
+          
+          if [ "$BEHIND_BY" -gt 0 ]; then
+            echo "::error::Branch is behind $BASE_BRANCH by $BEHIND_BY commits. Please update your branch."
+            exit 1
+          fi
+          
+      - name: Comment PR Status
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determine which checks passed
+          CHECKS_STATUS="## Validation Status"
+          
+          if [[ "${{ steps.check_init.outputs.initialized }}" == "true" ]]; then
+            CHECKS_STATUS="$CHECKS_STATUS
+          - ✓ Conventional Commits"
+          else
+            CHECKS_STATUS="$CHECKS_STATUS
+          - ⏭️ Conventional Commits (skipped during initialization)"
+          fi
+          
+          CHECKS_STATUS="$CHECKS_STATUS
+          - ✓ No Conflict Markers
+          - ✓ Branch Up-to-date
+          
+          Ready for review!"
+          
+          gh pr comment ${{ github.event.pull_request.number }} --body "$CHECKS_STATUS"
+
+================
+File: .github/dependabot.yml
+================
+version: 2
+updates:
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    target-branch: "fork_integration"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    
+  # NPM dependencies (for Release Please and commit hooks)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    target-branch: "fork_integration"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    
+  # Monitor upstream repository's package ecosystem
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    target-branch: "fork_upstream"
+    labels:
+      - "dependencies"
+      - "upstream"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+================
+File: doc/init-workflow.md
+================
+# Fork Management Initialization Workflow
+
+The Initialization Workflow (`.github/workflows/init.yml`) automates the setup of a fork management repository, ensuring proper branch structures, protection rules, and configurations are applied. This workflow streamlines the process of bringing online a fork with its upstream repository while maintaining controlled updates and synchronization.
+
+## Purpose
+
+The goal of this workflow is to:
+
+- Establish the required branch structure for proper upstream synchronization.
+
+- Configure branch protection rules to maintain repository integrity.
+
+- Manage repository setup through automated issue tracking.
+
+- Provide a clean initialization process by handling setup, validation, and cleanup efficiently.
+
+## How the Workflow is Triggered
+
+The workflow can be triggered through multiple mechanisms:
+
+```mermaid
+graph LR
+    A[Repository Created] -->|create: main| D[Workflow]
+    B[Issue Comment] -->|issue_comment: created| D
+    C[Manual Trigger] -->|workflow_dispatch| D
+```
+
+### Trigger Details
+
+1. Automatic – Runs when a repository is created with the main branch.
+
+2. Issue Comment – Activated when a user provides an upstream repository reference in an issue.
+
+3. Manual – A repository owner can trigger it from GitHub Actions.
+
+## Initialization Process
+
+### 1. Workflow Startup & Validation
+
+The workflow first checks if initialization is necessary by determining:
+
+- If .github/workflow.env exists (indicating prior initialization).
+
+- If required branches (main, fork_upstream, fork_integration) are already present and protected.
+
+```mermaid
+flowchart TD
+    A[Start] --> B{workflow.env exists?}
+    B -->|Yes| C[Skip Init]
+    B -->|No| D{Check Branches}
+    D -->|All Exist & Protected| E[Skip Init]
+    D -->|Missing/Unprotected| F[Continue Init]
+```
+
+### 2. Issue-Based Setup
+
+If initialization is required, the workflow creates an issue and awaits the user to provide the upstream repository reference.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant W as Workflow
+    participant I as Issue
+    participant R as Repository
+
+    W->>I: Create initialization issue
+    Note over I: Await user input for upstream repo
+    U->>I: Provide upstream repository reference
+    W->>I: Validate repository format
+    alt Valid Format
+        W->>R: Begin setup process
+        W->>I: Post progress updates
+        W->>R: Create cleanup PR
+        Note over R: PR merges & closes issue
+    else Invalid Format
+        W->>I: Post error message
+    end
+```
+
+### 3. Repository Configuration
+
+Once a valid upstream repository is provided, the following setup process begins:
+
+```mermaid
+graph TD
+    A[Configure Git] -->|Set user & email| B[Configure Upstream]
+    B -->|Add remote & fetch| C[Setup Branches]
+    C -->|Create & configure| D[Store URL]
+    D -->|Set repository secret| E[Configure Protection]
+    E -->|Apply branch protection rules| F[Create Cleanup PR]
+
+    subgraph "Branch Setup"
+    C1[fork_upstream] -->|Track upstream changes| C2[fork_integration]
+    C2 -->|Initialize workflows| C3[main]
+    end
+```
+
+### 4. Branch Protection Rules
+
+The workflow enforces branch protection policies on main, fork_upstream, and fork_integration:
+
+- Requires status checks (validation workflow must pass before merging).
+
+- Enforces linear commit history (no forced push or branch deletions).
+
+- Enables conversation resolution for PR discussions.
+
+### 5. Cleanup Process
+
+Once the repository is initialized, the workflow automatically generates a cleanup PR to remove unnecessary initialization files:
+
+- Deletes ISSUE_TEMPLATE/ directory.
+
+- Removes PULL_REQUEST_TEMPLATE/init-pr.md.
+
+- Deletes .github/workflows/init.yml.
+
+- Cleans up editor-specific files.
+
+The cleanup PR closes the initialization issue upon merging.
+
+## Error Handling & Troubleshooting
+
+The workflow includes robust error-handling mechanisms to ensure a smooth setup process.
+
+```mermaid
+flowchart LR
+    A[Error Occurs] --> B{Error Type}
+    B -->|Invalid Repo Format| C[Comment on Issue]
+    B -->|Setup Error| D[Continue Execution]
+    B -->|Branch Protection Error| E[Retry with Elevated Permissions]
+    
+    C --> F[Allow User to Retry]
+    D --> G[Request Manual Intervention]
+    E --> H[Reapply Protection Rules]
+```
+
+## Final Repository Structure
+
+```mermaid
+gitGraph
+    commit id: "Initial Setup"
+    branch fork_upstream
+    checkout fork_upstream
+    commit id: "Upstream Sync"
+    branch fork_integration
+    checkout fork_integration
+    commit id: "Setup Workflows"
+    checkout main
+    merge fork_integration id: "Complete Initialization"
+```
+
+================
+File: doc/prd.md
+================
+# Product Requirements Document (PRD)
+
+## 1. Overview
+
+This PRD describes a Fork Management System—a project designed to help teams maintain long-lived forks of an upstream open-source repository. 
+The system is implemented as a template repository with automated setup and management workflows.
+
+When a new repository is created from this template, GitHub Actions automatically:
+1. Configure the required branch structure
+2. Set up branch protection rules
+3. Initialize synchronization with the specified upstream repository
+4. Configure release management workflows
+
+The system handles:
+
+- Pulling changes from an upstream repository on a regular basis.
+- Integrating new updates into a private fork without disrupting ongoing local development.
+- Certifying and releasing stable versions for downstream users or internal consumers.
+
+The main objective is to ensure that any proprietary modifications (or specialized local changes) remain functional and up to date while maintaining alignment with the upstream source.
+
+## 2. Problem Statement
+
+Organizations may maintain private forks of open-source projects for additional features or custom modifications. However:
+
+- Upstream repositories evolve continuously with new features and fixes.
+- Local developments in the private fork can conflict with upstream changes, requiring careful integration.
+- Downstream users need stable, tested releases of these private forks on a predictable schedule.
+
+### Key Challenge
+How can we continuously integrate upstream updates into a private fork while ensuring proprietary code remains intact and providing reliable releases to downstream consumers?
+
+## 3. Goals and Objectives
+
+### Regular Upstream Sync
+- Provide an automated or on-demand mechanism to pull changes from the upstream repository on a set schedule (e.g., weekly) or as needed.
+
+### Controlled Integration
+- Introduce a dedicated branch for merging and testing new upstream changes before they reach the stable fork master.
+
+### Isolated Feature Development
+- Enable teams to develop proprietary or localized features in separate branches without breaking the stable mainline.
+
+### Stable Downstream Release
+- Release certified, tested builds to downstream consumers on a predictable cadence.
+
+### Traceable Versioning
+- Establish a semantic versioning scheme that references the upstream version or commit for clarity and traceability.
+
+## 4. User Stories
+
+1. As a Fork Maintainer, I need a reliable process to sync upstream changes into my private fork, ensuring that conflicts are resolved early.
+2. As a Developer, I want to create feature branches to build proprietary enhancements without affecting the main (master) branch until my changes are ready.
+3. As a Downstream Consumer, I require predictable, stable releases from the private fork on a consistent schedule.
+
+## 5. Functional Requirements
+
+### 5.1 Upstream Sync
+#### Scheduled or On-Demand Pull
+- The system must support fetching updates from the upstream repository at regular intervals or manually when required.
+
+#### Sync Branch
+- Maintain a dedicated branch (e.g., fork_upstream) to track upstream changes.
+
+### 5.2 Controlled Integration
+#### Integration Branch
+- Introduce a staging branch (e.g., fork_integration) where pulled updates are merged and conflicts resolved.
+
+#### Automated Conflict Detection
+- Provide tools or processes to quickly identify conflicts and prompt resolution.
+
+### 5.3 Proprietary Feature Development
+#### Feature Branches
+- Each new feature or proprietary change is developed on its own branch (e.g., Feature1, Feature2) for isolation.
+
+#### Merge to Main
+- Completed features merge into the main branch of the private fork when deemed stable.
+
+### 5.4 Downstream Releases
+#### Certified Tags
+- Tag stable snapshots in the main branch (e.g., v1.2.0) after successful testing and validation.
+
+#### Scheduled Pull
+- Downstream consumers or repositories pull these certified tags on a defined schedule (e.g., weekly).
+
+### 5.5 Versioning
+#### Semantic Versioning
+- Adopt Major.Minor.Patch, incrementing versions based on the scope of changes (breaking, features, or fixes).
+- Utilize Release Please for automated version management and changelog generation.
+- Follow Conventional Commits specification for commit messages to enable automated versioning.
+
+#### Release Please Integration
+- Automatically detect version bumps based on Conventional Commits.
+- Generate and maintain CHANGELOG.md files.
+- Create release pull requests with version updates.
+- Support monorepo configuration if needed.
+- Handle upstream version references in release notes.
+
+#### Commit Message Convention
+- feat: New feature (minor version bump)
+- fix: Bug fix (patch version bump)
+- feat!: or fix!: Breaking change (major version bump)
+- chore: Maintenance tasks (no version bump)
+- docs: Documentation updates (no version bump)
+- style: Code style changes (no version bump)
+- refactor: Code refactoring (no version bump)
+- perf: Performance improvements (patch version bump)
+- test: Test updates (no version bump)
+
+#### Upstream Reference
+- Append or record the upstream release/commit reference in the version tag (e.g., fork-v1.3.0-upstream-v1.3.0) or include it in the CHANGELOG.
+
+## 6. Non-Functional Requirements
+
+- **Automation**: Initial repository setup must be fully automated via GitHub Actions
+- **Reliability**: Each certified release must pass all relevant tests to ensure quality.
+- **Scalability**: The workflow should handle multiple feature branches and frequent upstream merges.
+- **Performance**: The integration process should not significantly degrade CI/CD performance.
+- **Security**: Proprietary code must remain protected and separated from public visibility where required.
+- **Maintainability**: Clear workflows and documentation allow new collaborators to get up to speed quickly.
+- **Automation**: Release management and changelog generation must be automated using Release Please.
+
+## 7. Assumptions
+
+1. The upstream repository follows a standard branching and tagging policy (main branch, feature branches, release tags, etc.).
+2. Teams have proper permissions to create and manage branches in the private fork.
+3. Downstream consumers can integrate new releases on a regular cadence without disruption.
+4. Proprietary or local changes can be isolated to feature branches without direct manipulation of the master branch.
+
+## 8. Dependencies
+
+1. GitHub Template Repository functionality
+2. GitHub Actions for automation and workflow orchestration
+3. GitHub API for branch protection and repository configuration
+4. Git Repository Hosting (GitHub, GitLab, Bitbucket, etc.) for version control, branching, and pull requests.
+5. CI/CD Pipeline for automated builds and test execution.
+6. Automation/Orchestration Tools (scripts or workflows) to manage merges, conflict resolution, and tagging.
+7. Versioning & Release Management processes for stable, traceable releases.
+8. Release Please GitHub Action for automated release management.
+
+## 9. Acceptance Criteria
+
+### Successful Upstream Pull
+- A designated sync branch (Fork_Upstream) pulls and tracks upstream commits without impacting the local master.
+
+### Conflict-Resolution Workflow
+- Merging upstream changes into the Fork_Integration branch triggers builds/tests to detect conflicts.
+
+### Feature Isolation
+- Proprietary features remain on separate branches until merged into master following successful testing.
+
+### Stable Master Branch
+- Only conflict-free and tested changes reach Fork Master.
+
+### Regular Downstream Updates
+- Certified tags are consistently published for downstream consumption, e.g., on a weekly basis.
+
+### Automated Release Management
+- Release Please successfully creates release pull requests based on Conventional Commits.
+- CHANGELOG.md is automatically updated with proper categorization of changes.
+- Version bumps correctly reflect the nature of changes (major, minor, patch).
+
+## 10. Technical Design Overview
+
+A recommended branching strategy facilitates controlled updates from upstream, isolated proprietary development, and stable releases for downstream.
+
+### 10.1 Upstream Branching Strategy (Generic)
+```
+┌────────────────┐
+│ Upstream Master│ (U0 → U5)
+└────────────────┘
+      ↑    ↑
+   Feature Branches
+```
+- **Master Branch**: Primary branch with continuous updates from the open-source project.
+- **Feature Branches**: Used by the upstream project for new features, fixes, etc.
+
+### 10.2 Fork Branching Strategy
+```
+             ┌────────────────────────┐
+             │ fork_upstream (Sync)   │
+             │ (Tracks Upstream)      │
+             └────────────────────────┘
+                        ↓
+             ┌───────────────────────┐
+             │ fork_integration      │
+             │ (Conflict Resolution) │
+             └───────────────────────┘
+                        ↓
+             ┌───────────────────────┐
+             │ fork_main             │
+             │ (Stable)              │
+             └───────────────────────┘
+              ↑                     ↑
+        Feature Branches       Certified Tags
+        (Feature1, etc.)       (Downstream Pull)
+```
+
+- **Fork_Upstream**: Regularly pulls changes from the upstream master.
+- **Fork_Integration**: Merges pulled changes, resolves conflicts before updates reach Fork Master.
+- **Fork Master**: Maintains the stable, production-ready version.
+- **Feature Branches**: Proprietary or localized work, merged into Fork Master upon completion.
+
+### 10.3 Downstream Repository Strategy
+```
+┌───────────────────────────┐
+│ Downstream Main           │
+│ (Stable Releases)         │
+└───────────────────────────┘
+              ↑
+     Certified Tags (Weekly)
+```
+- **Downstream Master**: Maintains stable code, pulling certified releases (tags) from Fork Master.
+- **No Direct Feature Development**: Downstream only consumes verified releases.
+
+### 10.4 Complete Fork Flow
+```
+ ┌─────────────────────┐      ┌─────────────────────┐
+ │ Upstream Master     │ ---> │ fork_upstream       │
+ │ (U0 → U5)           │      │ (Pull Changes)      │
+ └─────────────────────┘      └─────────────────────┘
+           ↑                         ↓
+ Feature Branches          ┌─────────────────────┐
+  (Upstream)               │ fork_integration    │
+                           │ (Conflict Resolve)  │
+                           └─────────────────────┘
+                                    ↓
+                           ┌─────────────────────┐
+                           │ Fork main           │
+                           │ (Stable)            │
+                           └─────────────────────┘
+                               ↑              ↑
+                        Feature Branches  Certified Tags
+                        (Proprietary)    (Downstream Pull)
+```
+
+**Process Flow**:
+1. **Pull from Upstream**: Fork_Upstream fetches updates from Upstream Master.
+2. **Merge & Resolve**: Changes merge into Fork_Integration, where conflicts are addressed and tested.
+3. **Promote to Master**: Tested changes flow into Fork Master.
+4. **Downstream Release**: Certified tags from Fork Master are pulled by downstream on a scheduled or on-demand basis.
+
+## 11. Versioning Strategy
+
+### 11.1 Semantic Versioning with Upstream Reference
+Major.Minor.Patch increments to reflect the nature of changes:
+- **Major**: Breaking changes.
+- **Minor**: New features or minor enhancements.
+- **Patch**: Bug fixes or small improvements.
+- **Upstream Reference**: Optionally append the upstream release/commit (e.g., fork-v2.0.0-upstream-v1.4.1).
+
+### 11.2 Examples
+| Upstream Version | Fork Outcome | Fork Version Tag |
+|-----------------|--------------|------------------|
+| upstream-v1.2.3 | No breaking changes | fork-v1.2.0-upstream-v1.2.3 |
+| upstream-v1.3.0 | Minor updates in fork features | fork-v1.3.0-upstream-v1.3.0 |
+| upstream-v1.4.1 | Breaking fork changes | fork-v2.0.0-upstream-v1.4.1 |
+| upstream-v1.4.1 | Bug fix in fork only | fork-v2.0.1-upstream-v1.4.1 |
+
+## 12. Testing Requirements
+
+### Branching & Merging
+- Validate merges from Fork_Upstream into Fork_Integration for conflict detection and resolution.
+- Ensure merges into Fork Master trigger automated builds and tests.
+
+### Feature Branch Isolation
+- Confirm that new features remain contained until they are merged to Fork Master post-testing.
+
+### Certification & Tagging
+- Each certified release tag must pass a full regression test suite before being published for downstream.
+
+### Version Tag Validation
+- Ensure the system enforces correct semantic versioning, optionally referencing the matching upstream version.
+
+## 13. Linting and Code Quality Requirements
+
+- **Static Analysis**: All scripts or automation tools must pass standard linters (e.g., Flake8, ESLint) based on the chosen language.
+- **Continuous Integration**: New merges require passing tests in a CI pipeline (style, unit tests, coverage).
+- **Documentation & Comments**: Complex processes or scripts must be thoroughly documented for maintainability.
+
+## 14. Documentation Testing
+
+- **Branching Diagrams**: Verify diagrams match the actual repo structure and branching setup.
+- **Usage Guides**: Provide clear, step-by-step instructions for maintainers and contributors on how to merge, resolve conflicts, and tag releases.
+- **Examples**: Demonstrate real-world scenarios for merging upstream changes, tagging stable releases, and addressing conflicts.
+- **Changelog Consistency**: Each version's upstream reference and changes must be clearly recorded.
+
+## 15. Conclusion
+
+This Fork Management System enables continuous alignment with an upstream open-source project while preserving local, proprietary changes. By maintaining a sync branch and an integration branch, users can effectively isolate and test upstream merges before committing updates to the stable master.
+
+Additionally, version tagging ensures downstream consumers receive predictable, stable releases. The result is a highly maintainable fork that benefits from the latest open-source contributions without jeopardizing unique local modifications.
+
+================
+File: doc/release-workflow.md
+================
+# Release Management Workflow
+
+This document describes the release workflow (`.github/workflows/release.yml`) that automates version management and release creation based on conventional commits.
+
+## Workflow Triggers
+
+The workflow runs on pushes to main branch:
+```mermaid
+graph LR
+    A[Push to Main] -->|if initialized| B[Release Process]
+    B -->|release-please| C[Version Management]
+```
+
+## Core Process
+
+The release process follows this sequence:
+
+```mermaid
+flowchart TD
+    A[Check Initialization] --> B{Initialized?}
+    B -->|No| C[Skip Release]
+    B -->|Yes| D[Generate Release]
+    D --> E[Tag with Upstream]
+    E --> F[Update Release Notes]
+
+    style D fill:#f9f,stroke:#333
+    style E fill:#bbf,stroke:#333
+    style F fill:#bfb,stroke:#333
+```
+
+## Key Features
+
+### 1. Initialization Check
+Verifies repository is ready for releases:
+```mermaid
+flowchart LR
+    A[Check workflow.env] --> B{INITIALIZATION_COMPLETE?}
+    B -->|Yes| C[Continue Release]
+    B -->|No| D[Skip Release]
+```
+
+### 2. Release Generation
+Uses release-please to manage versions:
+- Follows semantic versioning
+- Generates changelogs automatically
+- Creates release pull requests
+- Updates version numbers
+
+### 3. Changelog Categories
+Organizes changes into sections:
+```mermaid
+graph TD
+    A[Commits] --> B[Parse Type]
+    B --> C{Categorize}
+    C -->|feat| D[Features]
+    C -->|fix| E[Bug Fixes]
+    C -->|docs| F[Documentation]
+    C -->|perf| G[Performance]
+    C -->|upstream| H[Upstream Changes]
+    C -->|chore| I[Miscellaneous]
+```
+
+### 4. Upstream Version Tracking
+When a release is created:
+```mermaid
+sequenceDiagram
+    participant R as Release
+    participant U as Upstream
+    participant T as Tag
+
+    R->>U: Fetch Latest Version
+    U->>R: Return Version Tag
+    R->>T: Create Combined Tag
+    Note over T: format: vX.Y.Z-upstream-vA.B.C
+    R->>R: Update Release Notes
+```
+
+## Required Permissions
+
+The workflow needs:
+- `contents: write` - For creating releases and tags
+- `pull-requests: write` - For release PRs
+- Access to `UPSTREAM_REPO_URL` secret
+
+## Success Criteria
+
+A successful release requires:
+1. Repository initialization complete
+2. Conventional commit messages
+3. Valid upstream repository URL
+4. Proper permissions configured
+
+## Common Issues
+
+1. **Release Not Created**
+   - Check initialization status
+   - Verify commit message format
+   - Ensure proper permissions
+
+2. **Missing Upstream Version**
+   - Verify UPSTREAM_REPO_URL secret
+   - Check upstream repository access
+   - Ensure upstream has version tags
+
+3. **Changelog Issues**
+   - Follow conventional commit format
+   - Use correct type prefixes
+   - Include clear descriptions
+
+================
+File: doc/sync-workflow.md
+================
+# Upstream Sync Workflow
+
+This document describes the sync workflow (`.github/workflows/sync.yml`) that keeps your fork in sync with its upstream repository.
+
+## Workflow Triggers
+
+The workflow runs in two scenarios:
+```mermaid
+graph LR
+    A[Weekly] -->|"Sunday 00:00"| C[Sync Workflow]
+    B[Manual] -->|workflow_dispatch| C
+```
+
+## Core Process
+
+The sync process follows this simple flow:
+
+```mermaid
+flowchart TD
+    A[Fetch Upstream Changes] --> B{Changes Detected?}
+    B -->|No| C[Exit Successfully]
+    B -->|Yes| D[Create Sync Branch]
+    D --> E{Merge Clean?}
+    E -->|Yes| F[Create Sync PR]
+    E -->|No| G[Create Conflict PR/Issue]
+```
+
+## Key Features
+
+### 1. Change Detection
+- Connects to upstream using stored URL
+- Fetches latest changes
+- Compares with fork_upstream branch
+- Exits if no changes found
+
+### 2. Clean Sync Process
+When no conflicts are detected:
+```mermaid
+sequenceDiagram
+    participant U as Upstream
+    participant S as Sync Branch
+    participant F as fork_upstream
+    participant P as Pull Request
+
+    U->>S: Fetch Changes
+    S->>S: Create Branch
+    U->>S: Merge Changes
+    S->>P: Create PR
+    Note over P: Base: fork_upstream
+    Note over P: Title: ⬆️ Sync with upstream
+```
+
+### 3. Conflict Handling
+When conflicts are detected:
+```mermaid
+sequenceDiagram
+    participant W as Workflow
+    participant P as Pull Request
+    participant I as Issue
+
+    W->>P: Create Conflict PR
+    W->>I: Create Issue
+    Note over I: Lists conflicting files
+    Note over I: Provides resolution steps
+    Note over I: Tags repository owner
+```
+
+## Required Permissions
+
+The workflow needs specific permissions:
+- `contents: write` - For branch and content management
+- `pull-requests: write` - For creating PRs
+- `issues: write` - For creating issues
+- Requires `PAT_TOKEN` with repository access
+
+## Success Scenarios
+
+### 1. No Changes Required
+```mermaid
+graph LR
+    A[Check Upstream] -->|No Changes| B[Exit Clean]
+```
+
+### 2. Clean Sync
+```mermaid
+graph LR
+    A[Check Upstream] -->|Changes Found| B[Create PR]
+    B -->|Auto-mergeable| C[Ready for Review]
+```
+
+### 3. Conflicts Detected
+```mermaid
+graph LR
+    A[Check Upstream] -->|Conflicts| B[Create PR + Issue]
+    B --> C[Await Manual Resolution]
+```
+
+## Common Issues
+
+1. **Access Problems**
+   - Verify PAT_TOKEN permissions
+   - Check UPSTREAM_REPO_URL secret
+
+2. **Merge Conflicts**
+   - Review conflict PR
+   - Follow resolution steps in issue
+   - Manual intervention required
+
+3. **Branch Protection**
+   - Ensure sync branch can be created
+   - Verify PR can be created to fork_upstream
+
+================
+File: doc/validate-workflow.md
+================
+# Validation Workflow
+
+This document describes the validation workflow (`.github/workflows/validate.yml`) that ensures code quality and consistency across pull requests.
+
+## Workflow Triggers
+
+The workflow runs on two events:
+```mermaid
+graph LR
+    A[Pull Request] -->|to main/fork branches| C[Validation]
+    B[Push] -->|to main/fork branches| C
+```
+
+## Core Process
+
+The validation process follows this sequence:
+
+```mermaid
+flowchart TD
+    A[Start] --> B[Check Commits]
+    B --> C[Check Conflicts]
+    C --> D[Check Branch Status]
+    D --> E[Post Results]
+
+    style B fill:#f9f,stroke:#333
+    style C fill:#bbf,stroke:#333
+    style D fill:#bfb,stroke:#333
+```
+
+## Key Features
+
+### 1. Conventional Commits
+Ensures commit messages follow the conventional commits format:
+- feat: New features
+- fix: Bug fixes
+- docs: Documentation
+- chore: Maintenance
+- upstream: Upstream changes
+
+### 2. Conflict Detection
+```mermaid
+sequenceDiagram
+    participant W as Workflow
+    participant R as Repository
+    participant P as PR
+
+    W->>R: Check for Conflict Markers
+    alt Conflicts Found
+        W->>P: Report Error
+    else No Conflicts
+        W->>P: Mark Check Passed
+    end
+```
+
+### 3. Branch Status
+Verifies that pull request branches are up-to-date:
+```mermaid
+flowchart LR
+    A[Get Base Branch] --> B{Behind Base?}
+    B -->|Yes| C[Request Update]
+    B -->|No| D[Mark Ready]
+```
+
+### 4. Status Reporting
+Posts a comment on pull requests with validation results:
+```
+## Validation Status
+- ✓ Conventional Commits
+- ✓ No Conflict Markers
+- ✓ Branch Up-to-date
+
+Ready for review!
+```
+
+## Required Permissions
+
+The workflow needs:
+- `contents: read` - For repository access
+- `pull-requests: write` - For commenting on PRs
+
+## Success Criteria
+
+A pull request must pass all checks:
+1. All commits follow conventional format
+2. No conflict markers in files
+3. Branch is up-to-date with base
+
+## Common Issues
+
+1. **Commit Message Format**
+   - Follow conventional commits specification
+   - Use correct type prefixes
+   - Include clear descriptions
+
+2. **Merge Conflicts**
+   - Update branch from base
+   - Resolve any conflicts
+   - Remove conflict markers
+
+3. **Branch Status**
+   - Pull latest changes from base
+   - Merge or rebase as needed
+   - Push updated branch
+
+================
+File: .gitignore
+================
+.aider*
+
+================
+File: .release-please-config.json
+================
+{
+  "packages": {
+    ".": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "simple",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "draft": false,
+      "prerelease": false,
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "versioning": "default",
+      "extra-files": [
+        "package.json",
+        "packages/*/package.json"
+      ]
+    }
+  },
+  "plugins": ["sentence-case"],
+  "sequential-calls": true,
+  "separate-pull-requests": true,
+  "group-pull-request-title-pattern": "chore: release ${component} ${version}",
+  "pull-request-title-pattern": "chore: release ${version}",
+  "changelog-sections": [
+    { "type": "feat", "section": "Features", "hidden": false },
+    { "type": "fix", "section": "Bug Fixes", "hidden": false },
+    { "type": "perf", "section": "Performance Improvements", "hidden": false },
+    { "type": "deps", "section": "Dependencies", "hidden": false },
+    { "type": "revert", "section": "Reverts", "hidden": false },
+    { "type": "docs", "section": "Documentation", "hidden": false },
+    { "type": "style", "section": "Styles", "hidden": false },
+    { "type": "chore", "section": "Miscellaneous Chores", "hidden": false },
+    { "type": "refactor", "section": "Code Refactoring", "hidden": false },
+    { "type": "test", "section": "Tests", "hidden": false },
+    { "type": "build", "section": "Build System", "hidden": false },
+    { "type": "ci", "section": "Continuous Integration", "hidden": false },
+    { "type": "upstream", "section": "Upstream Changes", "hidden": false }
+  ]
+}
+
+================
+File: README.md
+================
+# Fork Management Template
+
+This repository provides an automated template for managing long-lived forks of upstream repositories, ensuring controlled synchronization and release management. For detailed design and requirements, see the [Product Requirements Document](doc/prd.md).
+
+## Features
+
+This template automates the process of maintaining a fork while keeping it updated with upstream changes. When you create a repository from this template, it will:
+
+- Set up a structured branch strategy for controlled upstream synchronization
+- Configure automated workflows to handle syncing, validation, and releases
+- Enforce branch protection rules to maintain repository integrity
+- Manage releases with semantic versioning and upstream tracking
+
+## Prerequisites
+
+Before starting, ensure you have:
+- GitHub account with repository creation permissions
+- Personal Access Token (PAT) with required permissions:
+  - `repo` (Full control of private repositories)
+  - `workflow` (Update GitHub Action workflows)
+  - `admin:repo_hook` (Full control of repository hooks)
+
+## Quick Start
+
+### 1. Create New Repository
+1. Click the "Use this template" button above
+2. Choose a name and owner for your new repository
+3. Create repository
+
+### 2. Initialize Repository
+1. Go to Actions → Select "Initialize Fork" → Click "Run workflow" (if not already running)
+2. An initialization issue will appear in the Issues tab
+3. Follow the instructions in the issue from the bot to complete setup
+
+## Branch Structure
+
+The permanent branches control how upstream updates flow through validation before reaching the main branch:
+
+```
+             ┌────────────────────────┐
+             │ fork_upstream          │
+             │ (Tracks Upstream)      │
+             └────────────────────────┘
+                      ↓
+             ┌───────────────────────┐
+             │ fork_integration      │
+             │ (Conflict Resolution) │
+             └───────────────────────┘
+                      ↓
+             ┌───────────────────────┐
+             │ main                  │
+             │ (Stable)              │
+             └───────────────────────┘
+              ↑                     ↑
+        Feature Branches       Certified Tags
+        (Feature1, etc.)      (Downstream Pull)
+```
+
+## Automated Workflows
+
+These workflows keep your fork in sync, enforce validation rules, and manage releases automatically:
+
+### 1. Upstream Sync
+- Scheduled automatic sync from upstream repository
+- Manual sync available via Actions tab
+- Automated conflict detection and notification
+- [Details →](doc/sync-workflow.md)
+
+### 2. Validation
+- Enforces commit format and branch status
+- Prevents merging of invalid PRs
+- Ensures code quality and consistency
+- [Details →](doc/validation-workflow.md)
+
+### 3. Release Management
+- Automated versioning and changelogs
+- Tracks upstream versions with release tags
+- [Details →](doc/release-workflow.md)
+
+## Development Workflow
+
+```mermaid
+gitGraph
+    checkout main
+    commit id: "Init Repo" tag: "0.0.0"
+
+    branch upstream
+    checkout upstream
+    commit id: "Upstream Sync 1" tag: "upstream-v1.0.0"
+
+    checkout main
+    branch integration
+    checkout integration
+
+
+    merge upstream 
+
+
+    commit id: "Bugfix 1"
+
+    checkout upstream
+    commit id: "Upstream Sync 2" tag: "upstream-v2.0.0"
+
+    checkout integration
+    merge upstream
+
+
+    commit id: "Bugfix 2"
+
+    checkout main
+    commit id: "Feature Work 1" tag: "0.0.1"
+    commit id: "Feature Work 2" tag: "0.1.0"
+
+    merge integration tag: "2.0.0"
+
+    commit id: "Feature Work 3" tag: "2.1.1"
+    commit id: "Feature Work 4" tag: "2.1.2"
+
+```
+
+### 1. Feature Development
+1. Branch from main: `git checkout -b feature/my-feature main`
+2. Make changes and test
+3. Use conventional commits:
+   ```
+   feat: new feature
+   fix: bug fix
+   feat!: breaking change
+   ```
+4. Create PR → Review → Merge
+
+### 2. Upstream Sync Process
+1. Auto-sync PR created daily
+2. Review changes
+3. Resolve conflicts if needed
+4. Merge sync PR
+
+### 3. Release Process
+1. Merge to main with conventional commits
+2. Release Please handles versioning and changelog
+3. Release includes upstream version tracking
+
+
+
+================================================================
+End of Codebase
+================================================================
