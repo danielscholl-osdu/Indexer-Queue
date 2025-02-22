@@ -1,0 +1,92 @@
+name: Release Management
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check-initialization:
+    runs-on: ubuntu-latest
+    outputs:
+      initialized: ${{ steps.check.outputs.initialized }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check initialization
+        id: check
+        run: |
+          if [ -f ".github/workflow.env" ]; then
+            source .github/workflow.env
+            if [ "$INITIALIZATION_COMPLETE" = "true" ]; then
+              echo "initialized=true" >> $GITHUB_OUTPUT
+            else
+              echo "initialized=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "initialized=false" >> $GITHUB_OUTPUT
+          fi
+          
+  release-please:
+    needs: check-initialization
+    if: needs.check-initialization.outputs.initialized == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        with:
+          release-type: simple
+          package-name: repo-sync
+          changelog-types: |
+            [
+              {"type":"feat","section":"Features","hidden":false},
+              {"type":"fix","section":"Bug Fixes","hidden":false},
+              {"type":"chore","section":"Miscellaneous","hidden":false},
+              {"type":"docs","section":"Documentation","hidden":false},
+              {"type":"perf","section":"Performance Improvements","hidden":false},
+              {"type":"upstream","section":"Upstream Changes","hidden":false}
+            ]
+          
+  tag-with-upstream:
+    needs: [check-initialization, release-please]
+    if: needs.check-initialization.outputs.initialized == 'true' && needs.release-please.outputs.release_created
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get Upstream Version
+        run: |
+          git remote add upstream ${{ secrets.UPSTREAM_REPO_URL }}
+          git fetch upstream --tags
+          UPSTREAM_VERSION=$(git describe --tags --abbrev=0 upstream/main 2>/dev/null || echo "v0.0.0")
+          echo "UPSTREAM_VERSION=$UPSTREAM_VERSION" >> $GITHUB_ENV
+          
+      - name: Update Release Tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the latest release tag
+          RELEASE_TAG=$(gh release list -L 1 | cut -f 3)
+          
+          # Create new tag with upstream reference
+          NEW_TAG="${RELEASE_TAG}-upstream-${UPSTREAM_VERSION}"
+          git tag -d $RELEASE_TAG
+          git push --delete origin $RELEASE_TAG
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+          
+          # Update release
+          gh release edit $RELEASE_TAG \
+            --tag $NEW_TAG \
+            --notes "$(gh release view $RELEASE_TAG --json body -q .body)
+
+            Upstream Version: ${UPSTREAM_VERSION}" 

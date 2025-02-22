@@ -1,0 +1,91 @@
+name: Validation
+
+on:
+  pull_request:
+    branches: [main, fork_integration, fork_upstream]
+  push:
+    branches: [main, fork_integration, fork_upstream]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Conventional Commits
+        if: steps.check_init.outputs.initialized == 'true'
+        uses: webiny/action-conventional-commits@v1.1.0
+        
+      - name: Check for merge conflicts
+        run: |
+          # Check if there are any conflict markers in files
+          if git diff --check; then
+            echo "No conflict markers found"
+          else
+            echo "::error::Conflict markers found in files"
+            exit 1
+          fi
+          
+      - name: Validate branch is up to date
+        if: github.event_name == 'pull_request'
+        run: |
+          # Fetch all branches
+          git fetch origin
+          
+          # Check if PR branch is behind its target
+          BASE_BRANCH="origin/${{ github.base_ref }}"
+          CURRENT_BRANCH="origin/${{ github.head_ref }}"
+          
+          # Make sure we have both branches
+          git fetch origin ${{ github.base_ref }}
+          git fetch origin ${{ github.head_ref }}
+          
+          # Check if branches exist
+          if ! git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            echo "::error::Base branch $BASE_BRANCH not found"
+            exit 1
+          fi
+          
+          if ! git rev-parse --verify $CURRENT_BRANCH >/dev/null 2>&1; then
+            echo "::error::Current branch $CURRENT_BRANCH not found"
+            exit 1
+          fi
+          
+          # Compare branches
+          BEHIND_BY=$(git rev-list --count $CURRENT_BRANCH..$BASE_BRANCH)
+          
+          if [ "$BEHIND_BY" -gt 0 ]; then
+            echo "::error::Branch is behind $BASE_BRANCH by $BEHIND_BY commits. Please update your branch."
+            exit 1
+          fi
+          
+      - name: Comment PR Status
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determine which checks passed
+          CHECKS_STATUS="## Validation Status"
+          
+          if [[ "${{ steps.check_init.outputs.initialized }}" == "true" ]]; then
+            CHECKS_STATUS="$CHECKS_STATUS
+          - ✓ Conventional Commits"
+          else
+            CHECKS_STATUS="$CHECKS_STATUS
+          - ⏭️ Conventional Commits (skipped during initialization)"
+          fi
+          
+          CHECKS_STATUS="$CHECKS_STATUS
+          - ✓ No Conflict Markers
+          - ✓ Branch Up-to-date
+          
+          Ready for review!"
+          
+          gh pr comment ${{ github.event.pull_request.number }} --body "$CHECKS_STATUS" 
