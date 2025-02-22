@@ -27,7 +27,7 @@
     <artifactId>indexer-queue-aws</artifactId>
     <description>Indexer Queue Service on AWS</description>
     <packaging>jar</packaging>
-    <version>0.28.0-SNAPSHOT</version>
+    <version>0.29.0-SNAPSHOT</version>
     
     <name>indexer-queue-aws</name>
 
