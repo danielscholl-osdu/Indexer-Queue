@@ -1,0 +1,46 @@
+#  Copyright © Microsoft Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+# This template is responsible for using an artifact docker image and pushing it to an ACR.
+
+steps:
+  - task: DockerInstaller@0
+    displayName: Install Docker
+    inputs:
+      dockerVersion: 17.09.0-ce
+      releaseType: stable
+  - task: AzureCLI@1
+    displayName: 'ACR Push'
+    env:
+      IMAGE: ${{ parameters.imageRepoName }}:$(Build.BuildId)
+      ACR_IMAGE: $(CONTAINER_REGISTRY_NAME).azurecr.io/${{ parameters.imageRepoName }}-${{ parameters.environment }}:$(Build.SourceVersion)
+      SERVICE_NAME: ${{ parameters.imageRepoName }}
+    inputs:
+      azureSubscription: '$(SERVICE_CONNECTION_NAME)'
+      addSpnToEnvironment: true
+      scriptLocation: inlineScript
+      inlineScript: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Logging in to the ACR Registry"
+        echo "------------------------------------"
+        az acr login -n $(CONTAINER_REGISTRY_NAME)
+
+        echo "Tagging and Pushing Image to ACR"
+        echo "------------------------------------"
+        docker load --input $(Pipeline.Workspace)/ContainerImage/$SERVICE_NAME.image.tar
+        docker images
+        docker tag $IMAGE $ACR_IMAGE
+        docker push $ACR_IMAGE

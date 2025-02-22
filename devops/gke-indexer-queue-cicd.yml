@@ -1,0 +1,64 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+  branches:
+    include:
+      - kuber-migration
+  paths:
+    exclude:
+      - README.md
+      - .gitignore
+
+pool:
+  name: Hosted Ubuntu 1604
+  demands: maven
+
+variables:
+  buildMavenModules: indexer-queue-gcp
+  dockerDir: indexer-queue-gcp/docker
+  imageName: os-indexer-queue-app
+  deploymentDir: indexer-queue-gcp/kubernetes/deployments
+  deploymentFile: deployment-os-indexer-queue-service.yml
+  mavenSettings: ./indexer-queue-gcp/maven/settings.xml
+
+steps:
+
+  - task: DownloadSecureFile@1
+    name: gcrKey
+    inputs:
+      secureFile: cicd-push-image-to-cr-keyfile.json
+
+  - task: DownloadSecureFile@1
+    name: kuberConfig
+    inputs:
+      secureFile: kubeconfig
+
+  - task: Maven@3
+    inputs:
+      mavenPomFile: 'pom.xml'
+      options: '--settings $(mavenSettings) -DVSTS_FEED_TOKEN=$(VSTS_FEED_TOKEN) -pl $(buildMavenModules) package'
+      publishJUnitResults: false
+      javaHomeOption: 'JDKVersion'
+      mavenVersionOption: 'Default'
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false
+
+  - bash: |
+      #!/bin/bash
+      set -e
+      pushd $(dockerDir)
+      docker-compose build $(imageName)
+      echo 'Image done.'
+      cat $(gcrKey.secureFilePath) | docker login -u _json_key --password-stdin https://gcr.io
+      echo 'Login done.'
+      docker push gcr.io/opendes/$(imageName)
+      echo 'Push done.'
+      popd
+      pushd $(deploymentDir)
+      kubectl --kubeconfig $(kuberConfig.secureFilePath) delete -f $(deploymentFile)
+      kubectl --kubeconfig $(kuberConfig.secureFilePath) apply -f $(deploymentFile)
+      popd

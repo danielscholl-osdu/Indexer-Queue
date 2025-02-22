@@ -1,0 +1,12 @@
+apiVersion: skaffold/v2beta4
+kind: Config
+metadata:
+  name: indexer-queue-reference
+build:
+  artifacts:
+    - image: us.gcr.io/osdu-anthos-02/os-indexer-queue/anthos-indexer-queue-reference
+      context: ./indexer-queue-reference
+deploy:
+  kubectl:
+    manifests:
+      - ./indexer-queue-reference/kubernetes/deployments/deployment-os-indexer-queue-service.yml

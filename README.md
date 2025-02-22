@@ -1,141 +1,158 @@
-# Fork Management Template
+# Introduction
 
-This repository provides an automated template for managing long-lived forks of upstream repositories, ensuring controlled synchronization and release management. For detailed design and requirements, see the [Product Requirements Document](doc/prd.md).
+This repository contains implementation code for what is formerly called as Indexer queue services which provides a set of APIs that help in forwarding the messages to and from storage service to indexer service.
 
-## Features
+## Azure Documentation
 
-This template automates the process of maintaining a fork while keeping it updated with upstream changes. When you create a repository from this template, it will:
+Instructions for running `os-indexer-queue-azure` can be found [here](./indexer-queue-azure-enqueue)
 
-- Set up a structured branch strategy for controlled upstream synchronization
-- Configure automated workflows to handle syncing, validation, and releases
-- Enforce branch protection rules to maintain repository integrity
-- Manage releases with semantic versioning and upstream tracking
+## Pre-requisites
 
-## Prerequisites
+1. JDK 8
+2. Java Developer Kit (JDK), version 8
+3. Apache Maven, version 3.0 or higher
+4. IntelliJ IDEA, Community or Ultimate versions with Maven
+5. Azure CLI
+6. Azure Functions Core Tools, version 2.
 
-Before starting, ensure you have:
-- GitHub account with repository creation permissions
-- Personal Access Token (PAT) with required permissions:
-  - `repo` (Full control of private repositories)
-  - `workflow` (Update GitHub Action workflows)
-  - `admin:repo_hook` (Full control of repository hooks)
+You will also require Git to work on the project.
 
-## Quick Start
+## Running the Indexer Queue service locally
 
-### 1. Create New Repository
-1. Click the "Use this template" button above
-2. Choose a name and owner for your new repository
-3. Create repository
+Navigate to indexer queue service's root folder and run:
 
-### 2. Initialize Repository
-1. Go to Actions → Select "Initialize Fork" → Click "Run workflow" (if not already running)
-2. An initialization issue will appear in the Issues tab
-3. Follow the instructions in the issue from the bot to complete setup
-
-## Branch Structure
-
-The permanent branches control how upstream updates flow through validation before reaching the main branch:
-
-```
-             ┌────────────────────────┐
-             │ fork_upstream          │
-             │ (Tracks Upstream)      │
-             └────────────────────────┘
-                      ↓
-             ┌───────────────────────┐
-             │ fork_integration      │
-             │ (Conflict Resolution) │
-             └───────────────────────┘
-                      ↓
-             ┌───────────────────────┐
-             │ main                  │
-             │ (Stable)              │
-             └───────────────────────┘
-              ↑                     ↑
-        Feature Branches       Certified Tags
-        (Feature1, etc.)      (Downstream Pull)
+```sh
+Run mvn clean package 
 ```
 
-## Automated Workflows
+### Running the Indexer Queue service in Google Cloud
 
-These workflows keep your fork in sync, enforce validation rules, and manage releases automatically:
+Navigate to indexer-queue-boot-gc folder and run:
 
-### 1. Upstream Sync
-- Scheduled automatic sync from upstream repository
-- Manual sync available via Actions tab
-- Automated conflict detection and notification
-- [Details →](doc/sync-workflow.md)
+```sh
+TODO
 
-### 2. Validation
-- Enforces commit format and branch status
-- Prevents merging of invalid PRs
-- Ensures code quality and consistency
-- [Details →](doc/validation-workflow.md)
+````
 
-### 3. Release Management
-- Automated versioning and changelogs
-- Tracks upstream versions with release tags
-- [Details →](doc/release-workflow.md)
+### Running the Indexer Queue service in Azure
 
-## Development Workflow
+The indexer-queue-azure module is a set of two Azure functions that are created to perform the role of EnqueueApi and TaskApi that exist in the current Google Cloud implementation.
 
-```mermaid
-gitGraph
-    checkout main
-    commit id: "Init Repo" tag: "0.0.0"
+1. The indexer-queue-azure-enqueue Azure function gets triggered when a message arrives on an Azure ServiceBus Topic/Subscription from Storage service.  The function will take the message
+and posts the message to indexer-worker Api endpoint in the Indexer service
+2. The indexer-queue-azure-requeue Azure function is called by the indexer-worker-api when it fails to process all or subset of mesages that it received from Storage service (see #1 above)
+and posts those back to ServiceBus.  This will again kick-off the workflow described in #1 above.
 
-    branch upstream
-    checkout upstream
-    commit id: "Upstream Sync 1" tag: "upstream-v1.0.0"
+![Des-pipeline.jpg](resources/Des-pipeline.jpg)
 
-    checkout main
-    branch integration
-    checkout integration
+#### Running the Enqueue Service
 
-
-    merge upstream 
-
-
-    commit id: "Bugfix 1"
-
-    checkout upstream
-    commit id: "Upstream Sync 2" tag: "upstream-v2.0.0"
-
-    checkout integration
-    merge upstream
-
-
-    commit id: "Bugfix 2"
-
-    checkout main
-    commit id: "Feature Work 1" tag: "0.0.1"
-    commit id: "Feature Work 2" tag: "0.1.0"
-
-    merge integration tag: "2.0.0"
-
-    commit id: "Feature Work 3" tag: "2.1.1"
-    commit id: "Feature Work 4" tag: "2.1.2"
-
+```sh
+1.Make sure the POM file inside the indexer-queue-auzre-enqueue folder has the 'properties' section properly modified to 
+refelct the correct Azure functionApp name, region, and ResourceGroup Name.  Example Shown below
+<properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <azure.functions.maven.plugin.version>1.3.3</azure.functions.maven.plugin.version>
+        <azure.functions.java.library.version>1.3.0</azure.functions.java.library.version>
+        <functionAppName>EnqueueFunction</functionAppName>
+        <functionAppRegion>westus</functionAppRegion>
+        <stagingDirectory>${project.build.directory}/azure-functions/${functionAppName}</stagingDirectory>
+        <functionResourceGroup>SLBIndexQueueServicesRG</functionResourceGroup>
+</properties>
 ```
 
-### 1. Feature Development
-1. Branch from main: `git checkout -b feature/my-feature main`
-2. Make changes and test
-3. Use conventional commits:
-   ```
-   feat: new feature
-   fix: bug fix
-   feat!: breaking change
-   ```
-4. Create PR → Review → Merge
+Navigate to indexer-queue-azure-enqueue folder
 
-### 2. Upstream Sync Process
-1. Auto-sync PR created daily
-2. Review changes
-3. Resolve conflicts if needed
-4. Merge sync PR
+##### Running locally
 
-### 3. Release Process
-1. Merge to main with conventional commits
-2. Release Please handles versioning and changelog
-3. Release includes upstream version tracking
+```sh
+Run mvn azure-functions:run
+````
+
+##### Running in Azure
+
+```sh
+1. Run mvn azure-functions:deploy
+````
+
+If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
+
+- [ASP.NET Core](https://github.com/aspnet/Home)
+- [Visual Studio Code](https://github.com/Microsoft/vscode)
+- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+
+##***REMOVED***
+
+Instructions for running the Google Cloud Platform implementation locally can be found [here](./indexer-queue-gcp/README.md).
+
+> Note: **since release `0.20` Indexer Queue Service is not supported in Google Cloud.**
+
+### Sample Request for various projects
+
+1. indexer-queue-boot-gc project:
+
+    curl -X POST \
+      <https://os-indexer-queue-dot-opendes.appspot.com/_dps/task-handlers/enqueue> \
+      -H 'Accept: */*' \
+      -H 'Authorization: Bearer <auth-token>
+      -H 'Content-Type: application/json' \
+      -H 'Host: os-indexer-queue-dot-opendes.appspot.com' \
+      -H 'account-id: common' \
+      -d '{
+        "message": "{\"data\":[{\"id\":\"common:welldb:dummy\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}",
+        "url": "/api/indexer/v2/_dps/task-handlers/index-worker"
+    }'
+
+    curl -X POST \
+      <https://os-indexer-queue-dot-opendes.appspot.com/_ah/push-handlers/enqueue> \
+      -H 'Content-Type: application/json' \
+      -H 'Host: os-indexer-queue-dot-opendes.appspot.com' \
+      -H 'account-id: common' \
+      -d '{
+        "message": {
+            "data": "W3tcImlkXCI6XCJ0ZW5hbnQxOndlbGxkYjp3ZWxsYm9yZS1kOTAzM2FlMS1mYjE1LTQ5NmMtOWJhMC04ODBmZDFkMmIyY2ZcIixcImtpbmRcIjpcInRlbmFudDE6d2VsbGRiOndlbGxib3JlOjEuMC4wXCIsXCJvcFwiOlwiY3JlYXRlXCJ9XQ==",
+            "attributes": {
+                "account-id": "common",
+                "slb-correlation-id": "b5a281bd-f59d-4db2-9939-b2d85036fc7e"
+            },
+            "messageId": "75328163778221",
+            "publishTime": "2018-05-08T21:48:56.131Z"
+        }
+    }'
+
+2. Re-enqueue Function:
+
+curl -X POST \
+  <http://localhost:9000/api/re-enqueue> \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "message": "{\"data\":[{\"id\":\"common:welldb:asd21\",\"kind\":\"common:welldb:wellbore:1.0.0\",\"op\":\"create\"}],\"account-id\":\"common\",\"data-partition-id\":\"common\",\"correlation-id\":\"ee85038e-4510-49d9-b2ec-3651315a4d00\"}",
+    "url": "foo"
+}'
+
+### Version info endpoint
+
+For deployment available public `/info` endpoint, which provides build and git related information.
+
+#### Example response
+
+```json
+{
+    "groupId": "org.opengroup.osdu",
+    "artifactId": "storage-gc",
+    "version": "0.10.0-SNAPSHOT",
+    "buildTime": "2021-07-09T14:29:51.584Z",
+    "branch": "feature/GONRG-2681_Build_info",
+    "commitId": "7777",
+    "commitMessage": "Added copyright to version info properties file"
+}
+```
+
+This endpoint takes information from files, generated by `spring-boot-maven-plugin`,
+`git-commit-id-plugin` plugins. Need to specify paths for generated files to matching
+properties:
+
+- `version.info.buildPropertiesPath`
+- `version.info.gitPropertiesPath`

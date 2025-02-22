@@ -1,0 +1,121 @@
+#  Copyright © Microsoft Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: osdu
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        aadpodidbinding: osdu-identity
+    spec:
+      volumes:
+        - name: azure-keyvault
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: azure-keyvault
+{{- if .Values.global.isAutoscalingEnabled }}
+      nodeSelector:
+        nodepool: {{ .Values.global.nodepool }} 
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}/{{ .Chart.Name }}-{{ .Values.image.branch }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+          livenessProbe:
+              httpGet:
+                path: /actuator/health
+                port: 8081
+              initialDelaySeconds: 250
+              periodSeconds: 10
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          volumeMounts:
+            - name: azure-keyvault
+              mountPath: "/mnt/azure-keyvault"
+              readOnly: true
+          env:
+            - name: spring_application_name
+              value: indexer-queue
+            - name: azure_application_insights_instrumentation_key
+              valueFrom:
+                secretKeyRef:
+                  name: central-logging
+                  key: appinsights
+            - name: indexer_worker_url
+              value: http://indexer-service/api/indexer/v2/_dps/task-handlers/index-worker
+            - name: schema_worker_url
+              value: http://indexer-service/api/indexer/v2/_dps/task-handlers/schema-worker
+            - name: azure_servicebus_topic_name
+              value: {{ .Values.azure.servicebusTopic }}
+            - name: azure_servicebus_topic_subscription
+              value: {{ .Values.azure.servicebusSubscription }}
+            - name: azure_reindex_topic_name
+              value: { { .Values.azure.reindexTopic } }
+            - name: azure_reindex_topic_subscription
+              value: { { .Values.azure.reindexSubscription } }
+            - name: azure_schemachanged_topic_name
+              value: {{ .Values.azure.schemachangedTopic }}
+            - name: azure_schemachanged_topic_subscription
+              value: {{ .Values.azure.schemachangedSubscription }}
+            - name: KEYVAULT_URI
+              valueFrom:
+                 configMapKeyRef:
+                   name: osdu-svc-properties
+                   key: ENV_KEYVAULT
+            - name: aad_client_id
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: application-appid
+            - name: AZURE_APP_RESOURCE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: active-directory
+                  key: application-appid
+            - name: server_port
+              value: "80"
+            - name: PARTITION_API
+              value: http://partition/api/partition/v1
+            - name: executor_n_threads
+              value: "32"
+            - name: max_concurrent_calls
+              value: "32"
+            - name: max_lock_renew_duration_seconds
+              value: "600"
+            - name: max_delivery_count
+              value: "8"
+            - name: SPRING_CONFIG_NAME
+              value: "common,application"

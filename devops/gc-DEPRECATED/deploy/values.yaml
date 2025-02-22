@@ -1,0 +1,37 @@
+# Default values for indexer-queue-deploy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+data:
+  # Configmap
+  logLevel: "ERROR"
+  entitlementsHost: "http://entitlements"
+  partitionHost: "http://partition"
+  springProfilesActive: "gcp"
+  cloudTaskTargetHost: ""
+  googleCloudProject: ""
+  googleCloudProjectRegion: ""
+  indexerQueueIdentifier: ""
+  indexerHost: "http://indexer"
+  # Deployment
+  requestsCpu: "30m"
+  requestsMemory: "650Mi"
+  limitsCpu: "1"
+  limitsMemory: "1G"
+  image: ""
+  imagePullPolicy: "IfNotPresent"
+  serviceAccountName: "indexer-queue"
+
+conf:
+  appName: "indexer-queue"
+  configmap: "indexer-queue-config"
+  keycloakSecretName: "indexer-queue-keycloak-secret"
+  rabbitmqSecretName: "rabbitmq-secret"
+  onPremEnabled: false
+  domain: ""
+
+istio:
+  proxyCPU: "20m"
+  proxyCPULimit: "500m"
+  proxyMemory: "200Mi"
+  proxyMemoryLimit: "512Mi"

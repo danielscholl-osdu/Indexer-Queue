@@ -1,0 +1,82 @@
+#  Copyright © Microsoft Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+# Responsible for creating the pipeline stages required for functions CI/CD flows
+
+parameters:
+  environments: []
+  serviceName: ''
+  skipTests: false
+  skipDeploy: false
+  hldRegPath: "providers/azure/hld-registry"
+
+stages:
+
+# Maven Test, Compile and Docker Image Stage
+- stage: ci
+  displayName: 'CI'
+  pool:
+    name: $(AGENT_POOL)
+    demands: maven
+  jobs:
+  - job: test
+    displayName: Test
+    steps:
+    - template: maven-test.yml
+      parameters:
+        disable: ${{ parameters.skipTests }}
+  - job: build
+    displayName: 'Build'
+    dependsOn:
+      - test
+    steps:
+    - template: docker-build.yml
+      parameters:
+        serviceName: ${{ parameters.serviceName }}
+    - publish: $(build.artifactstagingdirectory)
+      artifact: ContainerImage
+
+# Docker Image Tag, ACR Push and Function Deploy Stage
+- ${{ each environment in parameters.environments }}:
+  - stage: ${{ environment.name }}_cd
+    displayName: 'CD - ${{ environment.name }}'
+    pool:
+      name: $(AGENT_POOL)
+
+    variables:
+    - group: 'Azure Target Env Secrets - ${{ environment.name }}'
+    - group: 'Azure Target Env - ${{ environment.name }}'
+
+    jobs:
+    - deployment: ${{ environment.name }}
+      displayName: 'Deploy'
+      environment: ${{ environment.name }}
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - download: current
+            - template: acr-push.yml
+              parameters:
+                imageRepoName: ${{ parameters.serviceName }}
+                environment: ${{ environment.name  }}
+            - template: /devops/tasks/aks-deployment-steps.yml@TemplateRepo
+              parameters:
+                serviceName: ${{ parameters.serviceName }}
+                providerName: 'Azure'
+                environment: ${{ environment.name }}
+                chartPath: ${{ parameters.chartPath }}
+                valuesFile: ${{ parameters.valuesFile }}
+                hldRegPath: ${{ parameters.hldRegPath }}
+                skipDeploy: ${{ parameters.skipDeploy }}
