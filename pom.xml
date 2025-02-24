@@ -25,7 +25,7 @@
         <appengine.maven.plugin>1.0.0</appengine.maven.plugin>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
-        <log4j.version>2.21.0</log4j.version>
+        <log4j.version>2.24.3</log4j.version>
         <json-smart.version>2.5.0</json-smart.version>
         <jackson.version>2.16.1</jackson.version>
         <spring-boot.version>3.3.7</spring-boot.version>
