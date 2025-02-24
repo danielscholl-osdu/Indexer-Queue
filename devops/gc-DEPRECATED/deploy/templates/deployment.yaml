@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.conf.appName | quote }}
+  name: {{ .Values.conf.appName | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.conf.appName | quote }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.conf.appName | quote }}
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        sidecar.istio.io/proxyCPU: {{ .Values.istio.proxyCPU | quote }}
+        sidecar.istio.io/proxyMemory: {{ .Values.istio.proxyMemory | quote }}
+        sidecar.istio.io/proxyCPULimit: {{ .Values.istio.proxyCPULimit | quote }}
+        sidecar.istio.io/proxyMemoryLimit: {{ .Values.istio.proxyMemoryLimit | quote }}
+    spec:
+      containers:
+      - name: {{ .Values.conf.appName | quote }}
+        image: {{ .Values.data.image | quote }}
+        imagePullPolicy: {{ .Values.data.imagePullPolicy | quote }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.conf.configmap | quote }}
+        {{- if .Values.conf.onPremEnabled }}
+        - secretRef:
+            name: {{ .Values.conf.keycloakSecretName | quote }}
+        - secretRef:
+            name: {{ .Values.conf.rabbitmqSecretName | quote }}
+        {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: {{ .Values.data.requestsCpu | quote }}
+            memory: {{ .Values.data.requestsMemory | quote }}
+          limits:
+            cpu: {{ .Values.data.limitsCpu | quote }}
+            memory: {{ .Values.data.limitsMemory | quote }}
+      serviceAccountName: {{ .Values.data.serviceAccountName | quote }}

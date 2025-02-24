@@ -1,0 +1,40 @@
+#  Copyright © Microsoft Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+# This template is responsible for configuring a function apps container image.
+
+steps:
+  - task: AzureCLI@1
+    displayName: 'Function Deploy'
+    condition: eq('${{ parameters.disable }}', false)
+    env:
+      IMAGE: $(CONTAINER_REGISTRY_NAME).azurecr.io/$(IMAGE_NAME):$(Build.BuildId)-${{ parameters.env_tag }}
+    inputs:
+      azureSubscription: '$(SERVICE_CONNECTION_NAME)'
+      addSpnToEnvironment: true
+      scriptLocation: inlineScript
+      inlineScript: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Deploying the Function App"
+        echo "------------------------------------"
+        echo "Function App: $FUNCTION_APP_NAME"
+        echo "Resource Group: $RESOURCE_GROUP_NAME"
+
+        az functionapp config container set \
+          --docker-custom-image-name $IMAGE \
+          --name $FUNCTION_APP_NAME \
+          --resource-group $RESOURCE_GROUP_NAME \
+          -ojsonc

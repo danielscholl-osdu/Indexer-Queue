@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: "{{ .Values.conf.appName }}"
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  hosts:
+    {{- if and .Values.conf.domain .Values.conf.onPremEnabled }}
+    - {{ printf "osdu.%s" .Values.conf.domain | quote }}
+    {{- else if .Values.conf.domain }}
+    - {{ .Values.conf.domain | quote }}
+    {{- else }}
+    - "*"
+    {{- end }}
+  gateways:
+    - service-gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/api/indexer-queue/v1"
+      route:
+        - destination:
+            port:
+              number: 80
+            host: {{ printf "%s.%s.svc.cluster.local" .Values.conf.appName .Release.Namespace | quote }}

@@ -1,0 +1,34 @@
+data:
+# common
+  javaAppJar: "/deployments/*-spring-boot.jar"
+  serverPort: 8080
+  
+# log
+  logPrefix: indexer-queue
+  loggingLevelOsdu: info
+  loggingLevelSpring: info
+  envPrefix: ibm-iks
+
+# queue
+  retryCount: 2
+ 
+#authorization
+  deployEnv: CLOUD
+  indexerAPIKey: this_123_is_456_dev_789_key
+
+#tenant-validation
+  pKCEndPointHost: referenv
+  keycloakRealm: OSDU
+  pKCClientId: partition-service
+  pKCClientSecret: referenv
+  grantType: password
+  pKCPassword: changeit
+  pKCUser: partition-service-admin
+  pKAcceptHttp: true
+  tenantCacheExpiryInSec: 10000
+  #refer-cm-template
+  patitionAPI: refer-configmap-template
+
+
+conf:
+  configmap: "indexer-queue-config"

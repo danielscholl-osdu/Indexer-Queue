@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ .Values.conf.appName | quote }}
+  name: {{ .Values.conf.configmap | quote }}
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  LOG_LEVEL: {{ .Values.data.logLevel | quote }}
+  ENTITLEMENTS_HOST: {{ .Values.data.entitlementsHost | quote }}
+  PARTITION_HOST: {{ .Values.data.partitionHost | quote }}
+  SPRING_PROFILES_ACTIVE: {{ .Values.data.springProfilesActive | quote }}
+  {{- if .Values.conf.onPremEnabled }}
+  INDEXER_HOST: {{ .Values.data.indexerHost | quote }}
+  {{- else }}
+  CLOUD_TASK_TARGET_HOST: {{ .Values.data.cloudTaskTargetHost | quote }}
+  GOOGLE_CLOUD_PROJECT: {{ .Values.data.googleCloudProject | quote }}
+  GOOGLE_CLOUD_PROJECT_REGION: {{ .Values.data.googleCloudProjectRegion | quote }} 
+  INDEXER_QUEUE_IDENTIFIER: {{ .Values.data.indexerQueueIdentifier | quote }}
+  {{- end }}
