@@ -1,0 +1,159 @@
+name: Validation
+
+on:
+  pull_request:
+    branches: [main, fork_integration, fork_upstream]
+  push:
+    branches: [main, fork_integration, fork_upstream]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check-repo-state:
+    name: "🔍 Check Repository State"
+    runs-on: ubuntu-latest
+    outputs:
+      is_initialized: ${{ steps.check_init.outputs.initialized }}
+      is_java_repo: ${{ steps.check_java.outputs.is_java }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: "Check Repository Initialization"
+        id: check_init
+        run: |
+          # Check for key files that indicate repo is initialized
+          if [ -f "pom.xml" ] || [ -d "src" ]; then
+            echo "initialized=true" >> $GITHUB_OUTPUT
+          else
+            echo "initialized=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Check if Java Repository"
+        id: check_java
+        run: |
+          if [ -f "pom.xml" ] || [ -n "$(find . -name 'pom.xml' -type f)" ]; then
+            echo "is_java=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_java=false" >> $GITHUB_OUTPUT
+          fi
+
+  java-build:
+    name: "🔨 Java Build"
+    needs: check-repo-state
+    if: needs.check-repo-state.outputs.is_initialized == 'true' && needs.check-repo-state.outputs.is_java_repo == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      is_java_project: ${{ steps.build.outputs.is_java_project }}
+      build_result: ${{ steps.build.outputs.build_result }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: "Run Java Build"
+        id: build
+        uses: ./.github/actions/java-build
+        with:
+          generate_coverage: ${{ github.event_name == 'pull_request' }}
+
+  code-validation:
+    name: "✅ Code Quality Checks"
+    needs: [check-repo-state, java-build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Validate Commit Messages"
+        if: |
+          needs.check-repo-state.outputs.is_initialized == 'true' && 
+          github.actor != 'dependabot[bot]' &&
+          github.base_ref == 'main' &&
+          !contains(github.head_ref, 'fork_') &&
+          !startsWith(github.event.pull_request.title, 'chore(sync)')
+        uses: webiny/action-conventional-commits@v1.1.0
+        
+      - name: "Check for Merge Conflicts"
+        run: |
+          if git diff --check; then
+            echo "No conflict markers found"
+          else
+            echo "::error::Conflict markers found in files"
+            exit 1
+          fi
+          
+      - name: "Verify Branch Status"
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin
+          BASE_BRANCH="origin/${{ github.base_ref }}"
+          CURRENT_BRANCH="origin/${{ github.head_ref }}"
+          
+          git fetch origin ${{ github.base_ref }}
+          git fetch origin ${{ github.head_ref }}
+          
+          if ! git rev-parse --verify $BASE_BRANCH >/dev/null 2>&1; then
+            echo "::error::Base branch $BASE_BRANCH not found"
+            exit 1
+          fi
+          
+          if ! git rev-parse --verify $CURRENT_BRANCH >/dev/null 2>&1; then
+            echo "::error::Current branch $CURRENT_BRANCH not found"
+            exit 1
+          fi
+          
+          BEHIND_BY=$(git rev-list --count $CURRENT_BRANCH..$BASE_BRANCH)
+          
+          if [ "$BEHIND_BY" -gt 0 ]; then
+            echo "::error::Branch is behind $BASE_BRANCH by $BEHIND_BY commits. Please update your branch."
+            exit 1
+          fi
+
+      - name: "Prepare Validation Report"
+        id: status
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        run: |
+          # Initialize empty array
+          ITEMS="[]"
+          
+          # Add basic checks
+          ITEMS=$(echo "$ITEMS" | jq '. + ["✓ No Merge Conflicts"]')
+          ITEMS=$(echo "$ITEMS" | jq '. + ["✓ Branch is Up-to-date"]')
+          
+          # Add initialization and build status
+          if [[ "${{ needs.check-repo-state.outputs.is_initialized }}" == "true" ]]; then
+            if [[ "${{ needs.check-repo-state.outputs.is_java_repo }}" == "true" ]]; then
+              if [[ "${{ needs.java-build.result }}" == "success" ]]; then
+                ITEMS=$(echo "$ITEMS" | jq '. + ["✓ Java Build Successful"]')
+              else
+                ITEMS=$(echo "$ITEMS" | jq '. + ["❌ Java Build Failed"]')
+              fi
+            else
+              ITEMS=$(echo "$ITEMS" | jq '. + ["ℹ️ Non-Java Repository"]')
+            fi
+          else
+            ITEMS=$(echo "$ITEMS" | jq '. + ["ℹ️ Repository Not Yet Initialized"]')
+          fi
+
+          # Add Dependabot specific status if applicable
+          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            if [[ "${{ needs.java-build.result }}" == "success" ]]; then
+              ITEMS=$(echo "$ITEMS" | jq '. + ["✅ Dependency Update Build Successful"]')
+            else
+              ITEMS=$(echo "$ITEMS" | jq '. + ["❌ Dependency Update Build Failed"]')
+            fi
+          fi
+
+          # Set output with proper JSON escaping
+          echo "items=$(echo "$ITEMS" | jq -c '.')" >> $GITHUB_OUTPUT
+
+      - name: "Post PR Status"
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        uses: ./.github/actions/pr-status
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: ${{ github.event.pull_request.number }}
+          status_items: ${{ steps.status.outputs.items }}
