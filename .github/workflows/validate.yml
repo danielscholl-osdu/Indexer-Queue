@@ -21,7 +21,7 @@ jobs:
 
       - name: Check Conventional Commits
         if: steps.check_init.outputs.initialized == 'true'
-        uses: webiny/action-conventional-commits@v1.1.0
+        uses: webiny/action-conventional-commits@v1.3.0
         
       - name: Check for merge conflicts
         run: |
